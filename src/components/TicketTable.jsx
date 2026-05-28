@@ -1,18 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useApp } from '../context/AppContext';
-import { ROLES, ROLE_INFO, CATEGORIES } from '../data/mockData';
+import { ROLES, ROLE_INFO, CATEGORIES, STATUS_LABEL } from '../data/mockData';
 import TicketDetailModal from './TicketDetailModal';
 import { SLABadge, SLABar } from './SLAComponents';
-
-const STATUS_LABEL = {
-  new: { label: 'ใหม่', cls: 'badge-new' },
-  open: { label: 'เปิด', cls: 'badge-open' },
-  'in-progress': { label: 'กำลังดำเนินการ', cls: 'badge-in-progress' },
-  pending: { label: 'รออนุมัติ', cls: 'badge-pending' },
-  resolved: { label: 'แก้ไขแล้ว', cls: 'badge-resolved' },
-  closed: { label: 'ปิดแล้ว', cls: 'badge-closed' },
-  rejected: { label: 'ปฏิเสธ', cls: 'badge-rejected' },
-};
 
 const URGENCY_INFO = {
   low: { label: 'ต่ำ', cls: 'badge-low', dot: 'low' },
@@ -167,7 +157,7 @@ export default function TicketTable({ tickets, title = 'รายการ Ticke
             </thead>
             <tbody>
               {paginatedData.map(t => {
-                const statusInfo = STATUS_LABEL[t.status] || { label: t.status, cls: 'badge-new' };
+                const statusInfo = STATUS_LABEL[t.status] || { label: t.status, cls: 'status-pending' };
                 const urgInfo = URGENCY_INFO[t.urgency] || { label: t.urgency, cls: 'badge-medium', dot: 'medium' };
                 const catInfo = CATEGORIES[t.category];
                 return (
@@ -189,7 +179,7 @@ export default function TicketTable({ tickets, title = 'รายการ Ticke
                       </span>
                     </td>
                     <td>
-                      <span className={`badge ${statusInfo.cls}`}>{statusInfo.label}</span>
+                      <span className={`status-tag ${statusInfo.cls}`}>{statusInfo.label}</span>
                     </td>
                     <td style={{ minWidth: 180 }}>
                       <SLABar ticket={t} showLabel={false} />

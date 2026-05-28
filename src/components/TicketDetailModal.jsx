@@ -1,17 +1,7 @@
 import { useState } from 'react';
 import { useApp } from '../context/AppContext';
-import { CATEGORIES, ROLES, ROLE_INFO } from '../data/mockData';
+import { CATEGORIES, ROLES, ROLE_INFO, STATUS_LABEL } from '../data/mockData';
 import { SLADetail } from './SLAComponents';
-
-const STATUS_LABEL = {
-  new: { label: 'ใหม่', cls: 'badge-new' },
-  open: { label: 'เปิด', cls: 'badge-open' },
-  'in-progress': { label: 'กำลังดำเนินการ', cls: 'badge-in-progress' },
-  pending: { label: 'รออนุมัติ', cls: 'badge-pending' },
-  resolved: { label: 'แก้ไขแล้ว', cls: 'badge-resolved' },
-  closed: { label: 'ปิดแล้ว', cls: 'badge-closed' },
-  rejected: { label: 'ปฏิเสธ', cls: 'badge-rejected' },
-};
 
 const URGENCY_INFO = {
   low: { label: 'ต่ำ', cls: 'badge-low', dot: 'low' },
@@ -39,7 +29,7 @@ export default function TicketDetailModal({ ticket, onClose }) {
   const [activeTab, setActiveTab] = useState('info');
 
   const catInfo = CATEGORIES[ticket.category];
-  const statusInfo = STATUS_LABEL[ticket.status] || { label: ticket.status, cls: 'badge-new' };
+  const statusInfo = STATUS_LABEL[ticket.status] || { label: ticket.status, cls: 'status-pending' };
   const urgInfo = URGENCY_INFO[ticket.urgency] || { label: ticket.urgency, cls: 'badge-medium', dot: 'medium' };
   const roleInfo = ROLE_INFO[role];
 
@@ -59,7 +49,7 @@ export default function TicketDetailModal({ ticket, onClose }) {
               <div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                   <span className="ticket-id" style={{ fontSize: 14 }}>{ticket.id}</span>
-                  <span className={`badge ${statusInfo.cls}`}>{statusInfo.label}</span>
+                  <span className={`status-tag ${statusInfo.cls}`}>{statusInfo.label}</span>
                   <span className={`badge ${urgInfo.cls}`}>
                     <span className={`priority-dot ${urgInfo.dot}`}></span>
                     {urgInfo.label}
@@ -198,18 +188,38 @@ export default function TicketDetailModal({ ticket, onClose }) {
 
           {/* TIMELINE TAB */}
           {activeTab === 'timeline' && (
-            <div className="timeline">
-              {ticket.timeline.map((t, i) => (
-                <div key={i} className="timeline-item">
-                  <div className="timeline-dot" style={{ background: 'transparent', padding: 0, border: 'none' }}><div style={{ width: 30, height: 30, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--primary-pale)', color: 'var(--primary)', border: '2px solid var(--bg-card)', boxShadow: '0 0 0 2px var(--border-light)', flexShrink: 0 }}><i className={`fa-solid fa-${t.icon || 'circle-dot'}`} style={{ fontSize: 12 }}></i></div></div>
-                  <div className="timeline-content">
-                    <div className="timeline-title">{t.event}</div>
-                    <div className="timeline-time">
-                      {t.actor} · {t.time}
+            <div className="timeline" style={{ display: 'flex', flexDirection: 'column', gap: 16, padding: '16px 0', border: 'none' }}>
+              {ticket.timeline.map((t, i) => {
+                const isSystem = t.actor === 'System' || !t.actor;
+                
+                if (isSystem) {
+                  return (
+                    <div key={i} style={{ display: 'flex', justifyContent: 'center', margin: '8px 0' }}>
+                      <div style={{ background: 'var(--bg-main)', color: 'var(--text-muted)', fontSize: 11, padding: '4px 12px', borderRadius: 20 }}>
+                        <i className={`fa-solid fa-${t.icon || 'robot'}`} style={{ marginRight: 6 }}></i>
+                        {t.event} · {t.time}
+                      </div>
+                    </div>
+                  );
+                }
+
+                return (
+                  <div key={i} style={{ display: 'flex', gap: 12 }}>
+                    <div style={{ width: 36, height: 36, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--primary-pale)', color: 'var(--primary)', flexShrink: 0 }}>
+                      <i className={`fa-solid fa-${t.icon || 'user'}`} style={{ fontSize: 14 }}></i>
+                    </div>
+                    <div style={{ flex: 1 }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
+                        <span style={{ fontWeight: 600, fontSize: 13, color: 'var(--text-primary)' }}>{t.actor}</span>
+                        <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>{t.time}</span>
+                      </div>
+                      <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border-light)', borderRadius: '0 12px 12px 12px', padding: '10px 14px', fontSize: 13, color: 'var(--text-secondary)', boxShadow: 'var(--shadow-sm)' }}>
+                        {t.event}
+                      </div>
                     </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           )}
 

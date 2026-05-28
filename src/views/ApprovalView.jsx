@@ -1,17 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useApp } from '../context/AppContext';
-import { CATEGORIES, ROLE_INFO } from '../data/mockData';
+import { CATEGORIES, ROLE_INFO, STATUS_LABEL } from '../data/mockData';
 import TicketDetailModal from '../components/TicketDetailModal';
-
-const STATUS_LABEL = {
-  new: { label: 'ใหม่', cls: 'badge-new' },
-  open: { label: 'เปิด', cls: 'badge-open' },
-  'in-progress': { label: 'กำลังดำเนินการ', cls: 'badge-in-progress' },
-  pending: { label: 'รออนุมัติ', cls: 'badge-pending' },
-  resolved: { label: 'แก้ไขแล้ว', cls: 'badge-resolved' },
-  closed: { label: 'ปิดแล้ว', cls: 'badge-closed' },
-  rejected: { label: 'ปฏิเสธ', cls: 'badge-rejected' },
-};
 
 export default function ApprovalView() {
   const { tickets, role } = useApp();
@@ -193,7 +183,7 @@ export default function ApprovalView() {
               <tbody>
                 {paginatedHistory.map(t => {
                   const catInfo = CATEGORIES[t.category];
-                  const statusInfo = STATUS_LABEL[t.status] || { label: t.status, cls: 'badge-new' };
+                  const statusInfo = STATUS_LABEL[t.status] || { label: t.status, cls: 'status-pending' };
                   return (
                     <tr key={t.id}>
                       <td><span className="ticket-id">{t.id}</span></td>
@@ -212,7 +202,7 @@ export default function ApprovalView() {
                         </span>
                       </td>
                       <td>
-                        <span className={`badge ${statusInfo.cls}`}>{statusInfo.label}</span>
+                        <span className={`status-tag ${statusInfo.cls}`}>{statusInfo.label}</span>
                       </td>
                       <td>{t.createdBy}</td>
                       <td>

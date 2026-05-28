@@ -2,17 +2,15 @@ import { useState, useRef } from 'react';
 import { useApp } from '../context/AppContext';
 import { CATEGORIES, URGENCY_LEVELS, ROLE_INFO, DEPARTMENTS } from '../data/mockData';
 
-// ── Category card colours ──
 const CAT_THEME = {
-  machinery: { bg: '#eff6ff', border: '#bfdbfe', active: '#2563eb', iconColor: '#2563eb' },
-  facility:  { bg: '#f0fdf4', border: '#bbf7d0', active: '#16a34a', iconColor: '#16a34a' },
-  safety:    { bg: '#fff5f5', border: '#fecaca', active: '#ef4444', iconColor: '#ef4444' },
-  quality:   { bg: '#faf5ff', border: '#e9d5ff', active: '#7c3aed', iconColor: '#7c3aed' },
-  it:        { bg: '#fff7ed', border: '#fed7aa', active: '#c2410c', iconColor: '#c2410c' },
+  mechanical: { bg: '#fff7ed', border: '#fed7aa', active: '#ea580c', iconColor: '#ea580c' },
+  electrical: { bg: '#fefce8', border: '#fef08a', active: '#ca8a04', iconColor: '#ca8a04' },
+  facility:   { bg: '#f0fdf4', border: '#bbf7d0', active: '#16a34a', iconColor: '#16a34a' },
+  it_support: { bg: '#eff6ff', border: '#bfdbfe', active: '#2563eb', iconColor: '#2563eb' },
 };
 
 export default function TicketFormModal({ onClose }) {
-  const { createTicket, role } = useApp();
+  const { createTicket, role, addToast } = useApp();
   const info = ROLE_INFO[role];
   const fileRef = useRef();
 
@@ -56,7 +54,11 @@ export default function TicketFormModal({ onClose }) {
   const handleSubmit = (e) => {
     e.preventDefault();
     const errs = validate();
-    if (Object.keys(errs).length) { setErrors(errs); return; }
+    if (Object.keys(errs).length) { 
+      setErrors(errs); 
+      addToast('กรุณากรอกข้อมูลให้ครบถ้วน', 'error');
+      return; 
+    }
     setSubmitting(true);
     setTimeout(() => {
       createTicket({
@@ -82,10 +84,10 @@ export default function TicketFormModal({ onClose }) {
           <div className="modal-title-wrap">
             <div className="modal-icon-title">
               <div className="modal-header-icon">
-                <i className="fa-solid fa-pen-to-square" style={{ color: 'var(--primary)', fontSize: 18 }} aria-hidden="true"></i>
+                <i className="fa-solid fa-ticket" style={{ color: 'var(--primary)', fontSize: 18 }} aria-hidden="true"></i>
               </div>
               <div>
-                <h2 className="modal-title" id="form-modal-title">แจ้งปัญหา / ขอใช้บริการ</h2>
+                <h2 className="modal-title" id="form-modal-title">แจ้งเรื่องใหม่</h2>
                 <p className="modal-subtitle">กรอกข้อมูลให้ครบถ้วน เพื่อให้ทีม IT ช่วยได้รวดเร็วที่สุด</p>
               </div>
             </div>
@@ -156,7 +158,7 @@ export default function TicketFormModal({ onClose }) {
 
                 <div style={{
                   display: 'grid',
-                  gridTemplateColumns: 'repeat(5, 1fr)',
+                  gridTemplateColumns: 'repeat(4, 1fr)',
                   gap: 8,
                 }}>
                   {Object.entries(CATEGORIES).map(([key, cat]) => {

@@ -3,6 +3,7 @@ import { AppProvider, useApp } from './context/AppContext';
 import { ROLES, ROLE_INFO } from './data/mockData';
 
 import Sidebar from './components/Sidebar';
+import BottomNav from './components/BottomNav';
 import TicketTable from './components/TicketTable';
 import SearchModal from './components/SearchModal';
 import TicketFormModal from './components/TicketFormModal';
@@ -16,16 +17,18 @@ import './index.css';
 
 // ── Toast notifications ──
 function ToastContainer() {
-  const { toasts } = useApp();
-  const typeIcon = { success: 'check', error: 'xmark', warning: 'triangle-exclamation', info: 'circle-info' };
-  const typeColor = { success: '#10b981', error: '#ef4444', warning: '#f59e0b', info: '#3b82f6' };
-
+  const { toasts, removeToast } = useApp();
+  const typeIcon = { success: 'circle-check', error: 'circle-xmark', warning: 'triangle-exclamation', info: 'circle-info' };
+  
   return (
     <div className="toast-container">
       {toasts.map(t => (
         <div key={t.id} className={`toast ${t.type}`}>
-          <span className="toast-icon"><i className={`fa-solid fa-${typeIcon[t.type] || 'check'}`}  aria-hidden="true"></i></span>
+          <span className="toast-icon"><i className={`fa-solid fa-${typeIcon[t.type] || 'circle-check'}`} aria-hidden="true"></i></span>
           <span className="toast-msg">{t.msg}</span>
+          <button className="toast-close" onClick={() => removeToast(t.id)} aria-label="Close">
+            <i className="fa-solid fa-xmark" aria-hidden="true"></i>
+          </button>
         </div>
       ))}
     </div>
@@ -57,7 +60,7 @@ function Topbar({ onCreateTicket }) {
     'my-tickets':    { title: 'Ticket ของฉัน', sub: 'รายการที่คุณแจ้งซ่อม' },
     'all-tickets':   { title: 'Ticket ทั้งหมด', sub: 'จัดการงานซ่อมบำรุง' },
     'dept-tickets':  { title: 'Ticket ของแผนก', sub: 'รายการซ่อมในไลน์ผลิต/แผนก' },
-    'create-ticket': { title: 'แจ้งซ่อม/แจ้งปัญหา', sub: 'สร้าง Ticket ใหม่' },
+    'create-ticket': { title: 'แจ้งเรื่องใหม่', sub: 'สร้าง Ticket ใหม่' },
     track:           { title: 'ติดตามสถานะ', sub: 'ตรวจสอบความคืบหน้างานซ่อม' },
     approval:        { title: 'การอนุมัติ', sub: 'งานซ่อมที่รออนุมัติ' },
     'approved-history': { title: 'ประวัติการอนุมัติ', sub: '' },
@@ -94,7 +97,7 @@ function Topbar({ onCreateTicket }) {
             onClick={onCreateTicket}
             id="topbar-create-btn"
           >
-            <i className="fa-solid fa-plus" style={{marginRight: 6}}></i> แจ้งซ่อม/แจ้งปัญหา
+            <i className="fa-solid fa-ticket" style={{marginRight: 6}}></i> แจ้งเรื่องใหม่
           </button>
         )}
 
@@ -115,8 +118,8 @@ function Topbar({ onCreateTicket }) {
             id="notif-btn"
             onClick={() => setShowNotif(!showNotif)}
           >
-            <i className="fa-solid fa-bell"></i>
-            {unreadCount > 0 && <span className="notif-dot" />}
+            <i className={`fa-solid fa-bell ${unreadCount > 0 ? 'bell-ringing' : ''}`}></i>
+            {unreadCount > 0 && <span className="notification-badge">{unreadCount}</span>}
           </div>
 
           {showNotif && (
@@ -393,6 +396,7 @@ function AppShell() {
       <div className="main-content">
         <MainContent />
       </div>
+      <BottomNav />
       <ToastContainer />
     </div>
   );

@@ -14,7 +14,7 @@ const NAV_CONFIG = {
     {
       section: 'การดำเนินการ',
       items: [
-        { id: 'create-ticket', icon: 'plus',           label: 'แจ้งเรื่อง' },
+        { id: 'create-ticket', icon: 'ticket',           label: 'แจ้งเรื่องใหม่' },
         { id: 'track',         icon: 'magnifying-glass', label: 'ติดตามสถานะ' },
       ],
     },

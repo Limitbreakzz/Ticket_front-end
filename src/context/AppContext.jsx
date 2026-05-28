@@ -107,6 +107,10 @@ export function AppProvider({ children }) {
     setTimeout(() => setToasts(t => t.filter(x => x.id !== id)), 3500);
   }, []);
 
+  const removeToast = useCallback((id) => {
+    setToasts(t => t.filter(x => x.id !== id));
+  }, []);
+
   const addNotification = useCallback((ticketId, title, message, type = 'info') => {
     const id = Date.now();
     const newNotif = {
@@ -254,6 +258,7 @@ export function AppProvider({ children }) {
       approveTicket,
       assignTicket,
       addToast,
+      removeToast,
     }}>
       {children}
     </AppContext.Provider>
