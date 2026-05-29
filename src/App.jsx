@@ -295,9 +295,10 @@ function CreateTicketRedirect({ onOpen, onRedirect }) {
 
 // ── Main router ──
 function MainContent() {
-  const { activeNav, role, setActiveNav } = useApp();
+  const { activeNav, role, setActiveNav, setRole } = useApp();
   const [showForm, setShowForm] = useState(false);
   const { tickets } = useApp();
+  const info = ROLE_INFO[role];
 
   const renderView = () => {
     switch (activeNav) {
@@ -357,6 +358,71 @@ function MainContent() {
       // SLA
       case 'sla':
         return <SLAView />;
+
+      // Profile View
+      case 'profile':
+        return (
+          <div className="view-container">
+            <div style={{ background: 'var(--bg-card)', padding: 32, borderRadius: 'var(--radius-xl)', boxShadow: 'var(--shadow-sm)', border: '1px solid var(--border-light)', maxWidth: 600, margin: '0 auto' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 16, borderBottom: '1px solid var(--border-light)', paddingBottom: 24, marginBottom: 24 }}>
+                <div style={{ width: 80, height: 80, borderRadius: '50%', background: info.color, color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 32, fontWeight: 800, boxShadow: 'var(--shadow-md)' }}>
+                  {info.initials}
+                </div>
+                <div style={{ textAlign: 'center' }}>
+                  <h2 style={{ fontSize: 22, fontWeight: 800, color: 'var(--text-primary)', margin: '0 0 4px 0' }}>{info.name}</h2>
+                  <span className="status-tag status-progress" style={{ fontSize: 13, background: 'var(--primary-pale)', color: 'var(--primary)', borderColor: 'var(--primary-light)', padding: '4px 12px' }}>{info.label}</span>
+                </div>
+              </div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
+                <div>
+                  <div style={{ fontSize: 11, color: 'var(--text-muted)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 6 }}>สิทธิ์การใช้งาน (Role)</div>
+                  <div style={{ fontSize: 14, fontWeight: 600, color: 'var(--text-primary)' }}>{info.desc}</div>
+                </div>
+                <div>
+                  <div style={{ fontSize: 11, color: 'var(--text-muted)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 6 }}>ฝ่าย/แผนก (Department)</div>
+                  <div style={{ fontSize: 14, fontWeight: 600, color: 'var(--text-primary)' }}>{role === ROLES.EMPLOYEE ? 'ฝ่ายผลิต 1' : role === ROLES.MANAGER ? 'ฝ่ายซ่อมบำรุง' : 'ส่วนกลาง'}</div>
+                </div>
+                <div>
+                  <div style={{ fontSize: 11, color: 'var(--text-muted)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 8 }}>สลับบทบาทสำหรับทดสอบ (Demo Accounts)</div>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                    {Object.entries(ROLE_INFO).map(([key, ri]) => (
+                      <button
+                        key={key}
+                        onClick={() => {
+                          setRole(key);
+                          setActiveNav('dashboard');
+                        }}
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: 12,
+                          padding: '10px 14px',
+                          border: '1px solid var(--border-light)',
+                          background: key === role ? 'var(--primary-pale)' : 'var(--bg-main)',
+                          color: key === role ? 'var(--primary)' : 'var(--text-primary)',
+                          borderRadius: 'var(--radius-lg)',
+                          cursor: 'pointer',
+                          fontWeight: 600,
+                          textAlign: 'left',
+                          transition: 'var(--transition)'
+                        }}
+                      >
+                        <div style={{ width: 24, height: 24, borderRadius: '50%', background: ri.color, color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, fontWeight: 700 }}>
+                          {ri.initials}
+                        </div>
+                        <div style={{ flex: 1 }}>
+                          <div style={{ fontSize: 13 }}>{ri.name}</div>
+                          <div style={{ fontSize: 11, opacity: 0.7, fontWeight: 400 }}>{ri.label}</div>
+                        </div>
+                        {key === role && <i className="fa-solid fa-circle-check" style={{ color: 'var(--primary)' }}></i>}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        );
 
       // Stubs
       case 'reports':

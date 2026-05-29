@@ -51,7 +51,7 @@ export default function ApprovalView() {
   };
 
   return (
-    <div>
+    <div className="view-container">
       <div style={{ marginBottom: 24 }}>
         <h2 style={{ fontSize: 20, fontWeight: 800, color: 'var(--text-primary)', margin: 0 }}>
           การอนุมัติ Ticket

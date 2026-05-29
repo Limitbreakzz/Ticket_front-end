@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { useApp } from '../context/AppContext';
 import { CATEGORIES, URGENCY_LEVELS, ROLE_INFO, DEPARTMENTS } from '../data/mockData';
 
@@ -20,13 +20,38 @@ export default function TicketFormModal({ onClose }) {
     category: '',
     subCategory: '',
     urgency: '',
-    department: info.desc || 'ฝ่ายผลิต 1',
+    department: '',
   });
   const [file, setFile]       = useState(null);
   const [fileErr, setFileErr] = useState('');
   const [drag, setDrag]       = useState(false);
   const [errors, setErrors]   = useState({});
   const [submitting, setSubmitting] = useState(false);
+  const [viewImage, setViewImage] = useState(null);
+
+  const [deptSearch, setDeptSearch] = useState('');
+  const [showDeptDropdown, setShowDeptDropdown] = useState(false);
+  const deptDropdownRef = useRef(null);
+
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (deptDropdownRef.current && !deptDropdownRef.current.contains(e.target)) {
+        setShowDeptDropdown(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  const filteredDepts = DEPARTMENTS.filter(dept =>
+    dept.toLowerCase().includes(deptSearch.toLowerCase())
+  );
+
+  const selectDepartment = (dept) => {
+    set('department', dept);
+    setDeptSearch(dept);
+    setShowDeptDropdown(false);
+  };
 
   const set = (k, v) => {
     setForm(f => ({ ...f, [k]: v }));
@@ -88,7 +113,7 @@ export default function TicketFormModal({ onClose }) {
               </div>
               <div>
                 <h2 className="modal-title" id="form-modal-title">แจ้งเรื่องใหม่</h2>
-                <p className="modal-subtitle">กรอกข้อมูลให้ครบถ้วน เพื่อให้ทีม IT ช่วยได้รวดเร็วที่สุด</p>
+                <p className="modal-subtitle">กรอกข้อมูลให้ครบถ้วน</p>
               </div>
             </div>
           </div>
@@ -125,22 +150,140 @@ export default function TicketFormModal({ onClose }) {
               </div>
 
               {/* Department */}
-              <div className="form-group">
+              <div className="form-group" style={{ position: 'relative' }} ref={deptDropdownRef}>
                 <label className="form-label">
                   <i className="fa-solid fa-building" style={{ marginRight: 6, color: 'var(--primary)' }} aria-hidden="true"></i>
                   แผนก / ฝ่าย <span>*</span>
                 </label>
-                <select
-                  id="form-department"
-                  className="form-select"
-                  value={form.department}
-                  onChange={e => set('department', e.target.value)}
-                >
-                  <option value="">-- เลือกแผนก / ฝ่าย --</option>
-                  {DEPARTMENTS.map(dept => (
-                    <option key={dept} value={dept}>{dept}</option>
-                  ))}
-                </select>
+                <div style={{ position: 'relative' }}>
+                  <div 
+                    onClick={() => {
+                      setDeptSearch('');
+                      setShowDeptDropdown(!showDeptDropdown);
+                    }}
+                    className="form-select"
+                    style={{ 
+                      display: 'flex', 
+                      alignItems: 'center', 
+                      justifyContent: 'space-between', 
+                      cursor: 'pointer',
+                      background: 'var(--bg-main)',
+                      padding: '9px 12px',
+                      minHeight: '38px',
+                      userSelect: 'none',
+                    }}
+                    id="form-department-dropdown-trigger"
+                  >
+                    <span style={{ color: form.department ? 'var(--text-primary)' : 'var(--text-muted)' }}>
+                      {form.department || '-- เลือกแผนก / ฝ่าย --'}
+                    </span>
+                    <i className="fa-solid fa-chevron-down" style={{ fontSize: 12, color: 'var(--text-muted)' }} aria-hidden="true"></i>
+                  </div>
+                </div>
+
+                {showDeptDropdown && (
+                  <div
+                    style={{
+                      position: 'absolute',
+                      top: 'calc(100% + 4px)',
+                      left: 0,
+                      right: 0,
+                      background: 'var(--bg-card)',
+                      border: '1.5px solid var(--border)',
+                      borderRadius: 'var(--radius-md)',
+                      boxShadow: 'var(--shadow-lg)',
+                      zIndex: 100,
+                      padding: '8px',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      gap: 8,
+                      animation: 'fadeIn 0.12s ease',
+                    }}
+                  >
+                    {/* Search Input Inside the Dropdown Menu */}
+                    <div style={{ position: 'relative' }}>
+                      <input
+                        type="text"
+                        className="form-input"
+                        placeholder="พิมพ์เพื่อค้นหาแผนก..."
+                        value={deptSearch}
+                        onChange={(e) => setDeptSearch(e.target.value)}
+                        style={{ 
+                          width: '100%', 
+                          paddingRight: '32px',
+                          paddingTop: '6px',
+                          paddingBottom: '6px',
+                          fontSize: '12.5px',
+                        }}
+                        autoFocus
+                        autoComplete="off"
+                        onClick={(e) => e.stopPropagation()} // Prevent closing dropdown when clicking the search box
+                      />
+                      <i 
+                        className="fa-solid fa-magnifying-glass" 
+                        style={{ 
+                          position: 'absolute', 
+                          right: 12, 
+                          top: '50%', 
+                          transform: 'translateY(-50%)', 
+                          color: 'var(--text-muted)', 
+                          fontSize: 12 
+                        }} 
+                        aria-hidden="true"
+                      ></i>
+                    </div>
+
+                    {/* Options List */}
+                    <div style={{ maxHeight: '160px', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: 2 }}>
+                      {filteredDepts.length === 0 ? (
+                        <div style={{ padding: '8px 12px', fontSize: 13, color: 'var(--text-muted)', textAlign: 'center' }}>
+                          <i className="fa-solid fa-triangle-exclamation" style={{ marginRight: 6 }} aria-hidden="true"></i>
+                          ไม่พบแผนกที่ค้นหา
+                        </div>
+                      ) : (
+                        filteredDepts.map(dept => {
+                          const isSelected = form.department === dept;
+                          return (
+                            <button
+                              type="button"
+                              key={dept}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                selectDepartment(dept);
+                              }}
+                              style={{
+                                width: '100%',
+                                textAlign: 'left',
+                                padding: '8px 12px',
+                                border: 'none',
+                                background: isSelected ? 'var(--primary-pale)' : 'transparent',
+                                color: isSelected ? 'var(--primary)' : 'var(--text-primary)',
+                                fontSize: 13,
+                                fontWeight: isSelected ? 700 : 500,
+                                borderRadius: 'var(--radius-sm)',
+                                cursor: 'pointer',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'space-between',
+                                transition: 'background 0.15s ease',
+                              }}
+                              onMouseEnter={(e) => {
+                                if (!isSelected) e.currentTarget.style.background = 'var(--bg-main)';
+                              }}
+                              onMouseLeave={(e) => {
+                                if (!isSelected) e.currentTarget.style.background = 'transparent';
+                              }}
+                            >
+                              <span>{dept}</span>
+                              {isSelected && <i className="fa-solid fa-check" style={{ fontSize: 11 }} aria-hidden="true"></i>}
+                            </button>
+                          );
+                        })
+                      )}
+                    </div>
+                  </div>
+                )}
+                
                 {errors.department && (
                   <span className="form-error">
                     <i className="fa-solid fa-triangle-exclamation" style={{ marginRight: 4 }} aria-hidden="true"></i>
@@ -156,11 +299,7 @@ export default function TicketFormModal({ onClose }) {
                   หมวดหมู่ <span>*</span>
                 </label>
 
-                <div style={{
-                  display: 'grid',
-                  gridTemplateColumns: 'repeat(4, 1fr)',
-                  gap: 8,
-                }}>
+                <div className="category-grid">
                   {Object.entries(CATEGORIES).map(([key, cat]) => {
                     const theme = CAT_THEME[key];
                     const isActive = form.category === key;
@@ -291,7 +430,7 @@ export default function TicketFormModal({ onClose }) {
                   <i className="fa-solid fa-gauge-high" style={{ marginRight: 6, color: 'var(--primary)' }} aria-hidden="true"></i>
                   ระดับความเร่งด่วน <span>*</span>
                 </label>
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 8 }}>
+                <div className="urgency-grid">
                   {URGENCY_LEVELS.map(u => {
                     const isActive = form.urgency === u.value;
                     return (
@@ -373,11 +512,32 @@ export default function TicketFormModal({ onClose }) {
                 )}
                 {file && (
                   <div className="upload-preview" style={{ flexDirection: 'column', alignItems: 'stretch', gap: 8, padding: 12 }}>
-                    <div style={{ position: 'relative' }}>
-                      <img src={URL.createObjectURL(file)} alt="preview" style={{ width: '100%', height: 180, objectFit: 'cover', borderRadius: 'var(--radius-sm)' }} />
+                    <div style={{ position: 'relative', borderRadius: 'var(--radius-sm)', overflow: 'hidden' }}>
+                      <div
+                        onClick={() => setViewImage(URL.createObjectURL(file))}
+                        className="preview-image-container"
+                      >
+                        <img 
+                          src={URL.createObjectURL(file)} 
+                          alt="preview" 
+                        />
+                        <div className="preview-image-overlay">
+                          <i className="fa-solid fa-magnifying-glass-plus" aria-hidden="true"></i>
+                          <span>คลิกเพื่อดูรูปขนาดเต็ม</span>
+                        </div>
+                      </div>
+                      
+                      <div className="preview-image-badge">
+                        <i className="fa-solid fa-eye" aria-hidden="true"></i>
+                        กดเพื่อดูรูป
+                      </div>
+
                       <button
                         type="button"
-                        onClick={() => setFile(null)}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setFile(null);
+                        }}
                         title="ลบไฟล์"
                         style={{
                           position: 'absolute', top: 8, right: 8,
@@ -385,7 +545,8 @@ export default function TicketFormModal({ onClose }) {
                           border: 'none', borderRadius: '50%',
                           width: 28, height: 28,
                           display: 'flex', alignItems: 'center', justifyContent: 'center',
-                          cursor: 'pointer'
+                          cursor: 'pointer',
+                          zIndex: 10,
                         }}
                       >
                         <i className="fa-solid fa-xmark"  aria-hidden="true"></i>
@@ -443,6 +604,33 @@ export default function TicketFormModal({ onClose }) {
           </div>
         </form>
       </div>
+
+      {viewImage && (
+        <div 
+          className="lightbox-overlay" 
+          onClick={() => setViewImage(null)}
+        >
+          <div 
+            className="lightbox-content"
+            onClick={e => e.stopPropagation()}
+          >
+            <img 
+              src={viewImage} 
+              alt="Full view" 
+            />
+            <button
+              className="lightbox-close"
+              onClick={() => setViewImage(null)}
+              title="ปิด"
+            >
+              <i className="fa-solid fa-xmark" aria-hidden="true"></i>
+            </button>
+            <div className="lightbox-filename">
+              {file?.name}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

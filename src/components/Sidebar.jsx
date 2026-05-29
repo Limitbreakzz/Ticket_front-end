@@ -131,55 +131,91 @@ export default function Sidebar() {
 
       {/* Footer */}
       <div className="sidebar-footer" style={{ position: 'relative' }}>
-        <div className="sidebar-footer-btn" onClick={() => { setActiveNav('settings'); setShowRoleDropdown(false); }}>
-          <i className="fa-solid fa-gear" style={{ fontSize: 14 }} aria-hidden="true"></i>
-          <span>การตั้งค่า</span>
-        </div>
         
-        <div className="sidebar-footer-btn" style={{ color: 'var(--danger)' }}>
-          <i className="fa-solid fa-right-from-bracket" style={{ fontSize: 14 }} aria-hidden="true"></i>
-          <span>ออกจากระบบ</span>
+        {/* Role Switcher in Footer */}
+        <div className="profile-box" onClick={() => setShowRoleDropdown(v => !v)}>
+          <div className={`profile-avatar ${role}`}>
+            {info.initials}
+          </div>
+          <div className="profile-info">
+            <span className="profile-name">{info.name}</span>
+            <span className="profile-email">
+              {role === ROLES.EMPLOYEE ? 'somchai.j@factory.com' : role === ROLES.MANAGER ? 'wipa.r@factory.com' : 'thana.s@factory.com'}
+            </span>
+          </div>
+          <i className="fa-solid fa-arrows-up-down profile-chevron" aria-hidden="true"></i>
         </div>
 
-        <div style={{ borderTop: '1px solid var(--border-light)', margin: '12px -12px', padding: '12px 12px 0' }}>
-          {/* Role Switcher in Footer */}
-          <div className="sidebar-role" onClick={() => setShowRoleDropdown(v => !v)} style={{ margin: 0, padding: '8px' }}>
-            <div className={`role-avatar ${role}`} style={{ width: 32, height: 32, fontSize: 13 }}>
-              {info.initials}
-            </div>
-            <div className="role-info">
-              <div className="role-name">{info.name}</div>
-              <div className="role-label">{info.label}</div>
-            </div>
-            <i className={`fa-solid fa-${showRoleDropdown ? 'chevron-down' : 'chevron-up'} role-chevron`}  aria-hidden="true"></i>
-          </div>
-
-          {showRoleDropdown && (
-            <div className="role-dropdown" style={{ top: 'auto', bottom: '100%', marginBottom: '10px', boxShadow: '0 -4px 20px rgba(0,0,0,0.1)' }}>
-              <div style={{ padding: '8px 14px 6px', fontSize: 11, fontWeight: 700, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.07em' }}>
-                บัญชี Demo
+        {showRoleDropdown && (
+          <>
+            <div 
+              onClick={() => setShowRoleDropdown(false)}
+              style={{
+                position: 'fixed',
+                top: 0, left: 0, right: 0, bottom: 0,
+                zIndex: 999,
+                background: 'transparent'
+              }}
+            />
+            <div className="shadcn-dropdown">
+              {/* Header */}
+              <div className="shadcn-dropdown-header">
+                <div className={`profile-avatar ${role}`} style={{ width: 36, height: 36, fontSize: 15 }}>
+                  {info.initials}
+                </div>
+                <div className="profile-info">
+                  <span className="profile-name" style={{ fontSize: 13.5 }}>{info.name}</span>
+                  <span className="profile-email">
+                    {role === ROLES.EMPLOYEE ? 'somchai.j@factory.com' : role === ROLES.MANAGER ? 'wipa.r@factory.com' : 'thana.s@factory.com'}
+                  </span>
+                </div>
               </div>
+
+              <div className="shadcn-dropdown-divider" />
+
+              {/* Demo Section */}
+              <div className="shadcn-dropdown-section-title">สลับบทบาท (Demo)</div>
               {Object.entries(ROLE_INFO).map(([key, ri]) => (
                 <div
                   key={key}
-                  className="role-option"
+                  className="shadcn-dropdown-item"
                   onClick={() => { setRole(key); setActiveNav('dashboard'); setShowRoleDropdown(false); }}
                 >
-                  <div className={`role-option-avatar ${key}`} style={{ background: ri.color }}>
-                    <i className={`fa-solid fa-${ROLE_ICON[key]}`} style={{ color: '#fff', fontSize: 13 }} aria-hidden="true"></i>
+                  <div className={`item-avatar ${key}`}>
+                    {ri.initials}
                   </div>
-                  <div>
-                    <div className="role-option-name">{ri.name}</div>
-                    <div className="role-option-desc">{ri.label} — {ri.desc}</div>
+                  <div className="item-text-wrapper">
+                    <span className="item-name">{ri.name}</span>
+                    <span className="item-desc">{ri.label} — {ri.desc}</span>
                   </div>
                   {key === role && (
-                    <i className="fa-solid fa-check" style={{ marginLeft: 'auto', color: '#10b981', fontSize: 14 }} aria-hidden="true"></i>
+                    <i className="fa-solid fa-check" style={{ marginLeft: 'auto', color: 'var(--success)', fontSize: 12 }} aria-hidden="true"></i>
                   )}
                 </div>
               ))}
+
+              <div className="shadcn-dropdown-divider" />
+
+              {/* Actions Section */}
+              <div className="shadcn-dropdown-item" onClick={() => { setActiveNav('settings'); setShowRoleDropdown(false); }}>
+                <span className="item-icon"><i className="fa-solid fa-gear"></i></span>
+                <span>การตั้งค่า</span>
+              </div>
+              <div className="shadcn-dropdown-item" onClick={() => { setActiveNav('faq'); setShowRoleDropdown(false); }}>
+                <span className="item-icon"><i className="fa-solid fa-circle-question"></i></span>
+                <span>คู่มือ & คำถามทั่วไป</span>
+              </div>
+
+              <div className="shadcn-dropdown-divider" />
+
+              {/* Logout */}
+              <div className="shadcn-dropdown-item danger" onClick={() => setShowRoleDropdown(false)}>
+                <span className="item-icon"><i className="fa-solid fa-right-from-bracket"></i></span>
+                <span>ออกจากระบบ</span>
+              </div>
             </div>
-          )}
-        </div>
+          </>
+        )}
       </div>
     </aside>
   );

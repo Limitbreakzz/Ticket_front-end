@@ -108,7 +108,7 @@ export default function SLAView() {
   };
 
   return (
-    <div>
+    <div className="view-container">
       {/* Header */}
       <div style={{ marginBottom: 24 }}>
         <h2 style={{ fontSize: 20, fontWeight: 800, color: 'var(--text-primary)', margin: 0 }}>

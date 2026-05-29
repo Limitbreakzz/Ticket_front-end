@@ -27,6 +27,7 @@ export default function TicketDetailModal({ ticket, onClose }) {
   const [assignee, setAssignee] = useState(ticket.assignedTo);
   const [approvalNote, setApprovalNote] = useState('');
   const [activeTab, setActiveTab] = useState('info');
+  const [viewImage, setViewImage] = useState(null);
 
   const catInfo = CATEGORIES[ticket.category];
   const statusInfo = STATUS_LABEL[ticket.status] || { label: ticket.status, cls: 'status-pending' };
@@ -65,10 +66,7 @@ export default function TicketDetailModal({ ticket, onClose }) {
         </div>
 
         {/* Tabs */}
-        <div style={{
-          display: 'flex', borderBottom: '1px solid var(--border-light)',
-          padding: '0 28px', gap: 0, flexShrink: 0
-        }}>
+        <div className="modal-tabs">
           {[
             { id: 'info', label: 'ข้อมูล' },
             { id: 'timeline', label: 'ประวัติ' },
@@ -179,7 +177,24 @@ export default function TicketDetailModal({ ticket, onClose }) {
                   <div className="divider" />
                   <div className="detail-section">
                     <div className="detail-section-title">ภาพแนบ</div>
-                    <img src={ticket.image} alt="ภาพแนบ" className="detail-image" />
+                    <div style={{ position: 'relative', borderRadius: 'var(--radius-md)', overflow: 'hidden', display: 'inline-block', maxWidth: '100%' }}>
+                      <div
+                        onClick={() => setViewImage(ticket.image)}
+                        className="preview-image-container"
+                        style={{ height: 'auto', maxHeight: 300, maxWidth: '100%', display: 'block' }}
+                      >
+                        <img src={ticket.image} alt="ภาพแนบ" className="detail-image" style={{ margin: 0, display: 'block', cursor: 'pointer' }} />
+                        <div className="preview-image-overlay">
+                          <i className="fa-solid fa-magnifying-glass-plus" aria-hidden="true"></i>
+                          <span>คลิกเพื่อดูรูปขนาดเต็ม</span>
+                        </div>
+                      </div>
+                      
+                      <div className="preview-image-badge">
+                        <i className="fa-solid fa-eye" aria-hidden="true"></i>
+                        กดเพื่อดูรูป
+                      </div>
+                    </div>
                   </div>
                 </>
               )}
@@ -372,6 +387,33 @@ export default function TicketDetailModal({ ticket, onClose }) {
           <button className="btn btn-ghost" onClick={onClose}>ปิด</button>
         </div>
       </div>
+
+      {viewImage && (
+        <div 
+          className="lightbox-overlay" 
+          onClick={() => setViewImage(null)}
+        >
+          <div 
+            className="lightbox-content"
+            onClick={e => e.stopPropagation()}
+          >
+            <img 
+              src={viewImage} 
+              alt="Full view" 
+            />
+            <button
+              className="lightbox-close"
+              onClick={() => setViewImage(null)}
+              title="ปิด"
+            >
+              <i className="fa-solid fa-xmark" aria-hidden="true"></i>
+            </button>
+            <div className="lightbox-filename">
+              {ticket.id} - ภาพแนบ
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

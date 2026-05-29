@@ -7,31 +7,20 @@ export default function DashboardView() {
 
   // Stats calculation
   const totalTickets = tickets.length;
+  const newTickets = tickets.filter(t => t.status === 'new').length;
+  const inProgressTickets = tickets.filter(t => t.status === 'in-progress' || t.status === 'progress').length;
+  const resolvedTickets = tickets.filter(t => t.status === 'resolved').length;
   const criticalTickets = tickets.filter(t => t.urgency === 'critical').length;
   const waitApproveTickets = tickets.filter(t => t.status === 'wait-approve').length;
-
-  const inProgressTickets = tickets.filter(t => t.status === 'progress').length;
-  const resolvedTickets = tickets.filter(t => t.status === 'resolved').length;
   const pendingTickets = tickets.filter(t => t.status === 'pending').length;
 
   const recentTickets = [...tickets].sort((a, b) => b.id.localeCompare(a.id)).slice(0, 5);
 
   return (
-    <div style={{ padding: '24px', maxWidth: 1200, margin: '0 auto', display: 'flex', flexDirection: 'column', gap: 24 }}>
+    <div className="view-container" style={{ maxWidth: 1200, margin: '0 auto', display: 'flex', flexDirection: 'column', gap: 24 }}>
 
       {/* ── Hero / Greeting ── */}
-      <div style={{
-        background: 'linear-gradient(135deg, var(--primary), var(--accent))',
-        borderRadius: 'var(--radius-xl)',
-        padding: '32px',
-        color: 'white',
-        boxShadow: 'var(--shadow-md)',
-        display: 'flex',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        flexWrap: 'wrap',
-        gap: 20
-      }}>
+      <div className="hero-section">
         <div>
           <h1 style={{ fontSize: 28, margin: '0 0 8px 0', fontWeight: 800, letterSpacing: '-0.02em' }}>
             สวัสดี, {info.name} 👋
@@ -43,56 +32,57 @@ export default function DashboardView() {
       </div>
 
       {/* ── KPI Cards ── */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 24 }}>
+      <div className="dashboard-summary-grid">
 
-        {/* KPI 1: Total */}
+        {/* KPI 1: Ticket ทั้งหมด */}
         <div className="kpi-card" style={{ background: 'var(--bg-card)', padding: 24, borderRadius: 'var(--radius-xl)', boxShadow: 'var(--shadow-sm)', border: '1px solid var(--border-light)', display: 'flex', alignItems: 'center', gap: 20, transition: 'var(--transition)' }}>
-          <div style={{ width: 64, height: 64, borderRadius: 16, background: 'var(--primary-pale)', color: 'var(--primary)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 28 }}>
+          <div className="kpi-icon-box" style={{ width: 64, height: 64, borderRadius: 16, background: 'var(--primary-pale)', color: 'var(--primary)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 28, flexShrink: 0 }}>
             <i className="fa-solid fa-ticket-alt"></i>
           </div>
           <div>
-            <div style={{ color: 'var(--text-muted)', fontSize: 13, fontWeight: 600, marginBottom: 4 }}>Ticket ทั้งหมด</div>
-            <div style={{ fontSize: 32, fontWeight: 800, color: 'var(--text-primary)', lineHeight: 1 }}>{totalTickets}</div>
+            <div className="kpi-label" style={{ color: 'var(--text-muted)', fontSize: 13, fontWeight: 600, marginBottom: 4 }}>Ticket ทั้งหมด</div>
+            <div className="kpi-value" style={{ fontSize: 32, fontWeight: 800, color: 'var(--text-primary)', lineHeight: 1 }}>{totalTickets}</div>
           </div>
         </div>
 
-        {/* KPI 2: Critical */}
-        <div className="kpi-card" style={{ background: 'var(--bg-card)', padding: 24, borderRadius: 'var(--radius-xl)', boxShadow: 'var(--shadow-sm)', border: '1px solid #fecaca', display: 'flex', alignItems: 'center', gap: 20, transition: 'var(--transition)' }}>
-          <div style={{ width: 64, height: 64, borderRadius: 16, background: '#fee2e2', color: '#dc2626', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 28 }}>
-            <i className="fa-solid fa-fire"></i>
+        {/* KPI 2: เคสใหม่ */}
+        <div className="kpi-card" style={{ background: 'var(--bg-card)', padding: 24, borderRadius: 'var(--radius-xl)', boxShadow: 'var(--shadow-sm)', border: '1px solid #bfdbfe', display: 'flex', alignItems: 'center', gap: 20, transition: 'var(--transition)' }}>
+          <div className="kpi-icon-box" style={{ width: 64, height: 64, borderRadius: 16, background: '#eff6ff', color: '#1d4ed8', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 28, flexShrink: 0 }}>
+            <i className="fa-solid fa-square-plus"></i>
           </div>
           <div>
-            <div style={{ color: '#dc2626', fontSize: 13, fontWeight: 600, marginBottom: 4 }}>งานวิกฤต (Critical)</div>
-            <div style={{ fontSize: 32, fontWeight: 800, color: '#dc2626', lineHeight: 1 }}>{criticalTickets}</div>
+            <div className="kpi-label" style={{ color: '#1d4ed8', fontSize: 13, fontWeight: 600, marginBottom: 4 }}>เคสใหม่</div>
+            <div className="kpi-value" style={{ fontSize: 32, fontWeight: 800, color: '#1d4ed8', lineHeight: 1 }}>{newTickets}</div>
           </div>
         </div>
 
-        {/* KPI 3: In Progress */}
-        <div className="kpi-card" style={{ background: 'var(--bg-card)', padding: 24, borderRadius: 'var(--radius-xl)', boxShadow: 'var(--shadow-sm)', border: '1px solid #e9d5ff', display: 'flex', alignItems: 'center', gap: 20, transition: 'var(--transition)' }}>
-          <div style={{ width: 64, height: 64, borderRadius: 16, background: '#f3e8ff', color: '#9333ea', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 28 }}>
+        {/* KPI 3: กำลังดำเนินการ */}
+        <div className="kpi-card" style={{ background: 'var(--bg-card)', padding: 24, borderRadius: 'var(--radius-xl)', boxShadow: 'var(--shadow-sm)', border: '1px solid #fde68a', display: 'flex', alignItems: 'center', gap: 20, transition: 'var(--transition)' }}>
+          <div className="kpi-icon-box" style={{ width: 64, height: 64, borderRadius: 16, background: '#fef3c7', color: '#d97706', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 28, flexShrink: 0 }}>
             <i className="fa-solid fa-screwdriver-wrench"></i>
           </div>
           <div>
-            <div style={{ color: '#9333ea', fontSize: 13, fontWeight: 600, marginBottom: 4 }}>กำลังแก้ไข</div>
-            <div style={{ fontSize: 32, fontWeight: 800, color: '#9333ea', lineHeight: 1 }}>{inProgressTickets}</div>
+            <div className="kpi-label" style={{ color: '#d97706', fontSize: 13, fontWeight: 600, marginBottom: 4 }}>กำลังดำเนินการ</div>
+            <div className="kpi-value" style={{ fontSize: 32, fontWeight: 800, color: '#d97706', lineHeight: 1 }}>{inProgressTickets}</div>
           </div>
         </div>
 
-        {/* KPI 4: Wait Approve */}
-        <div className="kpi-card" style={{ background: 'var(--bg-card)', padding: 24, borderRadius: 'var(--radius-xl)', boxShadow: 'var(--shadow-sm)', border: '1px solid #fde68a', display: 'flex', alignItems: 'center', gap: 20, transition: 'var(--transition)' }}>
-          <div style={{ width: 64, height: 64, borderRadius: 16, background: '#fef3c7', color: '#d97706', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 28 }}>
-            <i className="fa-solid fa-clipboard-check"></i>
+        {/* KPI 4: แก้ไขเสร็จสิ้น */}
+        <div className="kpi-card" style={{ background: 'var(--bg-card)', padding: 24, borderRadius: 'var(--radius-xl)', boxShadow: 'var(--shadow-sm)', border: '1px solid #bbf7d0', display: 'flex', alignItems: 'center', gap: 20, transition: 'var(--transition)' }}>
+          <div className="kpi-icon-box" style={{ width: 64, height: 64, borderRadius: 16, background: '#f0fdf4', color: '#16a34a', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 28, flexShrink: 0 }}>
+            <i className="fa-solid fa-circle-check"></i>
           </div>
           <div>
-            <div style={{ color: '#d97706', fontSize: 13, fontWeight: 600, marginBottom: 4 }}>รอการอนุมัติ</div>
-            <div style={{ fontSize: 32, fontWeight: 800, color: '#d97706', lineHeight: 1 }}>{waitApproveTickets}</div>
+            <div className="kpi-label" style={{ color: '#16a34a', fontSize: 13, fontWeight: 600, marginBottom: 4 }}>แก้ไขเสร็จสิ้น</div>
+            <div className="kpi-value" style={{ fontSize: 32, fontWeight: 800, color: '#16a34a', lineHeight: 1 }}>{resolvedTickets}</div>
           </div>
         </div>
 
       </div>
 
+
       {/* ── Details Section ── */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))', gap: 24 }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 24 }}>
 
         {/* Status Overview */}
         <div style={{ background: 'var(--bg-card)', padding: 28, borderRadius: 'var(--radius-xl)', boxShadow: 'var(--shadow-sm)', border: '1px solid var(--border-light)' }}>

@@ -23,7 +23,7 @@ export default function MyTicketsView({ filterOverride }) {
   };
 
   return (
-    <div>
+    <div className="view-container">
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20 }}>
         <div>
           <h2 style={{ fontSize: 20, fontWeight: 800, color: 'var(--text-primary)', margin: 0 }}>
