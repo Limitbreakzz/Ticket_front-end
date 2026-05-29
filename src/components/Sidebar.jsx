@@ -1,85 +1,7 @@
 import { useState } from 'react';
 import { useApp } from '../context/AppContext';
-import { ROLES, ROLE_INFO } from '../data/mockData';
+import { ROLES, ROLE_INFO, NAV_CONFIG } from '../data/mockData';
 
-const NAV_CONFIG = {
-  [ROLES.EMPLOYEE]: [
-    {
-      section: 'ภาพรวม',
-      items: [
-        { id: 'dashboard',  icon: 'house',             label: 'หน้าหลัก' },
-        { id: 'my-tickets', icon: 'rectangle-list',    label: 'Ticket ของฉัน', badge: '3', badgeColor: 'blue' },
-      ],
-    },
-    {
-      section: 'การดำเนินการ',
-      items: [
-        { id: 'create-ticket', icon: 'ticket',           label: 'แจ้งเรื่องใหม่' },
-        { id: 'track',         icon: 'magnifying-glass', label: 'ติดตามสถานะ' },
-      ],
-    },
-    {
-      section: 'อื่น ๆ',
-      items: [
-        { id: 'sla', icon: 'gauge-high',              label: 'SLA ของฉัน' },
-        { id: 'faq', icon: 'circle-question',         label: 'คำถามที่พบบ่อย' },
-      ],
-    },
-  ],
-  [ROLES.MANAGER]: [
-    {
-      section: 'ภาพรวม',
-      items: [
-        { id: 'dashboard',    icon: 'house',           label: 'หน้าหลัก' },
-        { id: 'dept-tickets', icon: 'layer-group',     label: 'Ticket ของแผนก', badge: '5', badgeColor: 'blue' },
-      ],
-    },
-    {
-      section: 'การอนุมัติ',
-      items: [
-        { id: 'approval',          icon: 'clipboard-check',   label: 'รออนุมัติ', badge: '2' },
-        { id: 'approved-history',  icon: 'clock-rotate-left', label: 'ประวัติการอนุมัติ' },
-      ],
-    },
-    {
-      section: 'รายงาน',
-      items: [
-        { id: 'sla',     icon: 'gauge-high',  label: 'SLA Dashboard' },
-        { id: 'reports', icon: 'chart-line',  label: 'รายงานสรุป' },
-        { id: 'team',    icon: 'users',       label: 'ทีมงาน' },
-      ],
-    },
-  ],
-  [ROLES.ADMIN]: [
-    {
-      section: 'ภาพรวม',
-      items: [
-        { id: 'dashboard',  icon: 'house',   label: 'Dashboard' },
-        { id: 'all-tickets', icon: 'rectangle-list', label: 'Ticket ทั้งหมด', badge: '12', badgeColor: 'blue' },
-      ],
-    },
-    {
-      section: 'การจัดการ',
-      items: [
-        { id: 'approval',  icon: 'clipboard-check',      label: 'รออนุมัติ',       badge: '3' },
-        { id: 'assign',    icon: 'user-plus',             label: 'มอบหมายงาน',      badge: '4', badgeColor: 'orange' },
-        { id: 'escalated', icon: 'triangle-exclamation',  label: 'เร่งด่วน/วิกฤต', badge: '2' },
-      ],
-    },
-    {
-      section: 'วิเคราะห์',
-      items: [
-        { id: 'sla',      icon: 'gauge-high',  label: 'SLA Dashboard' },
-        { id: 'reports',  icon: 'chart-line',  label: 'รายงาน & วิเคราะห์' },
-        { id: 'users',    icon: 'user-shield', label: 'จัดการผู้ใช้งาน' },
-        { id: 'settings', icon: 'gear',        label: 'ตั้งค่าระบบ' },
-        { id: 'audit',    icon: 'file-lines',  label: 'Audit Log' },
-      ],
-    },
-  ],
-};
-
-const ROLE_ICON = { employee: 'user', manager: 'user-tie', admin: 'user-shield' };
 
 export default function Sidebar() {
   const { role, setRole, activeNav, setActiveNav } = useApp();
@@ -92,11 +14,10 @@ export default function Sidebar() {
       {/* Logo */}
       <div className="sidebar-logo">
         <div className="sidebar-logo-icon">
-          <i className="fa-solid fa-circle-nodes" style={{ color: '#fff', fontSize: 18 }} aria-hidden="true"></i>
+          <i className="fa-solid fa-ticket" style={{ color: '#fff', fontSize: 18 }} aria-hidden="true"></i>
         </div>
         <div className="sidebar-logo-text">
           <span className="sidebar-logo-title">Ticket Hub</span>
-          <span className="sidebar-logo-sub">Frontend Portal</span>
         </div>
       </div>
 

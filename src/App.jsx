@@ -7,6 +7,7 @@ import BottomNav from './components/BottomNav';
 import TicketTable from './components/TicketTable';
 import SearchModal from './components/SearchModal';
 import TicketFormModal from './components/TicketFormModal';
+import Breadcrumbs from './components/Breadcrumbs';
 
 import DashboardView  from './views/DashboardView';
 import MyTicketsView  from './views/MyTicketsView';
@@ -55,37 +56,10 @@ function Topbar({ onCreateTicket }) {
 
   const unreadCount = notifications.filter(n => !n.read).length;
 
-  const titleMap = {
-    dashboard:       { title: 'Dashboard', sub: 'ภาพรวมระบบแจ้งซ่อมโรงงาน' },
-    'my-tickets':    { title: 'Ticket ของฉัน', sub: 'รายการที่คุณแจ้งซ่อม' },
-    'all-tickets':   { title: 'Ticket ทั้งหมด', sub: 'จัดการงานซ่อมบำรุง' },
-    'dept-tickets':  { title: 'Ticket ของแผนก', sub: 'รายการซ่อมในไลน์ผลิต/แผนก' },
-    'create-ticket': { title: 'แจ้งเรื่องใหม่', sub: 'สร้าง Ticket ใหม่' },
-    track:           { title: 'ติดตามสถานะ', sub: 'ตรวจสอบความคืบหน้างานซ่อม' },
-    approval:        { title: 'การอนุมัติ', sub: 'งานซ่อมที่รออนุมัติ' },
-    'approved-history': { title: 'ประวัติการอนุมัติ', sub: '' },
-    sla:             { title: 'SLA Dashboard', sub: 'ติดตาม Service Level Agreement' },
-    reports:         { title: 'รายงาน & วิเคราะห์', sub: '' },
-    users:           { title: 'จัดการผู้ใช้งาน', sub: '' },
-    settings:        { title: 'ตั้งค่าระบบ', sub: '' },
-    audit:           { title: 'Audit Log', sub: '' },
-    escalated:       { title: 'เร่งด่วน / เครื่องจักรหยุด (Line Stop)', sub: '' },
-    assign:          { title: 'มอบหมายงาน', sub: '' },
-    team:            { title: 'ทีมช่างซ่อมบำรุง', sub: '' },
-    faq:             { title: 'คู่มือความปลอดภัย / FAQ', sub: '' },
-  };
-
-  const current = titleMap[activeNav] || { title: activeNav, sub: '' };
-
   return (
     <header className="topbar">
       <div>
-        <span className="topbar-title">
-          {current.title}
-          {current.sub && (
-            <span className="topbar-subtitle">— {current.sub}</span>
-          )}
-        </span>
+        <Breadcrumbs />
       </div>
 
       <div className="topbar-actions">
@@ -258,25 +232,62 @@ function Topbar({ onCreateTicket }) {
           )}
         </div>
 
-        {/* Role chip */}
+        {/* Profile info and tags */}
         <div style={{
-          display: 'flex', alignItems: 'center', gap: 8,
-          background: 'var(--primary-bg)', border: '1px solid var(--border-light)',
-          borderRadius: 'var(--radius-full)', padding: '5px 12px',
+          display: 'flex',
+          alignItems: 'center',
+          gap: 10,
+          background: 'var(--primary-bg)',
+          border: '1px solid var(--border-light)',
+          borderRadius: 'var(--radius-lg)',
+          padding: '6px 12px',
         }}>
           <div
             style={{
-              width: 26, height: 26, borderRadius: '50%',
-              background: info.color, color: '#fff',
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              fontSize: 11, fontWeight: 700,
+              width: 32,
+              height: 32,
+              borderRadius: '50%',
+              background: info.color,
+              color: '#fff',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              fontSize: 12,
+              fontWeight: 700,
+              boxShadow: 'var(--shadow-sm)',
             }}
           >
             {info.initials}
           </div>
-          <span style={{ fontSize: 12, fontWeight: 600, color: 'var(--text-primary)' }}>
-            {info.label}
-          </span>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+            <span style={{ fontSize: 12.5, fontWeight: 700, color: 'var(--text-primary)', lineHeight: 1.2 }}>
+              {info.name}
+            </span>
+            <div style={{ display: 'flex', gap: 4, alignItems: 'center' }}>
+              <span style={{ 
+                fontSize: '9px', 
+                padding: '1px 5px',
+                background: info.color + '15',
+                color: info.color,
+                border: `1px solid ${info.color}30`,
+                borderRadius: '4px',
+                fontWeight: 600
+              }}>
+                {info.label}
+              </span>
+              <span style={{ 
+                fontSize: '9px', 
+                padding: '1px 5px',
+                background: 'var(--primary-pale)',
+                color: 'var(--primary)',
+                border: '1px solid var(--border-light)',
+                borderRadius: '4px',
+                fontWeight: 600
+              }}>
+                {role === ROLES.EMPLOYEE ? 'ฝ่ายผลิต 1' : role === ROLES.MANAGER ? 'ฝ่ายซ่อมบำรุง' : 'ส่วนกลาง'}
+              </span>
+            </div>
+          </div>
         </div>
 
       </div>

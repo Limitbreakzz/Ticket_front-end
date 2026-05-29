@@ -16,10 +16,10 @@ export default function MyTicketsView({ filterOverride }) {
       : tickets
   );
 
-  const titleMap = {
-    employee: `Ticket ของฉัน`,
-    manager:  `Ticket ของแผนก`,
-    admin:    `Ticket ทั้งหมด`,
+  const getHeaderTitle = () => {
+    if (role === ROLES.EMPLOYEE) return 'Ticket ของฉัน';
+    if (role === ROLES.MANAGER) return 'Ticket ของแผนก';
+    return 'Ticket ทั้งหมด';
   };
 
   return (
@@ -27,7 +27,7 @@ export default function MyTicketsView({ filterOverride }) {
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20 }}>
         <div>
           <h2 style={{ fontSize: 20, fontWeight: 800, color: 'var(--text-primary)', margin: 0 }}>
-            {filterOverride ? `รายการที่กรองแล้ว` : titleMap[role]}
+            {filterOverride ? `รายการที่กรองแล้ว` : getHeaderTitle()}
           </h2>
           <p style={{ fontSize: 13, color: 'var(--text-muted)', marginTop: 4 }}>
             {myTickets.length} รายการ
