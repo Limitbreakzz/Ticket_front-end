@@ -1,7 +1,8 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useApp } from '../context/AppContext';
 import { CATEGORIES, ROLES, ROLE_INFO, STATUS_LABEL } from '../data/mockData';
 import { SLADetail } from './SLAComponents';
+import * as api from '../utils/api';
 
 const URGENCY_INFO = {
   low: { label: 'ต่ำ', cls: 'badge-low', dot: 'low' },
@@ -10,34 +11,67 @@ const URGENCY_INFO = {
   critical: { label: 'วิกฤต', cls: 'badge-critical', dot: 'critical' },
 };
 
-const TEAM_OPTIONS = [
-  'ทีม IT Support',
-  'ทีม IT Admin',
-  'ทีม IT Network',
-  'ทีม IT Software',
-  'ทีม IT Procurement',
-  'ช่าง IT ชั้น 1',
-  'ช่าง IT ชั้น 2',
-  'ช่าง IT ชั้น 3',
-];
-
 export default function TicketDetailModal({ ticket, onClose }) {
   const { role, updateTicketStatus, approveTicket, assignTicket } = useApp();
+  const [detailTicket, setDetailTicket] = useState(ticket);
   const [note, setNote] = useState('');
-  const [assignee, setAssignee] = useState(ticket.assignedTo);
+  const [assignee, setAssignee] = useState('');
   const [approvalNote, setApprovalNote] = useState('');
   const [activeTab, setActiveTab] = useState('info');
   const [viewImage, setViewImage] = useState(null);
+  
+  // Comment states
+  const [commentText, setCommentText] = useState('');
+  const [commentFile, setCommentFile] = useState(null);
+  const [postingComment, setPostingComment] = useState(false);
+  
+  // Users list state
+  const [usersList, setUsersList] = useState([]);
 
-  const catInfo = CATEGORIES[ticket.category];
-  const statusInfo = STATUS_LABEL[ticket.status] || { label: ticket.status, cls: 'status-pending' };
-  const urgInfo = URGENCY_INFO[ticket.urgency] || { label: ticket.urgency, cls: 'badge-medium', dot: 'medium' };
+  // Load ticket details and users list on mount
+  useEffect(() => {
+    async function loadData() {
+      try {
+        const details = await api.getTicketDetail(ticket.id);
+        setDetailTicket(details);
+        
+        if (role === ROLES.ADMIN) {
+          const users = await api.fetchUsers();
+          setUsersList(users.filter(u => u.role === 'ADMIN' || u.role === 'MANAGER'));
+        }
+      } catch (err) {
+        console.error("Error loading ticket detail:", err);
+      }
+    }
+    loadData();
+  }, [ticket.id, role]);
+
+  const catInfo = CATEGORIES[detailTicket.category];
+  const statusInfo = STATUS_LABEL[detailTicket.status] || { label: detailTicket.status, cls: 'status-pending' };
+  const urgInfo = URGENCY_INFO[detailTicket.urgency] || { label: detailTicket.urgency, cls: 'badge-medium', dot: 'medium' };
   const roleInfo = ROLE_INFO[role];
 
   const canApprove = role === ROLES.MANAGER || role === ROLES.ADMIN;
   const canChangeStatus = role === ROLES.ADMIN;
   const canAssign = role === ROLES.ADMIN;
-  const needsManagerApproval = ['permission', 'hardware'].includes(ticket.category) && !ticket.managerApproval;
+  const needsManagerApproval = ['permission', 'hardware'].includes(detailTicket.category) && !detailTicket.managerApproval;
+
+  const handlePostComment = async (e) => {
+    e.preventDefault();
+    if (!commentText.trim() && !commentFile) return;
+    setPostingComment(true);
+    try {
+      await api.addComment(detailTicket.id, commentText, false, commentFile);
+      setCommentText('');
+      setCommentFile(null);
+      const details = await api.getTicketDetail(ticket.id);
+      setDetailTicket(details);
+    } catch (err) {
+      console.error("Failed to post comment:", err);
+    } finally {
+      setPostingComment(false);
+    }
+  };
 
   return (
     <div className="modal-overlay" onClick={e => e.target === e.currentTarget && onClose()}>
@@ -49,7 +83,7 @@ export default function TicketDetailModal({ ticket, onClose }) {
               <div className="modal-header-icon">{catInfo?.icon || <i className="fa-solid fa-clipboard-list"></i>}</div>
               <div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                  <span className="ticket-id" style={{ fontSize: 14 }}>{ticket.id}</span>
+                  <span className="ticket-id" style={{ fontSize: 14 }}>{detailTicket.id}</span>
                   <span className={`status-tag ${statusInfo.cls}`}>{statusInfo.label}</span>
                   <span className={`badge ${urgInfo.cls}`}>
                     <span className={`priority-dot ${urgInfo.dot}`}></span>
@@ -57,7 +91,7 @@ export default function TicketDetailModal({ ticket, onClose }) {
                   </span>
                 </div>
                 <h2 className="modal-title" id="detail-modal-title" style={{ fontSize: 16, marginTop: 4 }}>
-                  {ticket.subject}
+                  {detailTicket.subject}
                 </h2>
               </div>
             </div>
@@ -104,42 +138,42 @@ export default function TicketDetailModal({ ticket, onClose }) {
                 <div className="detail-row">
                   <span className="detail-key">หมวดหมู่</span>
                   <span className="detail-val">
-                    <span className={`badge badge-${ticket.category}`}>
+                    <span className={`badge badge-${detailTicket.category}`}>
                       {catInfo?.icon} {catInfo?.label}
                     </span>
-                    {ticket.subCategory && (
+                    {detailTicket.subCategory && (
                       <span style={{ marginLeft: 6, fontSize: 12, color: 'var(--text-muted)' }}>
-                        › {ticket.subCategory}
+                        › {detailTicket.subCategory}
                       </span>
                     )}
                   </span>
                 </div>
                 <div className="detail-row">
                   <span className="detail-key">ผู้แจ้ง</span>
-                  <span className="detail-val">{ticket.createdBy}</span>
+                  <span className="detail-val">{detailTicket.createdBy}</span>
                 </div>
                 <div className="detail-row">
                   <span className="detail-key">แผนก</span>
-                  <span className="detail-val">{ticket.department}</span>
+                  <span className="detail-val">{detailTicket.department}</span>
                 </div>
                 <div className="detail-row">
                   <span className="detail-key">ผู้รับผิดชอบ</span>
-                  <span className="detail-val">{ticket.assignedTo}</span>
+                  <span className="detail-val">{detailTicket.assignedTo}</span>
                 </div>
                 <div className="detail-row">
                   <span className="detail-key">สร้างเมื่อ</span>
-                  <span className="detail-val">{ticket.createdAt}</span>
+                  <span className="detail-val">{detailTicket.createdAt}</span>
                 </div>
                 <div className="detail-row">
                   <span className="detail-key">อัปเดตล่าสุด</span>
-                  <span className="detail-val">{ticket.updatedAt}</span>
+                  <span className="detail-val">{detailTicket.updatedAt}</span>
                 </div>
-                {ticket.managerApproval && (
+                {detailTicket.managerApproval && (
                   <div className="detail-row">
                     <span className="detail-key">อนุมัติหัวหน้า</span>
                     <span className="detail-val">
-                      <span className={`badge ${ticket.managerApproval === 'approved' ? 'badge-resolved' : 'badge-rejected'}`}>
-                        {ticket.managerApproval === 'approved' ? <><i className="fa-solid fa-check" style={{ marginRight: 4 }} aria-hidden="true"></i> อนุมัติแล้ว</> : <><i className="fa-solid fa-xmark" style={{ marginRight: 4 }} aria-hidden="true"></i> ปฏิเสธแล้ว</>}
+                      <span className={`badge ${detailTicket.managerApproval === 'approved' ? 'badge-resolved' : 'badge-rejected'}`}>
+                        {detailTicket.managerApproval === 'approved' ? <><i className="fa-solid fa-check" style={{ marginRight: 4 }} aria-hidden="true"></i> อนุมัติแล้ว</> : <><i className="fa-solid fa-xmark" style={{ marginRight: 4 }} aria-hidden="true"></i> ปฏิเสธแล้ว</>}
                       </span>
                     </span>
                   </div>
@@ -150,40 +184,40 @@ export default function TicketDetailModal({ ticket, onClose }) {
 
               <div className="detail-section">
                 <div className="detail-section-title">รายละเอียดปัญหา</div>
-                <div className="detail-description">{ticket.description}</div>
+                <div className="detail-description">{detailTicket.description}</div>
               </div>
 
               {/* SLA Panel */}
               <div className="divider" />
               <div className="detail-section">
                 <div className="detail-section-title"><i className="fa-solid fa-clock" style={{ marginRight: 6 }} aria-hidden="true"></i> SLA / เวลาการแก้ไข</div>
-                <SLADetail ticket={ticket} />
+                <SLADetail ticket={detailTicket} />
               </div>
 
-              {ticket.adminNote && (
+              {detailTicket.adminNote && (
                 <>
                   <div className="divider" />
                   <div className="detail-section">
                     <div className="detail-section-title">หมายเหตุจากเจ้าหน้าที่</div>
-                    <div className="detail-description" style={{ borderColor: 'var(--success)', background: 'var(--success-pale)' }}>
-                      {ticket.adminNote}
+                    <div className="detail-description" style={{ borderColor: 'var(--success)', background: 'var(--success-pale)', whiteSpace: 'pre-wrap' }}>
+                      {detailTicket.adminNote}
                     </div>
                   </div>
                 </>
               )}
 
-              {ticket.image && (
+              {detailTicket.image && (
                 <>
                   <div className="divider" />
                   <div className="detail-section">
                     <div className="detail-section-title">ภาพแนบ</div>
                     <div style={{ position: 'relative', borderRadius: 'var(--radius-md)', overflow: 'hidden', display: 'inline-block', maxWidth: '100%' }}>
                       <div
-                        onClick={() => setViewImage(ticket.image)}
+                        onClick={() => setViewImage(detailTicket.image)}
                         className="preview-image-container"
                         style={{ height: 'auto', maxHeight: 300, maxWidth: '100%', display: 'block' }}
                       >
-                        <img src={ticket.image} alt="ภาพแนบ" className="detail-image" style={{ margin: 0, display: 'block', cursor: 'pointer' }} />
+                        <img src={detailTicket.image} alt="ภาพแนบ" className="detail-image" style={{ margin: 0, display: 'block', cursor: 'pointer' }} />
                         <div className="preview-image-overlay">
                           <i className="fa-solid fa-magnifying-glass-plus" aria-hidden="true"></i>
                           <span>คลิกเพื่อดูรูปขนาดเต็ม</span>
@@ -203,38 +237,78 @@ export default function TicketDetailModal({ ticket, onClose }) {
 
           {/* TIMELINE TAB */}
           {activeTab === 'timeline' && (
-            <div className="timeline" style={{ display: 'flex', flexDirection: 'column', gap: 16, padding: '16px 0', border: 'none' }}>
-              {ticket.timeline.map((t, i) => {
-                const isSystem = t.actor === 'System' || !t.actor;
-                
-                if (isSystem) {
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+              <div className="timeline" style={{ display: 'flex', flexDirection: 'column', gap: 16, padding: '16px 0', border: 'none' }}>
+                {detailTicket.timeline.map((t, i) => {
+                  const isSystem = t.actor === 'System' || !t.actor;
+                  
+                  if (isSystem) {
+                    return (
+                      <div key={i} style={{ display: 'flex', justifyContent: 'center', margin: '8px 0' }}>
+                        <div style={{ background: 'var(--bg-main)', color: 'var(--text-muted)', fontSize: 11, padding: '4px 12px', borderRadius: 20 }}>
+                          <i className={`fa-solid fa-${t.icon || 'robot'}`} style={{ marginRight: 6 }}></i>
+                          {t.event} · {t.time}
+                        </div>
+                      </div>
+                    );
+                  }
+
                   return (
-                    <div key={i} style={{ display: 'flex', justifyContent: 'center', margin: '8px 0' }}>
-                      <div style={{ background: 'var(--bg-main)', color: 'var(--text-muted)', fontSize: 11, padding: '4px 12px', borderRadius: 20 }}>
-                        <i className={`fa-solid fa-${t.icon || 'robot'}`} style={{ marginRight: 6 }}></i>
-                        {t.event} · {t.time}
+                    <div key={i} style={{ display: 'flex', gap: 12 }}>
+                      <div style={{ width: 36, height: 36, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--primary-pale)', color: 'var(--primary)', flexShrink: 0 }}>
+                        <i className={`fa-solid fa-${t.icon || 'user'}`} style={{ fontSize: 14 }}></i>
+                      </div>
+                      <div style={{ flex: 1 }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
+                          <span style={{ fontWeight: 600, fontSize: 13, color: 'var(--text-primary)' }}>{t.actor}</span>
+                          <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>{t.time}</span>
+                        </div>
+                        <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border-light)', borderRadius: '0 12px 12px 12px', padding: '10px 14px', fontSize: 13, color: 'var(--text-secondary)', boxShadow: 'var(--shadow-sm)' }}>
+                          {t.event}
+                          {t.attachmentUrl && (
+                            <div style={{ marginTop: 8, borderRadius: 'var(--radius-sm)', overflow: 'hidden', maxWidth: 200, cursor: 'pointer' }} onClick={() => setViewImage(t.attachmentUrl)}>
+                              <img src={t.attachmentUrl} alt="ภาพประกอบ" style={{ width: '100%', display: 'block' }} />
+                            </div>
+                          )}
+                        </div>
                       </div>
                     </div>
                   );
-                }
+                })}
+              </div>
 
-                return (
-                  <div key={i} style={{ display: 'flex', gap: 12 }}>
-                    <div style={{ width: 36, height: 36, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--primary-pale)', color: 'var(--primary)', flexShrink: 0 }}>
-                      <i className={`fa-solid fa-${t.icon || 'user'}`} style={{ fontSize: 14 }}></i>
+              {/* Add Comment Input Form */}
+              {detailTicket.status !== 'cancelled' && detailTicket.status !== 'closed' && (
+                <form onSubmit={handlePostComment} style={{ display: 'flex', flexDirection: 'column', gap: 10, padding: 16, background: 'var(--bg-main)', borderRadius: 'var(--radius-lg)', border: '1px solid var(--border)' }}>
+                  <div style={{ fontWeight: 700, fontSize: 13, color: 'var(--text-primary)' }}>เขียนข้อความตอบกลับ</div>
+                  <textarea
+                    className="form-textarea"
+                    rows={2}
+                    placeholder="พิมพ์รายละเอียดความคิดเห็นของคุณ..."
+                    value={commentText}
+                    onChange={e => setCommentText(e.target.value)}
+                    style={{ background: 'var(--bg-card)', resize: 'none' }}
+                  />
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                      <label style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, color: 'var(--primary)', cursor: 'pointer', fontWeight: 600 }}>
+                        <i className="fa-solid fa-paperclip"></i>
+                        แนบรูป
+                        <input
+                          type="file"
+                          accept="image/*"
+                          style={{ display: 'none' }}
+                          onChange={e => setCommentFile(e.target.files[0])}
+                        />
+                      </label>
+                      {commentFile && <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>{commentFile.name} ({(commentFile.size / 1024).toFixed(1)} KB)</span>}
                     </div>
-                    <div style={{ flex: 1 }}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
-                        <span style={{ fontWeight: 600, fontSize: 13, color: 'var(--text-primary)' }}>{t.actor}</span>
-                        <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>{t.time}</span>
-                      </div>
-                      <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border-light)', borderRadius: '0 12px 12px 12px', padding: '10px 14px', fontSize: 13, color: 'var(--text-secondary)', boxShadow: 'var(--shadow-sm)' }}>
-                        {t.event}
-                      </div>
-                    </div>
+                    <button type="submit" className="btn btn-primary btn-xs" style={{ padding: '6px 14px' }} disabled={postingComment}>
+                      {postingComment ? 'กำลังส่ง...' : 'ส่งข้อความ'}
+                    </button>
                   </div>
-                );
-              })}
+                </form>
+              )}
             </div>
           )}
 
@@ -242,7 +316,7 @@ export default function TicketDetailModal({ ticket, onClose }) {
           {activeTab === 'actions' && (
             <div style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
               {/* Manager/Admin Approval */}
-              {canApprove && needsManagerApproval && ticket.status !== 'rejected' && (
+              {canApprove && needsManagerApproval && detailTicket.status !== 'rejected' && (
                 <div className="approval-actions">
                   <div style={{ flex: 1 }}>
                     <div className="approval-title">
@@ -266,7 +340,7 @@ export default function TicketDetailModal({ ticket, onClose }) {
                         className="btn btn-success btn-sm"
                         id="btn-approve"
                         onClick={() => {
-                          approveTicket(ticket.id, true, roleInfo.name, approvalNote);
+                          approveTicket(detailTicket.id, true, roleInfo.name, approvalNote);
                           onClose();
                         }}
                       >
@@ -276,7 +350,7 @@ export default function TicketDetailModal({ ticket, onClose }) {
                         className="btn btn-danger btn-sm"
                         id="btn-reject"
                         onClick={() => {
-                          approveTicket(ticket.id, false, roleInfo.name, approvalNote);
+                          approveTicket(detailTicket.id, false, roleInfo.name, approvalNote);
                           onClose();
                         }}
                       >
@@ -302,38 +376,38 @@ export default function TicketDetailModal({ ticket, onClose }) {
                     />
                   </div>
                   <div className="action-btns">
-                    {ticket.status !== 'in-progress' && (
+                    {detailTicket.status !== 'in-progress' && (
                       <button
                         className="btn btn-warning btn-sm"
                         id="btn-status-inprogress"
-                        onClick={() => { updateTicketStatus(ticket.id, 'in-progress', note, roleInfo.name); onClose(); }}
+                        onClick={() => { updateTicketStatus(detailTicket.id, 'in-progress', note, roleInfo.name); onClose(); }}
                       >
                         <i className="fa-solid fa-wrench" style={{ marginRight: 4 }} aria-hidden="true"></i> รับงาน
                       </button>
                     )}
-                    {ticket.status !== 'resolved' && (
+                    {detailTicket.status !== 'resolved' && (
                       <button
                         className="btn btn-success btn-sm"
                         id="btn-status-resolved"
-                        onClick={() => { updateTicketStatus(ticket.id, 'resolved', note, roleInfo.name); onClose(); }}
+                        onClick={() => { updateTicketStatus(detailTicket.id, 'resolved', note, roleInfo.name); onClose(); }}
                       >
                         <i className="fa-solid fa-check" style={{ marginRight: 4 }} aria-hidden="true"></i> แก้ไขสำเร็จ
                       </button>
                     )}
-                    {ticket.status !== 'closed' && (
+                    {detailTicket.status !== 'closed' && (
                       <button
                         className="btn btn-ghost btn-sm"
                         id="btn-status-closed"
-                        onClick={() => { updateTicketStatus(ticket.id, 'closed', note, roleInfo.name); onClose(); }}
+                        onClick={() => { updateTicketStatus(detailTicket.id, 'closed', note, roleInfo.name); onClose(); }}
                       >
                         <i className="fa-solid fa-lock" style={{ marginRight: 4 }} aria-hidden="true"></i> ปิด Ticket
                       </button>
                     )}
-                    {ticket.status !== 'rejected' && (
+                    {detailTicket.status !== 'rejected' && (
                       <button
                         className="btn btn-danger btn-sm"
                         id="btn-status-reject"
-                        onClick={() => { updateTicketStatus(ticket.id, 'rejected', note, roleInfo.name); onClose(); }}
+                        onClick={() => { updateTicketStatus(detailTicket.id, 'rejected', note, roleInfo.name); onClose(); }}
                       >
                         <i className="fa-solid fa-xmark" style={{ marginRight: 4 }} aria-hidden="true"></i> ปฏิเสธ
                       </button>
@@ -348,20 +422,22 @@ export default function TicketDetailModal({ ticket, onClose }) {
                   <div className="approval-title"><i className="fa-solid fa-user-plus" style={{ marginRight: 6 }} aria-hidden="true"></i> มอบหมายงาน (Admin)</div>
                   <div style={{ display: 'flex', gap: 8, alignItems: 'flex-end' }}>
                     <div className="form-group" style={{ flex: 1 }}>
-                      <label className="form-label">มอบหมายให้ทีม</label>
+                      <label className="form-label">มอบหมายให้เจ้าหน้าที่</label>
                       <select
                         className="form-select"
                         value={assignee}
                         onChange={e => setAssignee(e.target.value)}
                         id="assign-select"
                       >
-                        {TEAM_OPTIONS.map(t => <option key={t} value={t}>{t}</option>)}
+                        <option value="">-- เลือกเจ้าหน้าที่ผู้รับผิดชอบ --</option>
+                        {usersList.map(u => <option key={u.id} value={u.id}>{u.name} ({u.role === 'ADMIN' ? 'Admin/Engineer' : 'Supervisor'})</option>)}
                       </select>
                     </div>
                     <button
                       className="btn btn-primary btn-sm"
                       id="btn-assign"
-                      onClick={() => { assignTicket(ticket.id, assignee); onClose(); }}
+                      onClick={() => { assignTicket(detailTicket.id, assignee); onClose(); }}
+                      disabled={!assignee}
                     >
                       บันทึก
                     </button>
@@ -409,7 +485,7 @@ export default function TicketDetailModal({ ticket, onClose }) {
               <i className="fa-solid fa-xmark" aria-hidden="true"></i>
             </button>
             <div className="lightbox-filename">
-              {ticket.id} - ภาพแนบ
+              {detailTicket.id} - ภาพแนบ
             </div>
           </div>
         </div>

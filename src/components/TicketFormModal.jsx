@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { useApp } from '../context/AppContext';
-import { CATEGORIES, URGENCY_LEVELS, ROLE_INFO, DEPARTMENTS } from '../data/mockData';
+import { CATEGORIES, URGENCY_LEVELS, ROLE_INFO } from '../data/mockData';
 
 const CAT_THEME = {
   mechanical: { bg: '#fff7ed', border: '#fed7aa', active: '#ea580c', iconColor: '#ea580c' },
@@ -10,7 +10,7 @@ const CAT_THEME = {
 };
 
 export default function TicketFormModal({ onClose }) {
-  const { createTicket, role, addToast } = useApp();
+  const { createTicket, role, addToast, depts } = useApp();
   const info = ROLE_INFO[role];
   const fileRef = useRef();
 
@@ -43,7 +43,7 @@ export default function TicketFormModal({ onClose }) {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  const filteredDepts = DEPARTMENTS.filter(dept =>
+  const filteredDepts = (depts || []).filter(dept =>
     dept.toLowerCase().includes(deptSearch.toLowerCase())
   );
 
@@ -85,16 +85,14 @@ export default function TicketFormModal({ onClose }) {
       return; 
     }
     setSubmitting(true);
-    setTimeout(() => {
-      createTicket({
-        ...form,
-        createdBy: info.name,
-        department: form.department,
-        image: file ? URL.createObjectURL(file) : null,
+    createTicket(form, file)
+      .then(() => {
+        setSubmitting(false);
+        onClose();
+      })
+      .catch(() => {
+        setSubmitting(false);
       });
-      setSubmitting(false);
-      onClose();
-    }, 700);
   };
 
   const subOptions = CATEGORIES[form.category]?.sub || [];
