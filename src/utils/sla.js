@@ -14,6 +14,13 @@ export const SLA_POLICY = {
   low:      { hours: 72,  label: '3 วัน',         desc: 'ต้องแก้ไขภายใน 3 วันทำการ' },
 };
 
+export const SLA_RESPONSE_POLICY = {
+  critical: { hours: 0.25, label: '15 นาที',    desc: 'วิกฤต! ต้องรับเรื่องภายใน 15 นาที' },
+  high:     { hours: 0.5,  label: '30 นาที',    desc: 'เร่งด่วน! ต้องรับเรื่องภายใน 30 นาที' },
+  medium:   { hours: 2,    label: '2 ชั่วโมง',   desc: 'ต้องรับเรื่องภายใน 2 ชั่วโมง' },
+  low:      { hours: 4,    label: '4 ชั่วโมง',   desc: 'ต้องรับเรื่องภายใน 4 ชั่วโมง' },
+};
+
 // Ticket statuses that are "closed" (SLA no longer counts)
 export const CLOSED_STATUSES = new Set(['resolved', 'closed', 'rejected']);
 
@@ -29,8 +36,8 @@ const THAI_MONTHS = {
 
 export function parseThaiDate(str) {
   if (!str) return null;
-  // "28 พ.ค. 2567, 08:30"
-  const m = str.match(/(\d+)\s+(\S+)\s+(\d+),\s+(\d+):(\d+)/);
+  // Support formats like "28 พ.ค. 2567, 08:30" or "28 พ.ค. 2567 08:30" or "28 พ.ค. 2567 เวลา 08:30"
+  const m = str.match(/(\d+)\s+(\S+)\s+(\d+)[,\s]*?(?:เวลา)?\s*?(\d+):(\d+)/);
   if (!m) return null;
   const [, day, monthThai, buddYear, hour, min] = m;
   const month = THAI_MONTHS[monthThai];
@@ -47,7 +54,7 @@ export function formatDuration(hours) {
   if (hours < 24)      return `${hours.toFixed(1)} ชั่วโมง`;
   const days = hours / 24;
   if (days < 30)       return `${days.toFixed(1)} วัน`;
-  return `${(days / 30).toFixed(1)} เดือน`;
+  return `${(days / 30).toFixed(1)} วัน`;
 }
 
 /**
@@ -61,11 +68,15 @@ export function calcSLA(ticket, now = new Date()) {
   const policy = SLA_POLICY[ticket.urgency];
   if (!policy) return null;
 
-  const createdDate = parseThaiDate(ticket.createdAt);
-  if (!createdDate) return null;
+  const createdDate = ticket.rawCreatedAt 
+    ? new Date(ticket.rawCreatedAt) 
+    : parseThaiDate(ticket.createdAt);
+  if (!createdDate || isNaN(createdDate.getTime())) return null;
 
   const isClosed = CLOSED_STATUSES.has(ticket.status);
-  const referenceDate = isClosed ? parseThaiDate(ticket.updatedAt) || now : now;
+  const referenceDate = isClosed 
+    ? (ticket.rawUpdatedAt ? new Date(ticket.rawUpdatedAt) : parseThaiDate(ticket.updatedAt)) || now 
+    : now;
 
   // Elapsed hours since ticket creation
   const elapsedMs  = referenceDate - createdDate;
@@ -99,13 +110,63 @@ export function calcSLA(ticket, now = new Date()) {
   };
 }
 
+/**
+ * Response SLA calculator.
+ *
+ * @param {object} ticket  — ticket object
+ * @param {Date}   now     — current time
+ * @returns {object} SLA info
+ */
+export function calcResponseSLA(ticket, now = new Date()) {
+  const policy = SLA_RESPONSE_POLICY[ticket.urgency] || SLA_RESPONSE_POLICY.medium;
+
+  const createdDate = ticket.rawCreatedAt 
+    ? new Date(ticket.rawCreatedAt) 
+    : parseThaiDate(ticket.createdAt);
+  if (!createdDate || isNaN(createdDate.getTime())) return null;
+
+  // Considered acknowledged if assignedTo is not 'รอมอบหมาย' and not empty, or status is not 'pending'
+  const isAcknowledged = (ticket.assignedTo && ticket.assignedTo !== 'รอมอบหมาย') || !['pending', 'new'].includes(ticket.status);
+  const ackDate = isAcknowledged 
+    ? (ticket.rawUpdatedAt ? new Date(ticket.rawUpdatedAt) : parseThaiDate(ticket.updatedAt)) || now
+    : now;
+
+  const elapsedMs = ackDate - createdDate;
+  const elapsedH = elapsedMs / (1000 * 60 * 60);
+
+  const deadlineH = policy.hours;
+  const remainingH = deadlineH - elapsedH;
+  const pct = Math.min((elapsedH / deadlineH) * 100, 100);
+
+  let slaStatus;
+  if (isAcknowledged) {
+    slaStatus = elapsedH <= deadlineH ? 'met' : 'missed';
+  } else {
+    if (remainingH <= 0)                        slaStatus = 'breached';
+    else if (pct >= 75)                         slaStatus = 'at-risk';
+    else                                        slaStatus = 'on-track';
+  }
+
+  const deadlineDate = new Date(createdDate.getTime() + deadlineH * 3600 * 1000);
+
+  return {
+    policy,
+    elapsedH,
+    remainingH,
+    pct,
+    slaStatus,   // 'on-track' | 'at-risk' | 'breached' | 'met' | 'missed'
+    deadlineDate,
+    isClosed: isAcknowledged,
+  };
+}
+
 /** Display config per slaStatus */
 export const SLA_STATUS_CONFIG = {
-  'on-track': { label: 'ทันเวลา',     color: '#10b981', bg: '#d1fae5', icon: 'check' },
-  'at-risk':  { label: 'ใกล้หมดเวลา', color: '#f59e0b', bg: '#fef3c7', icon: 'triangle-exclamation' },
-  'breached': { label: 'เกิน SLA',    color: '#ef4444', bg: '#fee2e2', icon: 'circle-xmark' },
-  'met':      { label: 'ผ่าน SLA',   color: '#10b981', bg: '#d1fae5', icon: 'trophy' },
-  'missed':   { label: 'ไม่ผ่าน SLA', color: '#ef4444', bg: '#fee2e2', icon: 'circle-exclamation' },
+  'on-track': { label: 'ยังอยู่ในเกณฑ์', color: '#10b981', bg: '#d1fae5', icon: 'check' },
+  'at-risk':  { label: 'ใกล้ครบกำหนด', color: '#f59e0b', bg: '#fef3c7', icon: 'triangle-exclamation' },
+  'breached': { label: 'เกินกำหนดแล้ว', color: '#ef4444', bg: '#fee2e2', icon: 'circle-xmark' },
+  'met':      { label: 'ผ่านเกณฑ์',   color: '#10b981', bg: '#d1fae5', icon: 'circle-check' },
+  'missed':   { label: 'เกินกำหนด', color: '#ef4444', bg: '#fee2e2', icon: 'circle-xmark' },
 };
 
 /**

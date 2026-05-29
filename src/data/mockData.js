@@ -7,25 +7,25 @@ export const ROLES = {
 
 export const ROLE_INFO = {
   employee: {
-    label: 'Operator',
+    label: 'พนักงานทั่วไป',
     name: 'สมชาย ใจดี',
     initials: 'สช',
     color: '#2563eb',
-    desc: 'พนักงานสายการผลิต',
+    desc: 'พนักงานทั่วไป',
   },
   manager: {
-    label: 'Supervisor',
+    label: 'หัวหน้าแผนก',
     name: 'วิภา รักดี',
     initials: 'วภ',
     color: '#10b981',
-    desc: 'หัวหน้ากะ/หัวหน้าสายการผลิต',
+    desc: 'หัวหน้าแผนก',
   },
   admin: {
-    label: 'Maintenance',
+    label: 'ผู้ดูแลระบบ',
     name: 'ธนา สมบูรณ์',
     initials: 'ธน',
     color: '#7c3aed',
-    desc: 'ช่างซ่อมบำรุง/วิศวกร',
+    desc: 'ผู้ดูแลระบบ',
   },
 };
 
@@ -33,75 +33,67 @@ export const ROLE_INFO = {
 export const NAV_CONFIG = {
   [ROLES.EMPLOYEE]: [
     {
-      section: 'ภาพรวม',
+      section: 'เมนูหลัก',
       items: [
-        { id: 'dashboard',  icon: 'house',             label: 'หน้าหลัก' },
-        { id: 'my-tickets', icon: 'rectangle-list',    label: 'Ticket ของฉัน', badge: '3', badgeColor: 'blue' },
+        { id: 'dashboard',       icon: 'table-columns',        label: 'แดชบอร์ด' },
+        { id: 'create-ticket',   icon: 'circle-plus',          label: 'สร้าง Ticket' },
       ],
     },
     {
-      section: 'การดำเนินการ',
+      section: 'งานของฉัน',
       items: [
-        { id: 'create-ticket', icon: 'ticket',           label: 'แจ้งเรื่องใหม่' },
-        { id: 'track',         icon: 'magnifying-glass', label: 'ติดตามสถานะ' },
-      ],
-    },
-    {
-      section: 'อื่น ๆ',
-      items: [
-        { id: 'sla', icon: 'gauge-high',              label: 'SLA ของฉัน' },
-        { id: 'faq', icon: 'circle-question',         label: 'คำถามที่พบบ่อย' },
+        { id: 'my-own-tickets',  icon: 'user',                 label: 'Ticket ของฉัน' },
+        { id: 'track',           icon: 'user-check',           label: 'งานในการดูแลของฉัน' },
+        { id: 'my-sent-tickets', icon: 'paper-plane',          label: 'Ticket ที่แผนกเราส่งไป', badgeColor: 'blue' },
+        { id: 'all-dept-tickets',icon: 'building-user',        label: 'Ticket ทั้งหมดของแผนก', badgeColor: 'blue' },
       ],
     },
   ],
   [ROLES.MANAGER]: [
     {
-      section: 'ภาพรวม',
+      section: 'เมนูหลัก',
       items: [
-        { id: 'dashboard',    icon: 'house',           label: 'หน้าหลัก' },
-        { id: 'dept-tickets', icon: 'layer-group',     label: 'Ticket ของแผนก', badge: '5', badgeColor: 'blue' },
+        { id: 'dashboard',       icon: 'table-columns',        label: 'แดชบอร์ด' },
       ],
     },
     {
-      section: 'การอนุมัติ',
+      section: 'งานของฉัน',
       items: [
-        { id: 'approval',          icon: 'clipboard-check',   label: 'รออนุมัติ', badge: '2' },
-        { id: 'approved-history',  icon: 'clock-rotate-left', label: 'ประวัติการอนุมัติ' },
-      ],
-    },
-    {
-      section: 'รายงาน',
-      items: [
-        { id: 'sla',     icon: 'gauge-high',  label: 'SLA Dashboard' },
-        { id: 'reports', icon: 'chart-line',  label: 'รายงานสรุป' },
-        { id: 'team',    icon: 'users',       label: 'ทีมงาน' },
+        { id: 'my-own-tickets',  icon: 'user',                 label: 'Ticket ของฉัน' },
+        { id: 'track',           icon: 'user-check',           label: 'งานในการดูแลของฉัน' },
+        { id: 'my-sent-tickets', icon: 'paper-plane',          label: 'Ticket ที่แผนกเราส่งไป', badgeColor: 'blue' },
+        { id: 'all-dept-tickets',icon: 'building-user',        label: 'Ticket ทั้งหมดของแผนก', badgeColor: 'blue' },
+        { id: 'approval',        icon: 'clipboard-check',      label: 'รออนุมัติ', badge: '2' },
+        { id: 'approved-history',icon: 'clock-rotate-left',   label: 'ประวัติการอนุมัติ' },
       ],
     },
   ],
   [ROLES.ADMIN]: [
     {
-      section: 'ภาพรวม',
+      section: 'เมนูหลัก',
       items: [
-        { id: 'dashboard',  icon: 'house',   label: 'Dashboard' },
-        { id: 'all-tickets', icon: 'rectangle-list', label: 'Ticket ทั้งหมด', badge: '12', badgeColor: 'blue' },
+        { id: 'dashboard',       icon: 'table-columns',        label: 'แดชบอร์ด' },
       ],
     },
     {
-      section: 'การจัดการ',
+      section: 'งานของฉัน',
       items: [
-        { id: 'approval',  icon: 'clipboard-check',      label: 'รออนุมัติ',       badge: '3' },
-        { id: 'assign',    icon: 'user-plus',             label: 'มอบหมายงาน',      badge: '4', badgeColor: 'orange' },
-        { id: 'escalated', icon: 'triangle-exclamation',  label: 'เร่งด่วน/วิกฤต', badge: '2' },
+        { id: 'my-own-tickets',  icon: 'user',                 label: 'Ticket ของฉัน' },
+        { id: 'track',           icon: 'user-check',           label: 'งานในการดูแลของฉัน' },
+        { id: 'my-sent-tickets', icon: 'paper-plane',          label: 'Ticket ที่แผนกเราส่งไป', badgeColor: 'blue' },
+        { id: 'all-dept-tickets',icon: 'building-user',        label: 'Ticket ทั้งหมดของแผนก', badgeColor: 'blue' },
+        { id: 'all-tickets',     icon: 'layer-group',          label: 'ตั๋วทั้งหมดในระบบ', badge: '12', badgeColor: 'blue' },
+        { id: 'approval',        icon: 'clipboard-check',      label: 'รออนุมัติ', badge: '3' },
+        { id: 'assign',          icon: 'user-plus',            label: 'มอบหมายงาน', badge: '4', badgeColor: 'orange' },
+        { id: 'escalated',       icon: 'triangle-exclamation', label: 'เร่งด่วน/วิกฤต', badge: '2' },
       ],
     },
     {
-      section: 'วิเคราะห์',
+      section: 'การควบคุมระบบ',
       items: [
-        { id: 'sla',      icon: 'gauge-high',  label: 'SLA Dashboard' },
-        { id: 'reports',  icon: 'chart-line',  label: 'รายงาน & วิเคราะห์' },
-        { id: 'users',    icon: 'user-shield', label: 'จัดการผู้ใช้งาน' },
-        { id: 'settings', icon: 'gear',        label: 'ตั้งค่าระบบ' },
-        { id: 'audit',    icon: 'file-lines',  label: 'Audit Log' },
+        { id: 'reports',         icon: 'chart-line',           label: 'รายงาน & วิเคราะห์' },
+        { id: 'users',           icon: 'users',                label: 'จัดการผู้ใช้งาน' },
+        { id: 'settings',        icon: 'gear',                 label: 'ตั้งค่าระบบ/Webhook' },
       ],
     },
   ],
@@ -141,16 +133,16 @@ export const URGENCY_LEVELS = [
 
 // ── STATUSES (Factory Context) ──
 export const STATUS_LABEL = {
-  pending: { label: 'รอดำเนินการ', cls: 'status-pending' },
-  progress: { label: 'กำลังแก้ไข', cls: 'status-progress' },
-  'wait-approve': { label: 'รออนุมัติ', cls: 'status-wait-approve' },
-  approved: { label: 'อนุมัติแล้ว', cls: 'status-approved' },
-  rejected: { label: 'ปฏิเสธ', cls: 'status-rejected' },
-  forwarded: { label: 'ส่งต่อแผนก', cls: 'status-forwarded' },
-  'wait-parts': { label: 'รออะไหล่/อุปกรณ์', cls: 'status-wait-parts' },
-  resolved: { label: 'แก้ไขเสร็จสิ้น', cls: 'status-resolved' },
-  closed: { label: 'ปิดเคส', cls: 'status-closed' },
-  cancelled: { label: 'ยกเลิก', cls: 'status-cancelled' },
+  pending:      { label: 'รอดำเนินการ',    cls: 'status-pending',      icon: 'clock' },
+  progress:     { label: 'กำลังแก้ไข',     cls: 'status-progress',     icon: 'spinner' },
+  'wait-approve': { label: 'รออนุมัติ',    cls: 'status-wait-approve', icon: 'hourglass-half' },
+  approved:     { label: 'อนุมัติแล้ว',    cls: 'status-approved',     icon: 'circle-check' },
+  rejected:     { label: 'ปฏิเสธ',         cls: 'status-rejected',     icon: 'circle-xmark' },
+  forwarded:    { label: 'ส่งต่อแผนก',     cls: 'status-forwarded',    icon: 'share-from-square' },
+  'wait-parts': { label: 'รออะไหล่/อุปกรณ์', cls: 'status-wait-parts', icon: 'box-open' },
+  resolved:     { label: 'แก้ไขเสร็จสิ้น', cls: 'status-resolved',    icon: 'circle-check' },
+  closed:       { label: 'ปิดเคส',          cls: 'status-closed',      icon: 'lock' },
+  cancelled:    { label: 'ยกเลิก',          cls: 'status-cancelled',   icon: 'ban' },
 };
 
 // ── DEPARTMENTS ──

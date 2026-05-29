@@ -4,7 +4,7 @@ import { ROLES, ROLE_INFO, NAV_CONFIG } from '../data/mockData';
 
 
 export default function Sidebar() {
-  const { role, setRole, activeNav, setActiveNav } = useApp();
+  const { role, setRole, activeNav, setActiveNav, logoutUser, currentUser } = useApp();
   const [showRoleDropdown, setShowRoleDropdown] = useState(false);
   const info = ROLE_INFO[role];
   const sections = NAV_CONFIG[role] || [];
@@ -55,13 +55,17 @@ export default function Sidebar() {
         
         {/* Role Switcher in Footer */}
         <div className="profile-box" onClick={() => setShowRoleDropdown(v => !v)}>
-          <div className={`profile-avatar ${role}`}>
-            {info.initials}
+          <div className="profile-avatar" style={{ overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center', background: info.color, color: '#fff', width: 36, height: 36, borderRadius: '50%', fontWeight: 700, fontSize: 13.5, flexShrink: 0 }}>
+            {currentUser?.avatarUrl ? (
+              <img src={currentUser.avatarUrl} alt="avatar" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+            ) : (
+              info.initials
+            )}
           </div>
           <div className="profile-info">
-            <span className="profile-name">{info.name}</span>
+            <span className="profile-name">{currentUser?.name || info.name}</span>
             <span className="profile-email">
-              {role === ROLES.EMPLOYEE ? 'somchai.j@factory.com' : role === ROLES.MANAGER ? 'wipa.r@factory.com' : 'thana.s@factory.com'}
+              {currentUser?.email || (role === ROLES.EMPLOYEE ? 'somchai.j@factory.com' : role === ROLES.MANAGER ? 'wipa.r@factory.com' : 'thana.s@factory.com')}
             </span>
           </div>
           <i className="fa-solid fa-arrows-up-down profile-chevron" aria-hidden="true"></i>
@@ -81,13 +85,17 @@ export default function Sidebar() {
             <div className="shadcn-dropdown">
               {/* Header */}
               <div className="shadcn-dropdown-header">
-                <div className={`profile-avatar ${role}`} style={{ width: 36, height: 36, fontSize: 15 }}>
-                  {info.initials}
+                <div className="profile-avatar" style={{ width: 36, height: 36, fontSize: 13.5, overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center', background: info.color, color: '#fff', borderRadius: '50%', fontWeight: 700, flexShrink: 0 }}>
+                  {currentUser?.avatarUrl ? (
+                    <img src={currentUser.avatarUrl} alt="avatar" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                  ) : (
+                    info.initials
+                  )}
                 </div>
                 <div className="profile-info">
-                  <span className="profile-name" style={{ fontSize: 13.5 }}>{info.name}</span>
+                  <span className="profile-name" style={{ fontSize: 13.5 }}>{currentUser?.name || info.name}</span>
                   <span className="profile-email">
-                    {role === ROLES.EMPLOYEE ? 'somchai.j@factory.com' : role === ROLES.MANAGER ? 'wipa.r@factory.com' : 'thana.s@factory.com'}
+                    {currentUser?.email || (role === ROLES.EMPLOYEE ? 'somchai.j@factory.com' : role === ROLES.MANAGER ? 'wipa.r@factory.com' : 'thana.s@factory.com')}
                   </span>
                 </div>
               </div>
@@ -102,7 +110,7 @@ export default function Sidebar() {
                   className="shadcn-dropdown-item"
                   onClick={() => { setRole(key); setActiveNav('dashboard'); setShowRoleDropdown(false); }}
                 >
-                  <div className={`item-avatar ${key}`}>
+                  <div className="item-avatar" style={{ background: ri.color, color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', width: 30, height: 30, borderRadius: '50%', fontWeight: 700, fontSize: 11.5, flexShrink: 0 }}>
                     {ri.initials}
                   </div>
                   <div className="item-text-wrapper">
@@ -118,20 +126,16 @@ export default function Sidebar() {
               <div className="shadcn-dropdown-divider" />
 
               {/* Actions Section */}
-              <div className="shadcn-dropdown-item" onClick={() => { setActiveNav('settings'); setShowRoleDropdown(false); }}>
-                <span className="item-icon"><i className="fa-solid fa-gear"></i></span>
-                <span>การตั้งค่า</span>
-              </div>
-              <div className="shadcn-dropdown-item" onClick={() => { setActiveNav('faq'); setShowRoleDropdown(false); }}>
-                <span className="item-icon"><i className="fa-solid fa-circle-question"></i></span>
-                <span>คู่มือ & คำถามทั่วไป</span>
+              <div className="shadcn-dropdown-item" onClick={() => { setActiveNav('profile'); setShowRoleDropdown(false); }}>
+                <span className="item-icon" style={{ color: 'var(--primary)' }}><i className="fa-solid fa-user-gear"></i></span>
+                <span>ตั้งค่าโปรไฟล์</span>
               </div>
 
               <div className="shadcn-dropdown-divider" />
 
               {/* Logout */}
-              <div className="shadcn-dropdown-item danger" onClick={() => setShowRoleDropdown(false)}>
-                <span className="item-icon"><i className="fa-solid fa-right-from-bracket"></i></span>
+              <div className="shadcn-dropdown-item danger" onClick={async () => { setShowRoleDropdown(false); await logoutUser(); }}>
+                <span className="item-icon" style={{ color: 'var(--danger)' }}><i className="fa-solid fa-right-from-bracket"></i></span>
                 <span>ออกจากระบบ</span>
               </div>
             </div>

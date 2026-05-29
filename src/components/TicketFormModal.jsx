@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { useApp } from '../context/AppContext';
-import { CATEGORIES, URGENCY_LEVELS, ROLE_INFO } from '../data/mockData';
+import { CATEGORIES, URGENCY_LEVELS } from '../data/mockData';
 
 const CAT_THEME = {
   mechanical: { bg: '#fff7ed', border: '#fed7aa', active: '#ea580c', iconColor: '#ea580c' },
@@ -10,8 +10,7 @@ const CAT_THEME = {
 };
 
 export default function TicketFormModal({ onClose }) {
-  const { createTicket, role, addToast, depts } = useApp();
-  const info = ROLE_INFO[role];
+  const { createTicket, role, addToast, depts, currentUser } = useApp();
   const fileRef = useRef();
 
   const [form, setForm] = useState({
@@ -578,9 +577,11 @@ export default function TicketFormModal({ onClose }) {
                 </div>
                 <div>
                   <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-primary)' }}>
-                    ผู้ส่ง: {info.name}
+                    ผู้ส่ง: {currentUser?.name || '-'}
                   </div>
-                  <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>{info.label} — {info.desc}</div>
+                  <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>
+                    {currentUser?.department?.name || ''}{currentUser?.department?.name ? ' — ' : ''}{currentUser?.email || ''}
+                  </div>
                 </div>
               </div>
 

@@ -13,6 +13,12 @@ import DashboardView  from './views/DashboardView';
 import MyTicketsView  from './views/MyTicketsView';
 import ApprovalView   from './views/ApprovalView';
 import SLAView        from './views/SLAView';
+import LoginView      from './views/LoginView';
+import TrackView      from './views/TrackView';
+import UsersView      from './views/UsersView';
+import ReportsView    from './views/ReportsView';
+import SettingsView   from './views/SettingsView';
+import ProfileView    from './views/ProfileView';
 
 import './index.css';
 
@@ -49,7 +55,7 @@ function PlaceholderView({ title, icon }) {
 
 // ── Topbar ──
 function Topbar({ onCreateTicket }) {
-  const { role, activeNav, notifications, markNotifAsRead, clearAllNotifications } = useApp();
+  const { role, activeNav, notifications, markNotifAsRead, clearAllNotifications, currentUser } = useApp();
   const info = ROLE_INFO[role];
   const [showSearch, setShowSearch] = useState(false);
   const [showNotif, setShowNotif] = useState(false);
@@ -81,8 +87,6 @@ function Topbar({ onCreateTicket }) {
         </div>
 
         {showSearch && <SearchModal onClose={() => setShowSearch(false)} />}
-
-
 
         {/* Notifications */}
         <div style={{ position: 'relative' }}>
@@ -232,7 +236,7 @@ function Topbar({ onCreateTicket }) {
           )}
         </div>
 
-        {/* Profile info and tags */}
+        {/* Profile + Logout */}
         <div style={{
           display: 'flex',
           alignItems: 'center',
@@ -255,36 +259,41 @@ function Topbar({ onCreateTicket }) {
               fontSize: 12,
               fontWeight: 700,
               boxShadow: 'var(--shadow-sm)',
+              overflow: 'hidden'
             }}
           >
-            {info.initials}
+            {currentUser?.avatarUrl ? (
+              <img src={currentUser.avatarUrl} alt="avatar" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+            ) : (
+              info.initials
+            )}
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
             <span style={{ fontSize: 12.5, fontWeight: 700, color: 'var(--text-primary)', lineHeight: 1.2 }}>
-              {info.name}
+              {currentUser?.name || info.name}
             </span>
             <div style={{ display: 'flex', gap: 4, alignItems: 'center' }}>
               <span style={{ 
                 fontSize: '9px', 
-                padding: '1px 5px',
-                background: info.color + '15',
-                color: info.color,
-                border: `1px solid ${info.color}30`,
+                padding: '2px 6px',
+                background: role === ROLES.ADMIN ? 'var(--critical-pale)' : role === ROLES.MANAGER ? 'var(--success-pale)' : 'var(--primary-pale)',
+                color: role === ROLES.ADMIN ? 'var(--critical)' : role === ROLES.MANAGER ? '#065f46' : 'var(--primary)',
+                border: `1px solid ${role === ROLES.ADMIN ? 'rgba(124,58,237,0.3)' : role === ROLES.MANAGER ? 'rgba(16,185,129,0.3)' : 'rgba(37,99,235,0.3)'}`,
                 borderRadius: '4px',
-                fontWeight: 600
+                fontWeight: 700
               }}>
                 {info.label}
               </span>
               <span style={{ 
                 fontSize: '9px', 
-                padding: '1px 5px',
-                background: 'var(--primary-pale)',
-                color: 'var(--primary)',
+                padding: '2px 6px',
+                background: 'var(--primary-bg)',
+                color: 'var(--text-secondary)',
                 border: '1px solid var(--border-light)',
                 borderRadius: '4px',
                 fontWeight: 600
               }}>
-                {role === ROLES.EMPLOYEE ? 'ฝ่ายผลิต 1' : role === ROLES.MANAGER ? 'ฝ่ายซ่อมบำรุง' : 'ส่วนกลาง'}
+                {currentUser?.department?.name || (role === ROLES.EMPLOYEE ? 'ฝ่ายผลิต 1' : role === ROLES.MANAGER ? 'ฝ่ายซ่อมบำรุง' : 'ส่วนกลาง')}
               </span>
             </div>
           </div>
@@ -316,49 +325,44 @@ function MainContent() {
       case 'dashboard':
         return <DashboardView />;
 
-      // Employee
-      case 'my-tickets':
+      // ผู้ใช้สร้าง Ticket
+      case 'my-own-tickets':
+        return <MyTicketsView defaultTab="my-created" titleOverride="Ticket ของฉัน" />;
       case 'track':
-        return <MyTicketsView />;
+        return <MyTicketsView defaultTab="my-assigned" titleOverride="งานในการดูแลของฉัน" />;
+      case 'my-sent-tickets':
+        return <MyTicketsView defaultTab="outbound" titleOverride="Ticket ที่แผนกเราส่งไป" />;
+      case 'all-dept-tickets':
+        return <MyTicketsView defaultTab="inbound" titleOverride="Ticket ทั้งหมดของแผนก" />;
+
 
       case 'create-ticket': {
         // Open the modal and redirect to my-tickets
-        // We use an effect-like approach: render a component that fires onMount
-        return <CreateTicketRedirect onOpen={() => setShowForm(true)} onRedirect={() => setActiveNav('my-tickets')} />;
+        return <CreateTicketRedirect onOpen={() => setShowForm(true)} onRedirect={() => setActiveNav('my-own-tickets')} />;
       }
 
       // Manager
       case 'dept-tickets':
-        return <MyTicketsView />;
+        return <MyTicketsView defaultTab="inbound" />;
 
       // Admin
       case 'all-tickets':
-        return <MyTicketsView />;
+        return <MyTicketsView defaultTab="inbound" />;
 
       case 'escalated':
         return (
-          <div>
-            <div style={{ marginBottom: 20 }}>
-              <h2 style={{ fontSize: 20, fontWeight: 800, color: 'var(--text-primary)', margin: 0 }}><i className="fa-solid fa-triangle-exclamation" style={{ marginRight: 8 }}></i>Ticket เร่งด่วน / Line Stop</h2>
-              <p style={{ fontSize: 13, color: 'var(--text-muted)', marginTop: 4 }}>รายการที่มีระดับความเร่งด่วน "สูง" หรือ "วิกฤต" และยังไม่ปิด</p>
-            </div>
-            <MyTicketsView
-              filterOverride={tickets.filter(t => ['high', 'critical'].includes(t.urgency) && !['closed', 'resolved'].includes(t.status))}
-            />
-          </div>
+          <MyTicketsView
+            filterOverride={tickets.filter(t => ['high', 'critical'].includes(t.urgency) && !['closed', 'resolved'].includes(t.status))}
+            titleOverride="รายการ Ticket เร่งด่วน / Line Stop"
+          />
         );
 
       case 'assign':
         return (
-          <div>
-            <div style={{ marginBottom: 20 }}>
-              <h2 style={{ fontSize: 20, fontWeight: 800, color: 'var(--text-primary)', margin: 0 }}><i className="fa-solid fa-user-plus" style={{ marginRight: 8 }} aria-hidden="true"></i>มอบหมายงาน</h2>
-              <p style={{ fontSize: 13, color: 'var(--text-muted)', marginTop: 4 }}>Ticket ที่ยังไม่ได้รับการมอบหมาย</p>
-            </div>
-            <MyTicketsView
-              filterOverride={tickets.filter(t => t.assignedTo === 'รอมอบหมาย')}
-            />
-          </div>
+          <MyTicketsView
+            filterOverride={tickets.filter(t => t.assignedTo === 'รอมอบหมาย')}
+            titleOverride="รายการ Ticket มอบหมายงาน"
+          />
         );
 
       // Shared approval
@@ -372,76 +376,15 @@ function MainContent() {
 
       // Profile View
       case 'profile':
-        return (
-          <div className="view-container">
-            <div style={{ background: 'var(--bg-card)', padding: 32, borderRadius: 'var(--radius-xl)', boxShadow: 'var(--shadow-sm)', border: '1px solid var(--border-light)', maxWidth: 600, margin: '0 auto' }}>
-              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 16, borderBottom: '1px solid var(--border-light)', paddingBottom: 24, marginBottom: 24 }}>
-                <div style={{ width: 80, height: 80, borderRadius: '50%', background: info.color, color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 32, fontWeight: 800, boxShadow: 'var(--shadow-md)' }}>
-                  {info.initials}
-                </div>
-                <div style={{ textAlign: 'center' }}>
-                  <h2 style={{ fontSize: 22, fontWeight: 800, color: 'var(--text-primary)', margin: '0 0 4px 0' }}>{info.name}</h2>
-                  <span className="status-tag status-progress" style={{ fontSize: 13, background: 'var(--primary-pale)', color: 'var(--primary)', borderColor: 'var(--primary-light)', padding: '4px 12px' }}>{info.label}</span>
-                </div>
-              </div>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
-                <div>
-                  <div style={{ fontSize: 11, color: 'var(--text-muted)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 6 }}>สิทธิ์การใช้งาน (Role)</div>
-                  <div style={{ fontSize: 14, fontWeight: 600, color: 'var(--text-primary)' }}>{info.desc}</div>
-                </div>
-                <div>
-                  <div style={{ fontSize: 11, color: 'var(--text-muted)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 6 }}>ฝ่าย/แผนก (Department)</div>
-                  <div style={{ fontSize: 14, fontWeight: 600, color: 'var(--text-primary)' }}>{role === ROLES.EMPLOYEE ? 'ฝ่ายผลิต 1' : role === ROLES.MANAGER ? 'ฝ่ายซ่อมบำรุง' : 'ส่วนกลาง'}</div>
-                </div>
-                <div>
-                  <div style={{ fontSize: 11, color: 'var(--text-muted)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 8 }}>สลับบทบาทสำหรับทดสอบ (Demo Accounts)</div>
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-                    {Object.entries(ROLE_INFO).map(([key, ri]) => (
-                      <button
-                        key={key}
-                        onClick={() => {
-                          setRole(key);
-                          setActiveNav('dashboard');
-                        }}
-                        style={{
-                          display: 'flex',
-                          alignItems: 'center',
-                          gap: 12,
-                          padding: '10px 14px',
-                          border: '1px solid var(--border-light)',
-                          background: key === role ? 'var(--primary-pale)' : 'var(--bg-main)',
-                          color: key === role ? 'var(--primary)' : 'var(--text-primary)',
-                          borderRadius: 'var(--radius-lg)',
-                          cursor: 'pointer',
-                          fontWeight: 600,
-                          textAlign: 'left',
-                          transition: 'var(--transition)'
-                        }}
-                      >
-                        <div style={{ width: 24, height: 24, borderRadius: '50%', background: ri.color, color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, fontWeight: 700 }}>
-                          {ri.initials}
-                        </div>
-                        <div style={{ flex: 1 }}>
-                          <div style={{ fontSize: 13 }}>{ri.name}</div>
-                          <div style={{ fontSize: 11, opacity: 0.7, fontWeight: 400 }}>{ri.label}</div>
-                        </div>
-                        {key === role && <i className="fa-solid fa-circle-check" style={{ color: 'var(--primary)' }}></i>}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        );
+        return <ProfileView />;
 
-      // Stubs
+      // Admin views
       case 'reports':
-        return <PlaceholderView title="รายงาน & วิเคราะห์" icon="chart-line" />;
+        return <ReportsView />;
       case 'users':
-        return <PlaceholderView title="จัดการผู้ใช้งาน" icon="users" />;
+        return <UsersView />;
       case 'settings':
-        return <PlaceholderView title="ตั้งค่าระบบ" icon="gear" />;
+        return <SettingsView />;
       case 'audit':
         return <PlaceholderView title="Audit Log" icon="scroll" />;
       case 'team':
@@ -465,8 +408,76 @@ function MainContent() {
   );
 }
 
+// ── Logout Button ──
+function LogoutButton() {
+  const { logoutUser } = useApp();
+  const [loading, setLoading] = useState(false);
+  const handleLogout = async () => {
+    setLoading(true);
+    await logoutUser();
+    setLoading(false);
+  };
+  return (
+    <button
+      id="logout-btn"
+      onClick={handleLogout}
+      disabled={loading}
+      title="ออกจากระบบ"
+      style={{
+        display: 'flex',
+        alignItems: 'center',
+        gap: 5,
+        padding: '5px 10px',
+        border: '1px solid rgba(239,68,68,0.3)',
+        borderRadius: 'var(--radius-md)',
+        background: 'rgba(239,68,68,0.07)',
+        color: '#dc2626',
+        cursor: loading ? 'not-allowed' : 'pointer',
+        fontSize: 11.5,
+        fontWeight: 700,
+        transition: 'all 0.18s',
+        marginLeft: 4,
+      }}
+      onMouseEnter={e => { e.currentTarget.style.background = 'rgba(239,68,68,0.14)'; }}
+      onMouseLeave={e => { e.currentTarget.style.background = 'rgba(239,68,68,0.07)'; }}
+    >
+      <i className={`fa-solid fa-${loading ? 'spinner fa-spin' : 'right-from-bracket'}`} style={{ fontSize: 11 }} />
+      {loading ? '' : 'ออก'}
+    </button>
+  );
+}
+
 // ── Root ──
 function AppShell() {
+  const { isLoggedIn, authLoading } = useApp();
+
+  if (authLoading) {
+    return (
+      <div style={{
+        minHeight: '100vh',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        background: 'linear-gradient(135deg, #1e3a5f 0%, #2563eb 100%)',
+        flexDirection: 'column',
+        gap: 16,
+        color: '#fff',
+      }}>
+        <i className="fa-solid fa-spinner fa-spin" style={{ fontSize: 36, opacity: 0.8 }} />
+        <span style={{ fontSize: 14, opacity: 0.65, fontWeight: 600 }}>กำลังโหลด...</span>
+      </div>
+    );
+  }
+
+  if (!isLoggedIn) {
+    return (
+      <>
+        <LoginView />
+        <ToastContainer />
+      </>
+    );
+  }
+
   return (
     <div className="app-layout">
       <Sidebar />

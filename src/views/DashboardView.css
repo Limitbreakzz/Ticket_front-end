@@ -1,0 +1,165 @@
+.mobile-only {
+  display: none !important;
+}
+.dashboard-main-grid {
+  display: grid;
+  grid-template-columns: 1.65fr 1.35fr;
+}
+.dashboard-card {
+  background: var(--bg-card);
+  padding: 24px;
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--border-light);
+  overflow: visible;
+  display: flex;
+  flex-direction: column;
+}
+.table-responsive-wrapper {
+  overflow-x: visible;
+  margin: 0 -24px -24px -24px;
+}
+.dashboard-feed-wrapper {
+  margin: 0 -24px -24px -24px;
+  overflow: visible;
+}
+.feed-item-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 24px;
+  border-bottom: 1px solid var(--border-light);
+  transition: var(--transition);
+}
+.dashboard-table th, 
+.dashboard-table td {
+  padding: 12px 12px;
+  transition: var(--transition);
+}
+.dashboard-table th.id-col,
+.dashboard-table td.id-col {
+  padding-left: 24px;
+  width: 80px;
+}
+.dashboard-table th.status-col,
+.dashboard-table td.status-col {
+  padding-right: 24px;
+  width: 90px;
+}
+@media (max-width: 768px) {
+  .dashboard-main-grid {
+    grid-template-columns: 1fr;
+  }
+  .dashboard-card {
+    overflow: hidden !important;
+  }
+  .table-responsive-wrapper {
+    overflow-x: auto;
+  }
+  .table-responsive-wrapper table {
+    min-width: 450px;
+  }
+}
+@media (max-width: 576px) {
+  .desktop-only {
+    display: none !important;
+  }
+  .mobile-only {
+    display: flex !important;
+  }
+  .view-container {
+    gap: 12px !important;
+  }
+  .reporter-col {
+    display: none !important;
+  }
+  .table-responsive-wrapper table {
+    min-width: 100% !important;
+  }
+  .dashboard-card {
+    padding: 12px !important;
+  }
+  .table-responsive-wrapper {
+    margin: 0 -12px -12px -12px !important;
+  }
+  .dashboard-feed-wrapper {
+    margin: 0 -12px -12px -12px !important;
+  }
+  .feed-item-row {
+    padding: 10px 12px !important;
+  }
+  .dashboard-table th, 
+  .dashboard-table td {
+    padding: 8px 6px !important;
+  }
+  .dashboard-table th.id-col,
+  .dashboard-table td.id-col {
+    padding-left: 8px !important;
+    width: 60px !important;
+  }
+  .dashboard-table th.status-col,
+  .dashboard-table td.status-col {
+    padding-right: 8px !important;
+    width: 80px !important;
+  }
+  .tooltip-container,
+  .tooltip-truncate {
+    max-width: 160px !important;
+  }
+}
+.kpi-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-md) !important;
+}
+.tooltip-container {
+  position: relative;
+  display: inline-block;
+  max-width: 260px;
+  vertical-align: middle;
+}
+.tooltip-truncate {
+  display: block;
+  max-width: 260px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.tooltip-box {
+  visibility: hidden;
+  width: 250px;
+  background: rgba(15, 23, 42, 0.95);
+  backdrop-filter: blur(8px);
+  color: #fff;
+  text-align: left;
+  border-radius: 8px;
+  padding: 8px 12px;
+  position: absolute;
+  z-index: 99;
+  bottom: 125%;
+  left: 0;
+  opacity: 0;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+  transform: translateY(4px);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.35);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1.4;
+  white-space: normal;
+  pointer-events: none;
+}
+.tooltip-box::after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 20px;
+  margin-left: -5px;
+  border-width: 5px;
+  border-style: solid;
+  border-color: rgba(15, 23, 42, 0.95) transparent transparent transparent;
+}
+.tooltip-container:hover .tooltip-box {
+  visibility: visible;
+  opacity: 1;
+  transform: translateY(0);
+}

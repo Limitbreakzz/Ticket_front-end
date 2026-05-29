@@ -2,7 +2,7 @@ import { useApp } from '../context/AppContext';
 import { ROLES } from '../data/mockData';
 
 export default function BottomNav() {
-  const { role, activeNav, setActiveNav } = useApp();
+  const { role, activeNav, setActiveNav, tickets } = useApp();
 
   const getNavItems = () => {
     switch (role) {
@@ -11,24 +11,24 @@ export default function BottomNav() {
         return [
           { id: 'dashboard', icon: 'house', label: 'หน้าแรก' },
           { id: 'my-tickets', icon: 'list', label: 'งานของฉัน' },
-          { id: 'create-ticket', icon: 'plus', label: 'แจ้งเรื่อง', isPrimary: true },
-          { id: 'track', icon: 'magnifying-glass', label: 'ติดตาม' },
+          { id: 'create-ticket', icon: 'plus', label: 'แจ้งเรื่อง (+)', isPrimary: true },
+          { id: 'track', icon: 'magnifying-glass', label: 'ติดตามงาน' },
           { id: 'profile', icon: 'user', label: 'โปรไฟล์' }
         ];
       case ROLES.MANAGER:
         return [
           { id: 'dashboard', icon: 'house', label: 'หน้าแรก' },
           { id: 'dept-tickets', icon: 'layer-group', label: 'กระดานคิว' },
-          { id: 'create-ticket', icon: 'plus', label: 'แจ้งเรื่อง', isPrimary: true },
-          { id: 'approval', icon: 'clipboard-check', label: 'อนุมัติ', badge: 3 },
+          { id: 'create-ticket', icon: 'plus', label: 'แจ้งเรื่อง (+)', isPrimary: true },
+          { id: 'approval', icon: 'clipboard-check', label: 'อนุมัติ', badge: tickets.filter(t => t.status === 'wait-approve').length, isYellow: true },
           { id: 'profile', icon: 'user', label: 'โปรไฟล์' }
         ];
       case ROLES.ADMIN:
         return [
           { id: 'dashboard', icon: 'house', label: 'หน้าแรก' },
           { id: 'all-tickets', icon: 'layer-group', label: 'กระดานคิว' },
-          { id: 'create-ticket', icon: 'plus', label: 'แจ้งเรื่อง', isPrimary: true },
-          { id: 'settings', icon: 'gear', label: 'จัดการ' },
+          { id: 'create-ticket', icon: 'plus', label: 'แจ้งเรื่อง (+)', isPrimary: true },
+          { id: 'settings', icon: 'gear', label: 'จัดการระบบ' },
           { id: 'profile', icon: 'user', label: 'โปรไฟล์' }
         ];
       default:
@@ -48,7 +48,14 @@ export default function BottomNav() {
         >
           <div className="icon-wrapper">
             <i className={`fa-solid fa-${item.icon}`}></i>
-            {item.badge && <span className="bottom-nav-badge">{item.badge}</span>}
+            {item.badge > 0 && (
+              <span 
+                className="bottom-nav-badge"
+                style={item.isYellow ? { background: '#eab308', color: '#1e3a5f', fontWeight: '800' } : {}}
+              >
+                {item.badge}
+              </span>
+            )}
           </div>
           <span className="label">{item.label}</span>
         </button>

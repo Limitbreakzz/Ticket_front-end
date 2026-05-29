@@ -1,4 +1,4 @@
-import { calcSLA, SLA_STATUS_CONFIG, SLA_POLICY, formatDuration, formatDeadline } from '../utils/sla';
+import { calcSLA, calcResponseSLA, SLA_STATUS_CONFIG, SLA_POLICY, formatDuration, formatDeadline } from '../utils/sla';
 
 /**
  * Compact inline SLA badge — used in ticket tables.
@@ -80,57 +80,117 @@ export function SLABar({ ticket, showLabel = true }) {
  * Full SLA detail block — used in ticket detail modal.
  */
 export function SLADetail({ ticket }) {
-  const sla = calcSLA(ticket);
-  if (!sla) return null;
-  const cfg = SLA_STATUS_CONFIG[sla.slaStatus];
-  const policy = SLA_POLICY[ticket.urgency];
+  const slaRes = calcSLA(ticket);
+  const slaResp = calcResponseSLA(ticket);
+  if (!slaRes || !slaResp) return null;
+
+  const cfgRes = SLA_STATUS_CONFIG[slaRes.slaStatus];
+  const cfgResp = SLA_STATUS_CONFIG[slaResp.slaStatus];
 
   return (
-    <div style={{
-      border: `1.5px solid ${cfg.color}40`,
-      borderLeft: `4px solid ${cfg.color}`,
-      borderRadius: 'var(--radius-lg)',
-      background: cfg.bg,
-      padding: '14px 16px',
-    }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
-        <span style={{ fontSize: 18 }}><i className={`fa-solid fa-${cfg.icon}`}  aria-hidden="true"></i></span>
-        <span style={{ fontWeight: 700, color: cfg.color, fontSize: 14 }}>
-          SLA — {cfg.label}
-        </span>
-        <span style={{
-          marginLeft: 'auto',
-          background: cfg.color,
-          color: '#fff',
-          fontSize: 12,
-          fontWeight: 700,
-          padding: '2px 10px',
-          borderRadius: 'var(--radius-full)',
-        }}>
-          {Math.round(sla.pct)}%
-        </span>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+      {/* 1. Response SLA */}
+      <div style={{
+        border: `1.5px solid ${cfgResp.color}40`,
+        borderLeft: `4px solid ${cfgResp.color}`,
+        borderRadius: 'var(--radius-lg)',
+        background: cfgResp.bg,
+        padding: '14px 16px',
+      }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
+          <span style={{ fontSize: 16 }}><i className={`fa-solid fa-${cfgResp.icon}`}  aria-hidden="true"></i></span>
+          <span style={{ fontWeight: 800, color: cfgResp.color, fontSize: 13.5 }}>
+            SLA การรับเรื่อง (Response Time) — {cfgResp.label}
+          </span>
+          <span style={{
+            marginLeft: 'auto',
+            background: cfgResp.color,
+            color: '#fff',
+            fontSize: 11,
+            fontWeight: 800,
+            padding: '2px 8px',
+            borderRadius: 'var(--radius-full)',
+          }}>
+            {Math.round(slaResp.pct)}%
+          </span>
+        </div>
+
+        {/* Progress bar */}
+        <div style={{ height: 6, background: 'rgba(0,0,0,0.08)', borderRadius: 'var(--radius-full)', marginBottom: 10 }}>
+          <div style={{
+            height: '100%', width: `${slaResp.pct}%`,
+            background: cfgResp.color,
+            borderRadius: 'var(--radius-full)',
+            transition: 'width 0.6s ease',
+          }} />
+        </div>
+
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '6px 20px' }}>
+          <SLARow label="เกณฑ์เวลาตอบรับ" value={slaResp.policy.label} />
+          <SLARow label="เส้นตายรับเรื่อง" value={formatDeadline(slaResp.deadlineDate)} />
+          <SLARow label="เวลาที่ใช้" value={formatDuration(slaResp.elapsedH)} />
+          {!slaResp.isClosed && slaResp.remainingH > 0 && (
+            <SLARow label="เวลาที่เหลือ" value={formatDuration(slaResp.remainingH)} highlight={slaResp.slaStatus === 'at-risk'} />
+          )}
+          {!slaResp.isClosed && slaResp.remainingH <= 0 && (
+            <SLARow label="เกินกำหนด" value={formatDuration(Math.abs(slaResp.remainingH))} danger />
+          )}
+          {slaResp.isClosed && (
+            <SLARow label="ผลการตอบรับ" value={slaResp.slaStatus === 'met' ? 'รับเรื่องทันเวลา' : 'เกินกำหนดการรับเรื่อง'} danger={slaResp.slaStatus !== 'met'} />
+          )}
+        </div>
       </div>
 
-      {/* Progress bar */}
-      <div style={{ height: 8, background: 'rgba(0,0,0,0.08)', borderRadius: 'var(--radius-full)', marginBottom: 10 }}>
-        <div style={{
-          height: '100%', width: `${sla.pct}%`,
-          background: cfg.color,
-          borderRadius: 'var(--radius-full)',
-          transition: 'width 0.6s ease',
-        }} />
-      </div>
+      {/* 2. Resolution SLA */}
+      <div style={{
+        border: `1.5px solid ${cfgRes.color}40`,
+        borderLeft: `4px solid ${cfgRes.color}`,
+        borderRadius: 'var(--radius-lg)',
+        background: cfgRes.bg,
+        padding: '14px 16px',
+      }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
+          <span style={{ fontSize: 16 }}><i className={`fa-solid fa-${cfgRes.icon}`}  aria-hidden="true"></i></span>
+          <span style={{ fontWeight: 800, color: cfgRes.color, fontSize: 13.5 }}>
+            SLA การแก้ไข (Resolution Time) — {cfgRes.label}
+          </span>
+          <span style={{
+            marginLeft: 'auto',
+            background: cfgRes.color,
+            color: '#fff',
+            fontSize: 11,
+            fontWeight: 800,
+            padding: '2px 8px',
+            borderRadius: 'var(--radius-full)',
+          }}>
+            {Math.round(slaRes.pct)}%
+          </span>
+        </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '6px 20px' }}>
-        <SLARow label="นโยบาย SLA" value={policy?.desc || '—'} />
-        <SLARow label="กำหนดเวลา" value={formatDeadline(sla.deadlineDate)} />
-        <SLARow label="เวลาที่ผ่านไป" value={formatDuration(sla.elapsedH)} />
-        {!sla.isClosed && sla.remainingH > 0 && (
-          <SLARow label="เวลาที่เหลือ" value={formatDuration(sla.remainingH)} highlight={sla.slaStatus === 'at-risk'} />
-        )}
-        {!sla.isClosed && sla.remainingH <= 0 && (
-          <SLARow label="เกินกำหนด" value={formatDuration(Math.abs(sla.remainingH))} danger />
-        )}
+        {/* Progress bar */}
+        <div style={{ height: 6, background: 'rgba(0,0,0,0.08)', borderRadius: 'var(--radius-full)', marginBottom: 10 }}>
+          <div style={{
+            height: '100%', width: `${slaRes.pct}%`,
+            background: cfgRes.color,
+            borderRadius: 'var(--radius-full)',
+            transition: 'width 0.6s ease',
+          }} />
+        </div>
+
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '6px 20px' }}>
+          <SLARow label="เกณฑ์เวลาแก้ไข" value={slaRes.policy.label} />
+          <SLARow label="เส้นตายแก้ไขเสร็จ" value={formatDeadline(slaRes.deadlineDate)} />
+          <SLARow label="เวลาที่ใช้" value={formatDuration(slaRes.elapsedH)} />
+          {!slaRes.isClosed && slaRes.remainingH > 0 && (
+            <SLARow label="เวลาที่เหลือ" value={formatDuration(slaRes.remainingH)} highlight={slaRes.slaStatus === 'at-risk'} />
+          )}
+          {!slaRes.isClosed && slaRes.remainingH <= 0 && (
+            <SLARow label="เกินกำหนด" value={formatDuration(Math.abs(slaRes.remainingH))} danger />
+          )}
+          {slaRes.isClosed && (
+            <SLARow label="ผลการแก้ไข" value={slaRes.slaStatus === 'met' ? 'แก้ไขเสร็จทันเวลา' : 'เกินกำหนดการแก้ไข'} danger={slaRes.slaStatus !== 'met'} />
+          )}
+        </div>
       </div>
     </div>
   );

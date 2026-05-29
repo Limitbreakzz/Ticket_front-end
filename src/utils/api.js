@@ -172,12 +172,15 @@ export function mapTicketBEtoFE(tk) {
       day: 'numeric', month: 'short', year: 'numeric',
       hour: '2-digit', minute: '2-digit',
     }),
+    rawCreatedAt: tk.createdAt,
+    rawUpdatedAt: tk.updatedAt,
     timeline: [], // Mapped when fetching detailed data
     managerApproval: tk.status === 'APPROVED' ? 'approved' : tk.status === 'REJECTED' ? 'rejected' : null,
     adminNote: '', // Handled from latest comment or updates
     image: tk.attachmentUrl || null,
     // Add SLA data
     slaDueDate: tk.slaDueDate,
+    targetDepartment: tk.targetDepartment ? tk.targetDepartment.name : 'ส่วนกลาง',
   };
 }
 
@@ -304,6 +307,17 @@ export async function assignTicket(id, agentId) {
   return mapTicketBEtoFE(res.data);
 }
 
+export async function transferTicket(id, toDepartmentId, note) {
+  const res = await apiFetch(`/tickets/${id}/transfer`, {
+    method: 'POST',
+    body: {
+      toDepartmentId,
+      note,
+    },
+  });
+  return res.data;
+}
+
 export async function fetchUsers() {
   const res = await apiFetch('/users');
   return res.data || [];
@@ -343,4 +357,102 @@ export async function markNotificationAsRead(id = null) {
     method: 'PUT',
     body: id ? { id } : {},
   });
+}
+
+// ── ADMIN USER MANAGEMENT ──
+export async function adminFetchUsers() {
+  const res = await apiFetch('/admin/users');
+  return res.data || [];
+}
+
+export async function adminCreateUser(payload) {
+  const res = await apiFetch('/admin/users', {
+    method: 'POST',
+    body: payload,
+  });
+  return res.data;
+}
+
+export async function adminUpdateUser(id, payload) {
+  const res = await apiFetch(`/admin/users/${id}`, {
+    method: 'PATCH',
+    body: payload,
+  });
+  return res.data;
+}
+
+export async function adminDeleteUser(id) {
+  await apiFetch(`/admin/users/${id}`, {
+    method: 'DELETE',
+  });
+}
+
+// ── ADMIN DEPARTMENT MANAGEMENT ──
+export async function adminFetchDepartments() {
+  const res = await apiFetch('/admin/departments');
+  return res.data || [];
+}
+
+export async function adminCreateDepartment(payload) {
+  const res = await apiFetch('/admin/departments', {
+    method: 'POST',
+    body: payload,
+  });
+  return res.data;
+}
+
+export async function adminUpdateDepartment(id, payload) {
+  const res = await apiFetch(`/admin/departments/${id}`, {
+    method: 'PATCH',
+    body: payload,
+  });
+  return res.data;
+}
+
+export async function adminDeleteDepartment(id) {
+  await apiFetch(`/admin/departments/${id}`, {
+    method: 'DELETE',
+  });
+}
+
+// ── ADMIN ANALYTICS ──
+export async function fetchAnalytics() {
+  const res = await apiFetch('/admin/analytics');
+  return res.data;
+}
+
+// ── WEBHOOK MANAGEMENT ──
+export async function fetchWebhooks() {
+  const res = await apiFetch('/webhooks');
+  return res.data || [];
+}
+
+export async function createWebhook(payload) {
+  const res = await apiFetch('/webhooks', {
+    method: 'POST',
+    body: payload,
+  });
+  return res.data;
+}
+
+export async function updateWebhook(id, payload) {
+  const res = await apiFetch(`/webhooks/${id}`, {
+    method: 'PATCH',
+    body: payload,
+  });
+  return res.data;
+}
+
+export async function deleteWebhook(id) {
+  await apiFetch(`/webhooks/${id}`, {
+    method: 'DELETE',
+  });
+}
+
+export async function updateMe(payload) {
+  const res = await apiFetch('/auth/me', {
+    method: 'PATCH',
+    body: payload,
+  });
+  return res.data;
 }

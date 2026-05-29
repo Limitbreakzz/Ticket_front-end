@@ -283,7 +283,7 @@ export default function SLAView() {
                           background: cfg.bg, color: cfg.color,
                           fontSize: 11, fontWeight: 700,
                         }}>
-                          {cfg.icon} {cfg.label}
+                          <i className={`fa-solid fa-${cfg.icon}`} aria-hidden="true"></i> {cfg.label}
                         </span>
                       </td>
                       <td>

@@ -124,7 +124,20 @@ export default function ApprovalView() {
                 boxShadow: 'var(--shadow-sm)',
                 flexWrap: 'wrap',
               }}>
-                <div style={{ fontSize: 28 }}>{catInfo?.icon}</div>
+                <div style={{
+                  fontSize: 22,
+                  width: 48,
+                  height: 48,
+                  borderRadius: 10,
+                  background: 'var(--primary-bg)',
+                  color: 'var(--primary)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  flexShrink: 0
+                }}>
+                  <i className={`fa-solid fa-${catInfo?.icon || 'folder'}`}></i>
+                </div>
                 <div style={{ flex: 1, minWidth: 200 }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
                     <span className="ticket-id">{t.id}</span>
@@ -192,8 +205,9 @@ export default function ApprovalView() {
                         <div className="ticket-meta">{t.updatedAt}</div>
                       </td>
                       <td>
-                        <span className={`badge badge-${t.category}`}>
-                          {catInfo?.icon} {catInfo?.label}
+                        <span className={`badge badge-${t.category}`} style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+                          <i className={`fa-solid fa-${catInfo?.icon || 'folder'}`} style={{ fontSize: 11 }}></i>
+                          {catInfo?.label}
                         </span>
                       </td>
                       <td>
