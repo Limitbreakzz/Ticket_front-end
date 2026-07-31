@@ -177,7 +177,7 @@ export function TicketsSkeleton() {
           <table style={{ width: '100%', borderCollapse: 'collapse' }}>
             <thead>
               <tr style={{ background: 'var(--bg-main)', borderBottom: '1px solid var(--border-light)' }}>
-                {['รหัส / วันที่', 'ผู้แจ้ง / แผนก', 'หัวข้อ / หมวดหมู่', 'สถานะ', 'SLA', 'ผู้รับผิดชอบ', 'ดำเนินการ'].map((h, i) => (
+                {['รหัส / วันที่', 'ผู้แจ้ง / แผนก', 'หัวข้อ / หมวดหมู่', 'ความเร่งด่วน', 'สถานะ', 'สถานะและเวลา SLA', 'ผู้รับผิดชอบ'].map((h, i) => (
                   <th key={i} style={{ padding: '14px 20px', textAlign: 'left' }}>
                     <div className="skeleton-shimmer" style={{ width: '60px', height: '12px', borderRadius: '3px' }} />
                   </th>
@@ -190,10 +190,10 @@ export function TicketsSkeleton() {
                   <td style={{ padding: '16px 20px' }}><div className="skeleton-shimmer" style={{ width: '80px', height: '12px', borderRadius: '3px' }} /></td>
                   <td style={{ padding: '16px 20px' }}><div className="skeleton-shimmer" style={{ width: '120px', height: '12px', borderRadius: '3px' }} /></td>
                   <td style={{ padding: '16px 20px' }}><div className="skeleton-shimmer" style={{ width: '220px', height: '12px', borderRadius: '3px' }} /></td>
+                  <td style={{ padding: '16px 20px' }}><div className="skeleton-shimmer" style={{ width: '60px', height: '18px', borderRadius: '10px' }} /></td>
                   <td style={{ padding: '16px 20px' }}><div className="skeleton-shimmer" style={{ width: '70px', height: '18px', borderRadius: '10px' }} /></td>
-                  <td style={{ padding: '16px 20px' }}><div className="skeleton-shimmer" style={{ width: '60px', height: '12px', borderRadius: '3px' }} /></td>
+                  <td style={{ padding: '16px 20px' }}><div className="skeleton-shimmer" style={{ width: '85px', height: '12px', borderRadius: '3px' }} /></td>
                   <td style={{ padding: '16px 20px' }}><div className="skeleton-shimmer" style={{ width: '100px', height: '12px', borderRadius: '3px' }} /></td>
-                  <td style={{ padding: '16px 20px' }}><div className="skeleton-shimmer" style={{ width: '90px', height: '28px', borderRadius: '6px' }} /></td>
                 </tr>
               ))}
             </tbody>

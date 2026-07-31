@@ -207,12 +207,25 @@ export default function AppSkeleton() {
 
       {/* Bottom Navigation Skeleton (hidden on desktop via css) */}
       <nav className="bottom-nav">
-        {[1, 2, 3, 4, 5].map(i => (
-          <div key={i} className="bottom-nav-item" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '4px' }}>
-            <div className="skeleton-shimmer" style={{ width: '20px', height: '20px', borderRadius: '4px' }} />
-            <div className="skeleton-shimmer" style={{ width: '32px', height: '8px', borderRadius: '2px' }} />
-          </div>
-        ))}
+        {[1, 2, 3, 4, 5].map(i => {
+          const isPrimary = i === 3;
+          if (isPrimary) {
+            return (
+              <div key={i} className="bottom-nav-item primary" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+                <div className="icon-wrapper" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(59, 130, 246, 0.15)', width: 44, height: 44, borderRadius: '50%' }}>
+                  <div className="skeleton-shimmer" style={{ width: '18px', height: '18px', borderRadius: '50%', background: 'rgba(255, 255, 255, 0.2)' }} />
+                </div>
+                <div className="skeleton-shimmer" style={{ width: '26px', height: '7px', borderRadius: '2px', marginTop: '2px' }} />
+              </div>
+            );
+          }
+          return (
+            <div key={i} className="bottom-nav-item" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '4px' }}>
+              <div className="skeleton-shimmer" style={{ width: '20px', height: '20px', borderRadius: '4px' }} />
+              <div className="skeleton-shimmer" style={{ width: '32px', height: '8px', borderRadius: '2px' }} />
+            </div>
+          );
+        })}
       </nav>
     </div>
   );
