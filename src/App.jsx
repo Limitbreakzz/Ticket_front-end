@@ -332,7 +332,7 @@ function MainContent() {
     // Ticket-dependent views load when ticketsLoading is true
     const isTicketView = ['dashboard', 'my-own-tickets', 'track', 'my-sent-tickets', 'all-dept-tickets', 'dept-tickets', 'all-tickets', 'escalated', 'approval', 'approved-history', 'sla', 'reports'].includes(activeNav);
 
-    if (ticketsLoading && isTicketView) {
+    if (ticketsLoading && isTicketView && tickets.length === 0) {
       if (activeNav === 'dashboard') return <DashboardSkeleton />;
       if (['my-own-tickets', 'track', 'my-sent-tickets', 'all-dept-tickets', 'dept-tickets', 'all-tickets', 'escalated'].includes(activeNav)) {
         return <TicketsSkeleton />;
