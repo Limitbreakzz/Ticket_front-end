@@ -69,13 +69,16 @@ export default function AppSkeleton() {
             {/* Create Ticket Button placeholder (Visible on desktop, hidden on mobile in CSS) */}
             <div className="skeleton-shimmer topbar-create-btn" style={{ width: '90px', height: '32px', borderRadius: 'var(--radius-md)' }} />
             {/* Bell Notification Icon placeholder */}
-            <div className="skeleton-shimmer" style={{ width: '32px', height: '32px', borderRadius: '50%' }} />
+            <div className="skeleton-shimmer icon-btn" style={{ width: '32px', height: '32px', borderRadius: '50%' }} />
             {/* User Profile block placeholder */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', background: 'var(--primary-bg)', border: '1px solid var(--border-light)', borderRadius: 'var(--radius-lg)', padding: '6px 12px' }}>
-              <div className="skeleton-shimmer" style={{ width: '32px', height: '32px', borderRadius: '50%' }} />
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                <div className="skeleton-shimmer" style={{ width: '70px', height: '11px', borderRadius: '3px' }} />
-                <div className="skeleton-shimmer" style={{ width: '90px', height: '9px', borderRadius: '3px' }} />
+            <div className="topbar-profile-box" style={{ display: 'flex', alignItems: 'center', gap: '8px', background: 'var(--primary-bg)', border: '1px solid var(--border-light)', borderRadius: 'var(--radius-lg)', padding: '6px 12px' }}>
+              <div className="skeleton-shimmer topbar-profile-avatar-container" style={{ width: '32px', height: '32px', borderRadius: '50%' }} />
+              <div className="topbar-profile-info" style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                <div className="skeleton-shimmer topbar-profile-name" style={{ width: '70px', height: '11px', borderRadius: '3px' }} />
+                <div className="topbar-profile-badges" style={{ display: 'flex', gap: '3px' }}>
+                  <div className="skeleton-shimmer topbar-profile-role-badge" style={{ width: '40px', height: '9px', borderRadius: '3px' }} />
+                  <div className="skeleton-shimmer topbar-profile-dept-badge" style={{ width: '45px', height: '9px', borderRadius: '3px' }} />
+                </div>
               </div>
             </div>
           </div>
