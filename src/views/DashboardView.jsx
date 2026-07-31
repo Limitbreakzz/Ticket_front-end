@@ -54,7 +54,7 @@ export default function DashboardView() {
 
   // Stats calculation
   const totalTickets = tickets.length;
-  const newTickets = tickets.filter(t => t.status === 'new' || t.status === 'pending' || t.status === 'wait-approve').length;
+  const newTickets = tickets.filter(t => t.status === 'new' || t.status === 'pending' || t.status === 'wait-approve' || t.status === 'forwarded').length;
   const inProgressTickets = tickets.filter(t => t.status === 'in-progress' || t.status === 'progress' || t.status === 'wait-parts').length;
   const resolvedTickets = tickets.filter(t => t.status === 'resolved' || t.status === 'closed').length;
   const ourDept =
