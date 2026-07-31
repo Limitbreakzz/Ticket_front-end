@@ -622,7 +622,7 @@ export function AppProvider({ children }) {
       updateProfile,
       addToast,
       removeToast,
-      reloadTickets: loadData,
+      reloadTickets: (fetchDepts = false, forceRefetch = true) => loadData(fetchDepts, forceRefetch),
       globalConfirm,
       showConfirm,
       setGlobalConfirm,

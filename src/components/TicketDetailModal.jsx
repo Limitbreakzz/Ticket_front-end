@@ -481,19 +481,26 @@ export default function TicketDetailModal({ ticket, onClose }) {
   
   // Department list for transfers
   const [deptsList, setDeptsList] = useState([]);
+  const [deptsLoadError, setDeptsLoadError] = useState(null);
 
   const rootContainerRef = useRef(null);
 
   // Load ticket details on mount
   const loadData = async (active = true, force = false) => {
     try {
+      setDeptsLoadError(null);
       const details = await api.getTicketDetail(ticket.id, force);
       if (!active) return;
       setDetailTicket(details);
       
-      const depts = await api.getDepartments(force);
-      if (!active) return;
-      setDeptsList(depts);
+      try {
+        const depts = await api.getDepartments(true);
+        if (!active) return;
+        setDeptsList(depts || []);
+      } catch (deptErr) {
+        console.error("Error loading departments:", deptErr);
+        if (active) setDeptsLoadError(deptErr.message || "Failed to load departments");
+      }
     } catch (error) {
       console.error("Error loading ticket detail:", error);
     }
@@ -2669,7 +2676,12 @@ export default function TicketDetailModal({ ticket, onClose }) {
 
                     {/* Options List */}
                     <div style={{ maxHeight: '160px', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: 2 }}>
-                      {deptsList
+                      {deptsLoadError ? (
+                        <div style={{ padding: '8px 12px', fontSize: 13, color: 'var(--danger)', textAlign: 'center' }}>
+                          <i className="fa-solid fa-circle-exclamation" style={{ marginRight: 6 }} aria-hidden="true"></i>
+                          โหลดข้อมูลแผนกล้มเหลว: {deptsLoadError}
+                        </div>
+                      ) : deptsList
                         .filter(d => d.name !== detailTicket.targetDepartment)
                         .filter(d => d.name.toLowerCase().includes(transferDeptSearch.toLowerCase())).length === 0 ? (
                         <div style={{ padding: '8px 12px', fontSize: 13, color: 'var(--text-muted)', textAlign: 'center' }}>
