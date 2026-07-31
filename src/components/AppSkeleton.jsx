@@ -48,17 +48,26 @@ export default function AppSkeleton() {
       <div className="main-content">
         {/* Topbar Skeleton */}
         <header className="topbar" style={{ justifyContent: 'space-between', display: 'flex', alignItems: 'center' }}>
-          {/* Breadcrumbs Placeholder */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          {/* Brand Logo (Visible on mobile, hidden on desktop in CSS) */}
+          <div className="topbar-brand">
+            <div className="topbar-logo-icon">
+              <i className="fa-solid fa-ticket" style={{ color: '#fff' }} aria-hidden="true"></i>
+            </div>
+            <span className="topbar-logo-text">Ticket Hub</span>
+          </div>
+          <div className="topbar-separator"></div>
+
+          {/* Breadcrumbs Placeholder (Visible on desktop, hidden on mobile in CSS) */}
+          <div className="topbar-left" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
             <div className="skeleton-shimmer" style={{ width: '60px', height: '12px', borderRadius: '3px' }} />
-            <span style={{ color: 'var(--text-muted)', fontSize: '12px' }}>/</span>
+            <span className="topbar-separator" style={{ color: 'var(--text-muted)', fontSize: '12px' }}>/</span>
             <div className="skeleton-shimmer" style={{ width: '80px', height: '12px', borderRadius: '3px' }} />
           </div>
 
           {/* Topbar Actions */}
           <div className="topbar-actions" style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-            {/* Create Ticket Button placeholder */}
-            <div className="skeleton-shimmer" style={{ width: '90px', height: '32px', borderRadius: 'var(--radius-md)' }} />
+            {/* Create Ticket Button placeholder (Visible on desktop, hidden on mobile in CSS) */}
+            <div className="skeleton-shimmer topbar-create-btn" style={{ width: '90px', height: '32px', borderRadius: 'var(--radius-md)' }} />
             {/* Bell Notification Icon placeholder */}
             <div className="skeleton-shimmer" style={{ width: '32px', height: '32px', borderRadius: '50%' }} />
             {/* User Profile block placeholder */}
