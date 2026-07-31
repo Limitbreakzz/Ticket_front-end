@@ -49,11 +49,9 @@ export default function AppSkeleton() {
         {/* Topbar Skeleton */}
         <header className="topbar" style={{ justifyContent: 'space-between', display: 'flex', alignItems: 'center' }}>
           {/* Brand Logo (Visible on mobile, hidden on desktop in CSS) */}
-          <div className="topbar-brand">
-            <div className="topbar-logo-icon">
-              <i className="fa-solid fa-ticket" style={{ color: '#fff' }} aria-hidden="true"></i>
-            </div>
-            <span className="topbar-logo-text">Ticket Hub</span>
+          <div className="topbar-brand" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <div className="skeleton-shimmer" style={{ width: '32px', height: '32px', borderRadius: '8px' }} />
+            <div className="skeleton-shimmer" style={{ width: '80px', height: '14px', borderRadius: '4px' }} />
           </div>
           <div className="topbar-separator"></div>
 
