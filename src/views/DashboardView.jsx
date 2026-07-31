@@ -57,12 +57,6 @@ export default function DashboardView() {
   const newTickets = tickets.filter(t => t.status === 'new' || t.status === 'pending' || t.status === 'wait-approve').length;
   const inProgressTickets = tickets.filter(t => t.status === 'in-progress' || t.status === 'progress' || t.status === 'wait-parts').length;
   const resolvedTickets = tickets.filter(t => t.status === 'resolved' || t.status === 'closed').length;
-  const recentTickets = [...tickets]
-    .sort((a, b) => new Date(b.rawCreatedAt) - new Date(a.rawCreatedAt))
-    .slice(0, 5);
-
-  const pendingApprovalsCount = tickets.filter(t => t.status === 'wait-approve' && t.assignedTo && t.assignedTo !== 'รอมอบหมาย').length;
-
   const ourDept =
     currentUser?.department?.name ||
     currentUser?.departmentName ||
@@ -77,9 +71,15 @@ export default function DashboardView() {
     // Admin sees all active tickets
     if (role === 'admin') return true;
 
-    // Others see tickets targeted to or created from their department
-    return ourDept && (t.targetDepartment === ourDept || t.department === ourDept);
+    // Others see tickets targeted to their department but created by another department
+    return ourDept && t.targetDepartment === ourDept && t.department !== ourDept;
   });
+
+  const recentTickets = (role === 'admin' ? [...tickets] : [...deptTickets])
+    .sort((a, b) => new Date(b.rawCreatedAt) - new Date(a.rawCreatedAt))
+    .slice(0, 5);
+
+  const pendingApprovalsCount = tickets.filter(t => t.status === 'wait-approve' && t.assignedTo && t.assignedTo !== 'รอมอบหมาย').length;
 
   return (
     <div className="view-container" style={{ maxWidth: 1200, margin: '0 auto', display: 'flex', flexDirection: 'column', gap: 24 }}>
