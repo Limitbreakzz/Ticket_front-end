@@ -2683,6 +2683,7 @@ export default function TicketDetailModal({ ticket, onClose }) {
                         </div>
                       ) : deptsList
                         .filter(d => d.name !== detailTicket.targetDepartment)
+                        .filter(d => d.name !== detailTicket.department)
                         .filter(d => d.name.toLowerCase().includes(transferDeptSearch.toLowerCase())).length === 0 ? (
                         <div style={{ padding: '8px 12px', fontSize: 13, color: 'var(--text-muted)', textAlign: 'center' }}>
                           <i className="fa-solid fa-triangle-exclamation" style={{ marginRight: 6 }} aria-hidden="true"></i>
@@ -2691,6 +2692,7 @@ export default function TicketDetailModal({ ticket, onClose }) {
                       ) : (
                         deptsList
                           .filter(d => d.name !== detailTicket.targetDepartment)
+                          .filter(d => d.name !== detailTicket.department)
                           .filter(d => d.name.toLowerCase().includes(transferDeptSearch.toLowerCase()))
                           .map(d => {
                             const isSelected = String(transferDeptId) === String(d.id);
