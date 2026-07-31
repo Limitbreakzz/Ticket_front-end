@@ -316,7 +316,7 @@ function CreateTicketRedirect({ onOpen, onRedirect }) {
 
 // ── Main router ──
 function MainContent() {
-  const { activeNav, setActiveNav, activeTicketId, closeTicketDetail, showCreateModal, setShowCreateModal, dataLoading } = useApp();
+  const { activeNav, setActiveNav, activeTicketId, closeTicketDetail, showCreateModal, setShowCreateModal, ticketsLoading } = useApp();
   const { tickets } = useApp();
 
   // Reset scroll position to top when changing page views
@@ -329,16 +329,17 @@ function MainContent() {
   }, [activeNav]);
 
   const renderView = () => {
-    if (dataLoading) {
+    // Ticket-dependent views load when ticketsLoading is true
+    const isTicketView = ['dashboard', 'my-own-tickets', 'track', 'my-sent-tickets', 'all-dept-tickets', 'dept-tickets', 'all-tickets', 'escalated', 'approval', 'approved-history', 'sla', 'reports'].includes(activeNav);
+
+    if (ticketsLoading && isTicketView) {
       if (activeNav === 'dashboard') return <DashboardSkeleton />;
       if (['my-own-tickets', 'track', 'my-sent-tickets', 'all-dept-tickets', 'dept-tickets', 'all-tickets', 'escalated'].includes(activeNav)) {
         return <TicketsSkeleton />;
       }
       if (['approval', 'approved-history'].includes(activeNav)) return <ApprovalSkeleton />;
-      if (['sla', 'settings'].includes(activeNav)) return <SLASkeleton />;
-      if (activeNav === 'profile') return <ProfileSkeleton />;
+      if (['sla'].includes(activeNav)) return <SLASkeleton />;
       if (activeNav === 'reports') return <ReportsSkeleton />;
-      if (activeNav === 'team') return <div className="view-container"><TableSkeleton cols={5} rows={6} /></div>;
       return <DashboardSkeleton />; // Fallback
     }
 

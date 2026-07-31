@@ -14,6 +14,9 @@ export function AppProvider({ children }) {
   const [useWs, setUseWs]           = useState(false);
   const [authLoading, setAuthLoading] = useState(true);
   const [dataLoading, setDataLoading] = useState(false);
+  const [ticketsLoading, setTicketsLoading] = useState(false);
+  const [notificationsLoading, setNotificationsLoading] = useState(false);
+  const [departmentsLoading, setDepartmentsLoading] = useState(false);
   const [currentUser, setCurrentUser] = useState(null);
   const [tickets, setTickets]       = useState([]);
   const [toasts, setToasts]         = useState([]);
@@ -96,26 +99,37 @@ export function AppProvider({ children }) {
     if (!forceRefetch && (now - lastFetchRef.current) < MIN_REFETCH_MS) return; // Too soon
 
     isFetchingRef.current = true;
-    if (forceRefetch) {
-      setDataLoading(true);
+    
+    // Set individual and global loading states
+    setTicketsLoading(true);
+    setNotificationsLoading(true);
+    if (fetchDepts) {
+      setDepartmentsLoading(true);
     }
-    try {
-      const [tks, notifs] = await Promise.all([
-        api.fetchTickets(),
-        api.fetchNotifications(),
-      ]);
-      setTickets(tks);
-      setNotifications(notifs);
-      
-      // Save data cache to sessionStorage
-      sessionStorage.setItem('cached_tickets', JSON.stringify(tks));
-      sessionStorage.setItem('cached_notifications', JSON.stringify(notifs));
-      
-      const fetchTime = Date.now();
-      lastFetchRef.current = fetchTime;
-      sessionStorage.setItem('cached_time', String(fetchTime));
+    setDataLoading(true);
 
-      if (fetchDepts) {
+    // Fetch tickets asynchronously and update state immediately
+    const ticketsPromise = api.fetchTickets()
+      .then(tks => {
+        setTickets(tks);
+        sessionStorage.setItem('cached_tickets', JSON.stringify(tks));
+      })
+      .catch(err => console.error('Error fetching tickets:', err))
+      .finally(() => setTicketsLoading(false));
+
+    // Fetch notifications asynchronously and update state immediately
+    const notificationsPromise = api.fetchNotifications()
+      .then(notifs => {
+        setNotifications(notifs);
+        sessionStorage.setItem('cached_notifications', JSON.stringify(notifs));
+      })
+      .catch(err => console.error('Error fetching notifications:', err))
+      .finally(() => setNotificationsLoading(false));
+
+    // Fetch departments asynchronously and update state immediately
+    let departmentsPromise = Promise.resolve();
+    if (fetchDepts) {
+      departmentsPromise = (async () => {
         let departmentsData = [];
         let managersData = [];
         try {
@@ -136,13 +150,20 @@ export function AppProvider({ children }) {
         
         setManagers(managersData);
         sessionStorage.setItem('cached_managers', JSON.stringify(managersData));
-      }
-    } catch (err) {
-      console.error('Error loading data:', err);
-    } finally {
+      })()
+      .catch(err => console.error('Error fetching departments/managers:', err))
+      .finally(() => setDepartmentsLoading(false));
+    }
+
+    const fetchTime = Date.now();
+    lastFetchRef.current = fetchTime;
+    sessionStorage.setItem('cached_time', String(fetchTime));
+
+    // Wait for all in background to clear global loader and lock
+    Promise.all([ticketsPromise, notificationsPromise, departmentsPromise]).finally(() => {
       isFetchingRef.current = false;
       setDataLoading(false);
-    }
+    });
   }, []);
 
   // Check existing session on mount (no auto-login)
@@ -602,6 +623,7 @@ export function AppProvider({ children }) {
     <AppContext.Provider value={{
       role, setRole: switchRole,
       isLoggedIn, authLoading, dataLoading,
+      ticketsLoading, notificationsLoading, departmentsLoading,
       currentUser,
       loginUser, logoutUser,
       tickets, setTickets,
