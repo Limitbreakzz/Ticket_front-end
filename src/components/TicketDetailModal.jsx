@@ -868,7 +868,9 @@ export default function TicketDetailModal({ ticket, onClose }) {
         : [...chatTimeline, tempComment])
     : chatTimeline;
 
-  const systemTimeline = timeline.filter(item => item.event.includes('ระบบ:') || item.event.includes('🔄') || item.actor === 'System');
+  const systemTimeline = timeline
+    .filter(item => item.event.includes('ระบบ:') || item.event.includes('🔄') || item.actor === 'System')
+    .reverse();
 
   const filteredTimeline = activeChatTab === 'chat' ? finalChatTimeline : systemTimeline;
 
