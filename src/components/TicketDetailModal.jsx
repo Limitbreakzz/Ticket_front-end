@@ -2692,18 +2692,9 @@ export default function TicketDetailModal({ ticket, onClose }) {
                           โหลดข้อมูลแผนกล้มเหลว: {deptsLoadError}
                         </div>
                       ) : !deptsList || deptsList.length === 0 ? (
-                        <div style={{ padding: '12px 14px', display: 'flex', flexDirection: 'column', gap: 8 }}>
-                          {[1, 2, 3].map(i => (
-                            <div
-                              key={i}
-                              className="skeleton-box"
-                              style={{
-                                height: 28,
-                                borderRadius: 6,
-                                width: i === 1 ? '85%' : i === 2 ? '65%' : '90%',
-                              }}
-                            />
-                          ))}
+                        <div style={{ padding: '20px 14px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10, color: 'var(--primary)' }}>
+                          <i className="fa-solid fa-spinner fa-spin" style={{ fontSize: 18 }}></i>
+                          <span style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-secondary)' }}>กำลังโหลดรายการแผนก...</span>
                         </div>
                       ) : deptsList
                         .filter(d => d.name !== detailTicket.targetDepartment)
