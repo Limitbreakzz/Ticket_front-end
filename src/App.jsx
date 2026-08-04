@@ -42,15 +42,19 @@ function ToastContainer() {
   
   return createPortal(
     <div className="toast-container">
-      {toasts.map(t => (
-        <ToastNotification
-          key={t.id}
-          variant={t.type || "success"}
-          title={t.title || (t.type === 'error' ? 'เกิดข้อผิดพลาด' : t.type === 'warning' ? 'คำเตือน' : t.type === 'info' ? 'แจ้งเตือน' : 'สำเร็จ')}
-          message={typeof t.msg === 'string' ? t.msg : (t.msg?.props?.children || t.msg)}
-          onClose={() => removeToast(t.id)}
-        />
-      ))}
+      {toasts.map(t => {
+        const msgContent = typeof t.msg === 'string' ? renderTextWithIcons(t.msg) : (t.msg?.props?.children || t.msg);
+        const titleContent = typeof t.title === 'string' ? renderTextWithIcons(t.title) : t.title;
+        return (
+          <ToastNotification
+            key={t.id}
+            variant={t.type || "success"}
+            title={titleContent || (t.type === 'error' ? 'เกิดข้อผิดพลาด' : t.type === 'warning' ? 'คำเตือน' : t.type === 'info' ? 'แจ้งเตือน' : 'สำเร็จ')}
+            message={msgContent}
+            onClose={() => removeToast(t.id)}
+          />
+        );
+      })}
     </div>,
     document.body
   );

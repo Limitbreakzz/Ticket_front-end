@@ -287,8 +287,8 @@ export function AppProvider({ children }) {
                 type,
               };
 
-              // Trigger toast exactly once
-              addToast(formattedNotif.title || 'มีแจ้งเตือนใหม่', 'info');
+              // Trigger toast exactly once with title & message
+              addToast(formattedNotif.message || 'มีแจ้งเตือนใหม่', type, formattedNotif.title || 'การแจ้งเตือน');
 
               setNotifications((prev) => {
                 const doubleCheck = prev.some((n) => n.id === parsed.id);
