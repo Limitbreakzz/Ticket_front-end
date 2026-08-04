@@ -2790,10 +2790,11 @@ tbody td {
 @media (max-width: 576px) {
   .topbar {
     height: 56px !important;
-    padding: 0 18px !important;
+    padding: 0 10px !important;
     border-bottom: 1px solid var(--border-light) !important;
     box-shadow: 0 1px 3px rgba(0,0,0,0.02) !important;
     background: var(--bg-card) !important;
+    gap: 6px !important;
   }
   .topbar-left,
   .topbar-separator {
@@ -2802,41 +2803,60 @@ tbody td {
   .topbar-create-btn {
     display: none !important;
   }
+  .topbar-brand {
+    gap: 6px !important;
+    min-width: 0 !important;
+    flex-shrink: 1 !important;
+  }
   .topbar-brand .topbar-logo-icon {
-    width: 32px !important;
-    height: 32px !important;
-    font-size: 14px !important;
+    width: 28px !important;
+    height: 28px !important;
+    font-size: 12px !important;
+    flex-shrink: 0 !important;
   }
   .topbar-brand .topbar-logo-text {
-    font-size: 15px !important;
+    font-size: 13.5px !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
   }
   .topbar-profile-box {
     background: transparent !important;
     border: none !important;
     padding: 0 !important;
-    gap: 6px !important;
+    gap: 4px !important;
+    flex-shrink: 0 !important;
+    max-width: 140px !important;
   }
   .topbar-profile-avatar-container {
-    width: 28px !important;
-    height: 28px !important;
-    font-size: 11px !important;
+    width: 26px !important;
+    height: 26px !important;
+    font-size: 10px !important;
+    flex-shrink: 0 !important;
   }
   .topbar-profile-info {
     gap: 1px !important;
+    min-width: 0 !important;
   }
   .topbar-profile-name {
-    font-size: 11.5px !important;
-    max-width: 75px !important;
+    font-size: 11px !important;
+    max-width: 60px !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
   }
   .topbar-profile-badges {
     display: flex !important;
-    gap: 3px !important;
+    gap: 2px !important;
   }
   .topbar-profile-role-badge,
   .topbar-profile-dept-badge {
-    font-size: 8px !important;
-    padding: 1px 4px !important;
-    max-width: 55px !important;
+    font-size: 7.5px !important;
+    padding: 0px 3px !important;
+    max-width: 45px !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
   }
   .icon-btn {
     width: 32px !important;
