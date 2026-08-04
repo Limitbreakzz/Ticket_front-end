@@ -934,31 +934,31 @@ export default function TicketDetailModal({ ticket, onClose }) {
           {initialLoading || reloading || statusUpdating ? (
             <div className="detail-steps-flex" style={{ display: 'flex', alignItems: 'center', gap: 20, flex: 1, justifyContent: 'center' }}>
               {/* Step 1 Skeleton */}
-              <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                <div className="skeleton-shimmer" style={{ width: 36, height: 36, borderRadius: '50%' }} />
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-                  <div className="skeleton-shimmer" style={{ width: 90, height: 14, borderRadius: 3 }} />
-                  <div className="skeleton-shimmer" style={{ width: 60, height: 10, borderRadius: 3 }} />
+              <div className="detail-step-item" style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                <div className="skeleton-shimmer" style={{ width: 36, height: 36, borderRadius: '50%', flexShrink: 0 }} />
+                <div className="detail-step-text" style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                  <div className="skeleton-shimmer" style={{ width: 70, height: 14, borderRadius: 3 }} />
+                  <div className="skeleton-shimmer" style={{ width: 50, height: 10, borderRadius: 3 }} />
                 </div>
               </div>
               {/* Line 1 */}
-              <div className="skeleton-shimmer" style={{ height: 2.5, flex: 1, maxWidth: 120, minWidth: 40, borderRadius: 1.25 }} />
+              <div className="skeleton-shimmer detail-step-line" style={{ height: 2.5, flex: 1, maxWidth: 120, minWidth: 10, borderRadius: 1.25 }} />
               {/* Step 2 Skeleton */}
-              <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                <div className="skeleton-shimmer" style={{ width: 36, height: 36, borderRadius: '50%' }} />
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-                  <div className="skeleton-shimmer" style={{ width: 90, height: 14, borderRadius: 3 }} />
-                  <div className="skeleton-shimmer" style={{ width: 60, height: 10, borderRadius: 3 }} />
+              <div className="detail-step-item" style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                <div className="skeleton-shimmer" style={{ width: 36, height: 36, borderRadius: '50%', flexShrink: 0 }} />
+                <div className="detail-step-text" style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                  <div className="skeleton-shimmer" style={{ width: 70, height: 14, borderRadius: 3 }} />
+                  <div className="skeleton-shimmer" style={{ width: 50, height: 10, borderRadius: 3 }} />
                 </div>
               </div>
               {/* Line 2 */}
-              <div className="skeleton-shimmer" style={{ height: 2.5, flex: 1, maxWidth: 120, minWidth: 40, borderRadius: 1.25 }} />
+              <div className="skeleton-shimmer detail-step-line" style={{ height: 2.5, flex: 1, maxWidth: 120, minWidth: 10, borderRadius: 1.25 }} />
               {/* Step 3 Skeleton */}
-              <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                <div className="skeleton-shimmer" style={{ width: 36, height: 36, borderRadius: '50%' }} />
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-                  <div className="skeleton-shimmer" style={{ width: 90, height: 14, borderRadius: 3 }} />
-                  <div className="skeleton-shimmer" style={{ width: 60, height: 10, borderRadius: 3 }} />
+              <div className="detail-step-item" style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                <div className="skeleton-shimmer" style={{ width: 36, height: 36, borderRadius: '50%', flexShrink: 0 }} />
+                <div className="detail-step-text" style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                  <div className="skeleton-shimmer" style={{ width: 70, height: 14, borderRadius: 3 }} />
+                  <div className="skeleton-shimmer" style={{ width: 50, height: 10, borderRadius: 3 }} />
                 </div>
               </div>
             </div>
