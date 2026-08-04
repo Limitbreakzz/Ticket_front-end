@@ -27,7 +27,6 @@ import LoginView      from './views/LoginView';
 import ReportsView    from './views/ReportsView';
 import SettingsView   from './views/SettingsView';
 import ProfileView    from './views/ProfileView';
-import NotFoundView   from './views/NotFoundView';
 import { AnimatePresence, motion } from 'framer-motion';
 import PageTransition from './components/PageTransition';
 
@@ -472,9 +471,6 @@ function MainContent() {
       case 'faq':
         return <PlaceholderView title="คู่มือความปลอดภัย / FAQ" icon="question" />;
 
-      case '404':
-        return <NotFoundView onGoHome={() => changeActiveNav('dashboard')} />;
-
       default:
         return <DashboardView />;
     }
@@ -509,15 +505,6 @@ function AppShell() {
     return (
       <>
         <LoginView />
-        <ToastContainer />
-      </>
-    );
-  }
-
-  if (activeNav === '404') {
-    return (
-      <>
-        <NotFoundView onGoHome={() => changeActiveNav('dashboard')} />
         <ToastContainer />
       </>
     );

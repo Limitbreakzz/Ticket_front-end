@@ -24,18 +24,17 @@ export function AppProvider({ children }) {
   const [activeNav, setActiveNav]   = useState(() => {
     if (typeof window === 'undefined') return 'dashboard';
     const path = window.location.pathname;
-    if (path === '/' || path === '') return 'dashboard';
     if (path.startsWith('/tickets/')) {
-      return sessionStorage.getItem('last_active_nav') || 'track';
+      return sessionStorage.getItem('last_active_nav') || 'dashboard';
     }
-    const nav = path.replace('/', '');
+    const nav = path.replace('/', '') || 'dashboard';
     const validNavs = [
       'dashboard', 'my-own-tickets', 'track', 'my-sent-tickets',
       'all-dept-tickets', 'dept-tickets', 'all-tickets',
       'escalated', 'approval', 'approved-history', 'sla', 'profile',
       'reports', 'settings', 'team', 'faq'
     ];
-    return validNavs.includes(nav) ? '404' : '404';
+    return validNavs.includes(nav) ? nav : 'dashboard';
   });
   const [activeTicketId, setActiveTicketId] = useState(() => {
     if (typeof window === 'undefined') return null;
@@ -404,17 +403,35 @@ export function AppProvider({ children }) {
     }
   }, [activeNav]);
 
-  // Handle manual URL path navigation for 404 page
+  // Sync state to/from URL pathname
   const handleLocationChange = useCallback(() => {
     const path = window.location.pathname;
-    if (path === '/' || path === '') {
-      setActiveTicketId(null);
-    } else if (path.startsWith('/tickets/')) {
+    if (path.startsWith('/tickets/')) {
       const id = path.split('/').pop();
       setActiveTicketId(id);
+      const cachedNav = sessionStorage.getItem('last_active_nav') || 'dashboard';
+      setActiveNav(cachedNav);
     } else {
-      setActiveNav('404');
       setActiveTicketId(null);
+      const nav = path.replace('/', '') || 'dashboard';
+      const validNavs = [
+        'dashboard', 'my-own-tickets', 'track', 'my-sent-tickets',
+        'all-dept-tickets', 'create-ticket', 'dept-tickets', 'all-tickets',
+        'escalated', 'approval', 'approved-history', 'sla', 'profile',
+        'reports', 'settings', 'team', 'faq'
+      ];
+      if (nav === 'sla-settings') {
+        window.history.replaceState({ navName: 'dashboard' }, '', '/');
+        setActiveNav('dashboard');
+      } else if (nav === 'create-ticket') {
+        window.history.replaceState({ navName: 'dashboard' }, '', '/');
+        setActiveNav('dashboard');
+        setShowCreateModal(true);
+      } else if (validNavs.includes(nav)) {
+        setActiveNav(nav);
+      } else {
+        setActiveNav('dashboard');
+      }
     }
   }, []);
 
