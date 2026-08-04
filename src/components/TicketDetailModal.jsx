@@ -1172,10 +1172,14 @@ export default function TicketDetailModal({ ticket, onClose }) {
                 color: 'var(--primary-light)',
                 display: 'inline-flex',
                 alignItems: 'center',
-                gap: 6
+                gap: 6,
+                maxWidth: '100%',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                whiteSpace: 'nowrap'
               }}>
-                <i className={`fa-solid fa-${catInfo?.icon || 'folder'}`} style={{ fontSize: 10 }}></i>
-                {getCategoryPath(detailTicket)}
+                <i className={`fa-solid fa-${catInfo?.icon || 'folder'}`} style={{ fontSize: 10, flexShrink: 0 }}></i>
+                <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{getCategoryPath(detailTicket)}</span>
               </span>
 
               {/* Urgency */}
