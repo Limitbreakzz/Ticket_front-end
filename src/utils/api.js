@@ -14,6 +14,9 @@ export const removeToken = () => localStorage.removeItem('jwt_token');
 
 export function resolveImageUrl(url) {
   if (!url) return null;
+  if (typeof url === 'string' && url.includes(',')) {
+    return url.split(',').map(s => resolveImageUrl(s.trim())).filter(Boolean);
+  }
   try {
     const backendBase = API_BASE_URL.replace(/\/api$/, '');
     if (url.startsWith('/')) {
@@ -334,10 +337,13 @@ export async function fetchTickets() {
   return (res.data || []).map(mapTicketBEtoFE);
 }
 
-export async function createTicket(formData, file = null) {
+export async function createTicket(formData, file = null, files = []) {
   let attachmentUrl = null;
-  if (file) {
-    attachmentUrl = await uploadFile(file);
+  const fileArray = files && files.length > 0 ? files : (file ? [file] : []);
+  
+  if (fileArray.length > 0) {
+    const uploadedUrls = await Promise.all(fileArray.map(f => uploadFile(f)));
+    attachmentUrl = uploadedUrls.join(',');
   }
   
   // Look up departments to find ID

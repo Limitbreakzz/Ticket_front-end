@@ -405,6 +405,30 @@ export default function TicketDetailModal({ ticket, onClose }) {
 
   const [detailTicket, setDetailTicket] = useState(ticket);
   const [viewImage, setViewImage] = useState(null);
+  const [viewImageIndex, setViewImageIndex] = useState(0);
+  const [viewImageList, setViewImageList] = useState([]);
+  const [zoomScale, setZoomScale] = useState(1);
+  const [zoomOffset, setZoomOffset] = useState({ x: 0, y: 0 });
+  const [isDraggingImage, setIsDraggingImage] = useState(false);
+  const dragStartRef = useRef({ x: 0, y: 0 });
+  const hasDraggedRef = useRef(false);
+
+  const resetZoom = () => {
+    setZoomScale(1);
+    setZoomOffset({ x: 0, y: 0 });
+    hasDraggedRef.current = false;
+  };
+
+  const openImageLightbox = (imgUrl, allImages = []) => {
+    const list = allImages && allImages.length > 0 
+      ? allImages 
+      : (Array.isArray(detailTicket.image) ? detailTicket.image : [detailTicket.image || imgUrl].filter(Boolean));
+    const idx = list.indexOf(imgUrl);
+    setViewImageList(list);
+    setViewImageIndex(idx >= 0 ? idx : 0);
+    setViewImage(imgUrl);
+    resetZoom();
+  };
   
   // Comment states
   const [commentText, setCommentText] = useState('');
@@ -460,6 +484,7 @@ export default function TicketDetailModal({ ticket, onClose }) {
   const [transferring, setTransferring] = useState(false);
   const [approvalNote, setApprovalNote] = useState('');
   const [reloading, setReloading] = useState(false);
+  const [initialLoading, setInitialLoading] = useState(!ticket.description);
   const [transferDeptSearch, setTransferDeptSearch] = useState('');
   const [showTransferDeptDropdown, setShowTransferDeptDropdown] = useState(false);
   const transferDeptDropdownRef = useRef(null);
@@ -525,8 +550,10 @@ export default function TicketDetailModal({ ticket, onClose }) {
 
   useEffect(() => {
     let active = true;
-    /* eslint-disable-next-line react-hooks/set-state-in-effect */
-    loadData(active);
+    setInitialLoading(true);
+    loadData(active).finally(() => {
+      if (active) setInitialLoading(false);
+    });
     return () => {
       active = false;
     };
@@ -904,7 +931,7 @@ export default function TicketDetailModal({ ticket, onClose }) {
           boxShadow: 'var(--shadow-sm)'
         }}>
           {/* Steps */}
-          {reloading || statusUpdating ? (
+          {initialLoading || reloading || statusUpdating ? (
             <div className="detail-steps-flex" style={{ display: 'flex', alignItems: 'center', gap: 20, flex: 1, justifyContent: 'center' }}>
               {/* Step 1 Skeleton */}
               <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
@@ -1053,7 +1080,7 @@ export default function TicketDetailModal({ ticket, onClose }) {
             </button>
           </div>
         </div>        {/* 2. Middle Section Grid: Info vs Chat */}
-        {reloading || statusUpdating ? (
+        {initialLoading || reloading || statusUpdating ? (
           <DetailSkeleton />
         ) : (
           <div className="detail-grid-container" style={{
@@ -1264,19 +1291,150 @@ export default function TicketDetailModal({ ticket, onClose }) {
               </div>
             </div>
 
-            {/* Image Attachments */}
+            {/* Image Attachments (Seamless Collage Layout) */}
             {detailTicket.image && (
               <div className="detail-attachment-section" style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
                 <div style={{ fontSize: 12, color: 'var(--primary)', fontWeight: 700, display: 'flex', alignItems: 'center', gap: 6 }}>
-                  <i className="fa-solid fa-image"></i> รูปภาพหลักฐาน (คลิกเพื่อขยาย)
+                  <i className="fa-solid fa-image"></i> รูปภาพหลักฐาน ({Array.isArray(detailTicket.image) ? detailTicket.image.length : 1} รูปภาพ - คลิกเพื่อขยาย)
                 </div>
-                <SafeImage 
-                  src={detailTicket.image} 
-                  alt="หลักฐาน" 
-                  style={{ maxWidth: '100%', maxHeight: 260, minWidth: 200, minHeight: 150, borderRadius: 12 }} 
-                  onClick={() => setViewImage(detailTicket.image)}
-                  objectFit="contain"
-                />
+                {(() => {
+                  const images = Array.isArray(detailTicket.image) ? detailTicket.image : [detailTicket.image];
+                  const count = images.length;
+
+                  if (count === 1) {
+                    return (
+                      <div style={{ borderRadius: 14, overflow: 'hidden', border: '1px solid var(--border-light)' }}>
+                        <SafeImage 
+                          src={images[0]} 
+                          alt="หลักฐาน" 
+                          style={{ width: '100%', maxHeight: 340, borderRadius: 0 }} 
+                          onClick={() => openImageLightbox(images[0], images)}
+                          objectFit="cover"
+                        />
+                      </div>
+                    );
+                  }
+
+                  if (count === 2) {
+                    return (
+                      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 2, borderRadius: 14, overflow: 'hidden', border: '1px solid var(--border-light)' }}>
+                        {images.map((imgUrl, idx) => (
+                          <SafeImage 
+                            key={idx}
+                            src={imgUrl} 
+                            alt={`หลักฐาน-${idx + 1}`} 
+                            style={{ width: '100%', height: 240, borderRadius: 0 }} 
+                            onClick={() => openImageLightbox(imgUrl, images)}
+                            objectFit="cover"
+                          />
+                        ))}
+                      </div>
+                    );
+                  }
+
+                  if (count === 3) {
+                    return (
+                      <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr', gap: 2, height: 260, borderRadius: 14, overflow: 'hidden', border: '1px solid var(--border-light)' }}>
+                        <SafeImage 
+                          src={images[0]} 
+                          alt="หลักฐาน-1" 
+                          style={{ width: '100%', height: '100%', borderRadius: 0 }} 
+                          onClick={() => openImageLightbox(images[0], images)}
+                          objectFit="cover"
+                        />
+                        <div style={{ display: 'grid', gridTemplateRows: '1fr 1fr', gap: 2, height: '100%' }}>
+                          <SafeImage 
+                            src={images[1]} 
+                            alt="หลักฐาน-2" 
+                            style={{ width: '100%', height: '100%', borderRadius: 0 }} 
+                            onClick={() => openImageLightbox(images[1], images)}
+                            objectFit="cover"
+                          />
+                          <SafeImage 
+                            src={images[2]} 
+                            alt="หลักฐาน-3" 
+                            style={{ width: '100%', height: '100%', borderRadius: 0 }} 
+                            onClick={() => openImageLightbox(images[2], images)}
+                            objectFit="cover"
+                          />
+                        </div>
+                      </div>
+                    );
+                  }
+
+                  if (count === 4) {
+                    return (
+                      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 2, height: 280, borderRadius: 14, overflow: 'hidden', border: '1px solid var(--border-light)' }}>
+                        <div style={{ display: 'grid', gridTemplateRows: '1fr 1fr', gap: 2, height: '100%' }}>
+                          <SafeImage 
+                            src={images[0]} 
+                            alt="หลักฐาน-1" 
+                            style={{ width: '100%', height: '100%', borderRadius: 0 }} 
+                            onClick={() => openImageLightbox(images[0], images)}
+                            objectFit="cover"
+                          />
+                          <SafeImage 
+                            src={images[1]} 
+                            alt="หลักฐาน-2" 
+                            style={{ width: '100%', height: '100%', borderRadius: 0 }} 
+                            onClick={() => openImageLightbox(images[1], images)}
+                            objectFit="cover"
+                          />
+                        </div>
+                        <div style={{ display: 'grid', gridTemplateRows: '1fr 1fr', gap: 2, height: '100%' }}>
+                          <SafeImage 
+                            src={images[2]} 
+                            alt="หลักฐาน-3" 
+                            style={{ width: '100%', height: '100%', borderRadius: 0 }} 
+                            onClick={() => openImageLightbox(images[2], images)}
+                            objectFit="cover"
+                          />
+                          <SafeImage 
+                            src={images[3]} 
+                            alt="หลักฐาน-4" 
+                            style={{ width: '100%', height: '100%', borderRadius: 0 }} 
+                            onClick={() => openImageLightbox(images[3], images)}
+                            objectFit="cover"
+                          />
+                        </div>
+                      </div>
+                    );
+                  }
+
+                  // 5 or more images (Seamless Bento Grid Collage)
+                  return (
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 2, borderRadius: 14, overflow: 'hidden', border: '1px solid var(--border-light)' }}>
+                      <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr', gap: 2, height: 220 }}>
+                        <SafeImage 
+                          src={images[0]} 
+                          alt="หลักฐาน-1" 
+                          style={{ width: '100%', height: '100%', borderRadius: 0 }} 
+                          onClick={() => openImageLightbox(images[0], images)}
+                          objectFit="cover"
+                        />
+                        <SafeImage 
+                          src={images[1]} 
+                          alt="หลักฐาน-2" 
+                          style={{ width: '100%', height: '100%', borderRadius: 0 }} 
+                          onClick={() => openImageLightbox(images[1], images)}
+                          objectFit="cover"
+                        />
+                      </div>
+                      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 2, height: 130 }}>
+                        {images.slice(2, 5).map((imgUrl, idx) => (
+                          <SafeImage 
+                            key={idx + 2}
+                            src={imgUrl} 
+                            alt={`หลักฐาน-${idx + 3}`} 
+                            style={{ width: '100%', height: '100%', borderRadius: 0 }} 
+                            onClick={() => openImageLightbox(imgUrl, images)}
+                            objectFit="cover"
+                          />
+                        ))}
+                      </div>
+                    </div>
+                  );
+                })()}
               </div>
             )}
 
@@ -2852,36 +3010,267 @@ export default function TicketDetailModal({ ticket, onClose }) {
         document.body
       )}
 
-      {/* Lightbox zoom */}
+      {/* Lightbox Zoom Gallery with Interactive Pan & Zoom */}
       {viewImage && createPortal(
         <div 
-          onClick={() => setViewImage(null)}
+          onClick={() => { setViewImage(null); resetZoom(); }}
+          tabIndex={0}
+          onWheel={(e) => {
+            e.stopPropagation();
+            if (e.deltaY < 0) {
+              setZoomScale(s => Math.min(s + 0.3, 4));
+            } else {
+              setZoomScale(s => {
+                const next = Math.max(s - 0.3, 1);
+                if (next === 1) setZoomOffset({ x: 0, y: 0 });
+                return next;
+              });
+            }
+          }}
+          onKeyDown={(e) => {
+            if (e.key === 'Escape') { setViewImage(null); resetZoom(); }
+            if (e.key === 'ArrowLeft' && viewImageList.length > 1) {
+              const prevIdx = (viewImageIndex - 1 + viewImageList.length) % viewImageList.length;
+              setViewImageIndex(prevIdx);
+              setViewImage(viewImageList[prevIdx]);
+              resetZoom();
+            }
+            if (e.key === 'ArrowRight' && viewImageList.length > 1) {
+              const nextIdx = (viewImageIndex + 1) % viewImageList.length;
+              setViewImageIndex(nextIdx);
+              setViewImage(viewImageList[nextIdx]);
+              resetZoom();
+            }
+          }}
+          onMouseMove={(e) => {
+            if (isDraggingImage && zoomScale > 1) {
+              const dx = e.clientX - dragStartRef.current.x;
+              const dy = e.clientY - dragStartRef.current.y;
+              if (Math.abs(dx) > 3 || Math.abs(dy) > 3) {
+                hasDraggedRef.current = true;
+              }
+              dragStartRef.current = { x: e.clientX, y: e.clientY };
+              setZoomOffset(prev => ({ x: prev.x + dx, y: prev.y + dy }));
+            }
+          }}
+          onMouseUp={() => setIsDraggingImage(false)}
           style={{
             position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
-            background: 'rgba(0,0,0,0.85)', zIndex: 9999,
+            background: 'rgba(0, 0, 0, 0.94)', zIndex: 99999,
             display: 'flex', alignItems: 'center', justifyContent: 'center',
-            cursor: 'zoom-out'
+            backdropFilter: 'blur(12px)',
+            WebkitBackdropFilter: 'blur(12px)',
+            outline: 'none',
+            userSelect: 'none',
+            overflow: 'hidden',
+            cursor: isDraggingImage ? 'grabbing' : (zoomScale > 1 ? 'grab' : 'default')
           }}
         >
-          <img 
-            src={viewImage} 
-            alt="ขยายใหญ่" 
-            style={{ maxHeight: '90%', maxWidth: '90%', objectFit: 'contain', borderRadius: 8, boxShadow: 'var(--shadow-xl)' }} 
-          />
-          <button
-            onClick={() => setViewImage(null)}
+          {/* Main Image View Container */}
+          <div 
+            onClick={(e) => e.stopPropagation()}
+            onMouseDown={(e) => {
+              if (zoomScale > 1) {
+                e.stopPropagation();
+                setIsDraggingImage(true);
+                hasDraggedRef.current = false;
+                dragStartRef.current = { x: e.clientX, y: e.clientY };
+              }
+            }}
+            style={{ 
+              maxHeight: '85vh', 
+              maxWidth: '90vw', 
+              display: 'flex', 
+              alignItems: 'center', 
+              justifyContent: 'center',
+              position: 'relative'
+            }}
+          >
+            <img 
+              src={viewImageList[viewImageIndex] || viewImage} 
+              alt="ขยายใหญ่" 
+              draggable={false}
+              onDragStart={(e) => e.preventDefault()}
+              onClick={() => {
+                if (hasDraggedRef.current) {
+                  hasDraggedRef.current = false;
+                  return;
+                }
+                if (zoomScale === 1) {
+                  setZoomScale(2);
+                } else {
+                  resetZoom();
+                }
+              }}
+              style={{ 
+                maxHeight: '85vh', 
+                maxWidth: '90vw', 
+                objectFit: 'contain', 
+                borderRadius: 12, 
+                boxShadow: '0 20px 50px rgba(0,0,0,0.8)',
+                transform: `translate(${zoomOffset.x}px, ${zoomOffset.y}px) scale(${zoomScale})`,
+                transition: isDraggingImage ? 'none' : 'transform 0.22s cubic-bezier(0.2, 0, 0.2, 1)',
+                cursor: zoomScale > 1 ? (isDraggingImage ? 'grabbing' : 'grab') : 'zoom-in'
+              }} 
+            />
+          </div>
+
+          {/* Top Control Bar */}
+          <div 
+            onClick={(e) => e.stopPropagation()}
             style={{
               position: 'absolute', top: 20, right: 20,
-              background: 'rgba(255,255,255,0.15)', border: 'none',
-              borderRadius: '50%', width: 40, height: 40,
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              color: '#fff', cursor: 'pointer', fontSize: 18, transition: 'background 0.2s'
+              display: 'flex', alignItems: 'center', gap: 10,
+              zIndex: 100001
             }}
-            onMouseEnter={e => e.currentTarget.style.background = 'rgba(255,255,255,0.3)'}
-            onMouseLeave={e => e.currentTarget.style.background = 'rgba(255,255,255,0.15)'}
           >
-            <i className="fa-solid fa-xmark"></i>
-          </button>
+            {/* Zoom Out Button */}
+            <button
+              onClick={() => {
+                setZoomScale(s => {
+                  const next = Math.max(s - 0.3, 1);
+                  if (next === 1) setZoomOffset({ x: 0, y: 0 });
+                  return next;
+                });
+              }}
+              title="ย่อรูปภาพ (-)"
+              style={{
+                background: 'rgba(255,255,255,0.15)', border: 'none',
+                borderRadius: '50%', width: 42, height: 42,
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                color: '#fff', cursor: 'pointer', fontSize: 16, transition: 'all 0.2s ease',
+                backdropFilter: 'blur(4px)'
+              }}
+              onMouseEnter={e => e.currentTarget.style.background = 'rgba(255,255,255,0.3)'}
+              onMouseLeave={e => e.currentTarget.style.background = 'rgba(255,255,255,0.15)'}
+            >
+              <i className="fa-solid fa-magnifying-glass-minus"></i>
+            </button>
+
+            {/* Zoom Percentage Badge */}
+            <button
+              onClick={resetZoom}
+              title="รีเซ็ตขนาด (100%)"
+              style={{
+                background: 'rgba(255,255,255,0.15)', border: 'none',
+                borderRadius: 20, padding: '8px 14px',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                color: '#fff', cursor: 'pointer', fontSize: 12, fontWeight: 700,
+                transition: 'all 0.2s ease',
+                backdropFilter: 'blur(4px)'
+              }}
+              onMouseEnter={e => e.currentTarget.style.background = 'rgba(255,255,255,0.3)'}
+              onMouseLeave={e => e.currentTarget.style.background = 'rgba(255,255,255,0.15)'}
+            >
+              {Math.round(zoomScale * 100)}%
+            </button>
+
+            {/* Zoom In Button */}
+            <button
+              onClick={() => setZoomScale(s => Math.min(s + 0.3, 4))}
+              title="ขยายรูปภาพ (+)"
+              style={{
+                background: 'rgba(255,255,255,0.15)', border: 'none',
+                borderRadius: '50%', width: 42, height: 42,
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                color: '#fff', cursor: 'pointer', fontSize: 16, transition: 'all 0.2s ease',
+                backdropFilter: 'blur(4px)'
+              }}
+              onMouseEnter={e => e.currentTarget.style.background = 'rgba(255,255,255,0.3)'}
+              onMouseLeave={e => e.currentTarget.style.background = 'rgba(255,255,255,0.15)'}
+            >
+              <i className="fa-solid fa-magnifying-glass-plus"></i>
+            </button>
+
+            {/* Close button */}
+            <button
+              onClick={() => { setViewImage(null); resetZoom(); }}
+              title="ปิด (Esc)"
+              style={{
+                background: 'rgba(239, 68, 68, 0.75)', border: 'none',
+                borderRadius: '50%', width: 42, height: 42,
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                color: '#fff', cursor: 'pointer', fontSize: 18, transition: 'all 0.2s ease',
+                backdropFilter: 'blur(4px)',
+                marginLeft: 4
+              }}
+              onMouseEnter={e => e.currentTarget.style.background = 'rgba(239, 68, 68, 1)'}
+              onMouseLeave={e => e.currentTarget.style.background = 'rgba(239, 68, 68, 0.75)'}
+            >
+              <i className="fa-solid fa-xmark"></i>
+            </button>
+          </div>
+
+          {/* Previous Button (Left Arrow) */}
+          {viewImageList.length > 1 && (
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                const prevIdx = (viewImageIndex - 1 + viewImageList.length) % viewImageList.length;
+                setViewImageIndex(prevIdx);
+                setViewImage(viewImageList[prevIdx]);
+                setZoomScale(1);
+              }}
+              title="รูปภาพถัดไปก่อนหน้า (ลูกศรซ้าย)"
+              style={{
+                position: 'absolute', left: 24, top: '50%', transform: 'translateY(-50%)',
+                background: 'rgba(255,255,255,0.18)', border: 'none',
+                borderRadius: '50%', width: 48, height: 48,
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                color: '#fff', cursor: 'pointer', fontSize: 20, transition: 'all 0.2s ease',
+                backdropFilter: 'blur(4px)',
+                boxShadow: '0 4px 14px rgba(0,0,0,0.4)',
+                zIndex: 100000
+              }}
+              onMouseEnter={e => { e.currentTarget.style.background = 'rgba(255,255,255,0.35)'; e.currentTarget.style.transform = 'translateY(-50%) scale(1.08)'; }}
+              onMouseLeave={e => { e.currentTarget.style.background = 'rgba(255,255,255,0.18)'; e.currentTarget.style.transform = 'translateY(-50%) scale(1)'; }}
+            >
+              <i className="fa-solid fa-chevron-left"></i>
+            </button>
+          )}
+
+          {/* Next Button (Right Arrow) */}
+          {viewImageList.length > 1 && (
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                const nextIdx = (viewImageIndex + 1) % viewImageList.length;
+                setViewImageIndex(nextIdx);
+                setViewImage(viewImageList[nextIdx]);
+                setZoomScale(1);
+              }}
+              title="รูปภาพถัดไป (ลูกศรอิสระขวา)"
+              style={{
+                position: 'absolute', right: 24, top: '50%', transform: 'translateY(-50%)',
+                background: 'rgba(255,255,255,0.18)', border: 'none',
+                borderRadius: '50%', width: 48, height: 48,
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                color: '#fff', cursor: 'pointer', fontSize: 20, transition: 'all 0.2s ease',
+                backdropFilter: 'blur(4px)',
+                boxShadow: '0 4px 14px rgba(0,0,0,0.4)',
+                zIndex: 100000
+              }}
+              onMouseEnter={e => { e.currentTarget.style.background = 'rgba(255,255,255,0.35)'; e.currentTarget.style.transform = 'translateY(-50%) scale(1.08)'; }}
+              onMouseLeave={e => { e.currentTarget.style.background = 'rgba(255,255,255,0.18)'; e.currentTarget.style.transform = 'translateY(-50%) scale(1)'; }}
+            >
+              <i className="fa-solid fa-chevron-right"></i>
+            </button>
+          )}
+
+          {/* Counter Badge */}
+          {viewImageList.length > 1 && (
+            <div style={{
+              position: 'absolute', bottom: 24,
+              background: 'rgba(15, 23, 42, 0.75)', color: '#ffffff',
+              padding: '6px 16px', borderRadius: 20,
+              fontSize: 13, fontWeight: 700,
+              backdropFilter: 'blur(4px)',
+              border: '1px solid rgba(255,255,255,0.15)',
+              letterSpacing: '1px'
+            }}>
+              {viewImageIndex + 1} / {viewImageList.length}
+            </div>
+          )}
         </div>,
         document.body
       )}

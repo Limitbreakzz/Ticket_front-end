@@ -1657,6 +1657,17 @@ tbody td {
     100% { opacity: 1; transform: translateY(0) scale(1); }
   }
 }
+@keyframes pulseGreen {
+  0% {
+    box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.6);
+  }
+  70% {
+    box-shadow: 0 0 0 6px rgba(16, 185, 129, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(16, 185, 129, 0);
+  }
+}
 
 /* ── BOTTOM NAVIGATION (MOBILE) ── */
 .bottom-nav {

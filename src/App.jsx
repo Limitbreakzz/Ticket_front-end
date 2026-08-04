@@ -27,13 +27,119 @@ import LoginView      from './views/LoginView';
 import ReportsView    from './views/ReportsView';
 import SettingsView   from './views/SettingsView';
 import ProfileView    from './views/ProfileView';
-import { AnimatePresence } from 'framer-motion';
+import { AnimatePresence, motion } from 'framer-motion';
 import PageTransition from './components/PageTransition';
 
 import { renderTextWithIcons } from './utils/render';
 
 import ToastNotification from './components/ToastNotification';
 import './index.css';
+
+// ── 404 Not Found View ──
+function NotFoundView({ onGoHome }) {
+  return (
+    <div style={{
+      position: 'fixed',
+      top: 0, left: 0, right: 0, bottom: 0,
+      width: '100vw',
+      height: '100vh',
+      zIndex: 999999,
+      background: '#090a0f',
+      display: 'flex',
+      flexDirection: 'column',
+      alignItems: 'center',
+      justifyContent: 'center',
+      textAlign: 'center',
+      padding: '40px 24px',
+      fontFamily: "'Inter', 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif",
+      color: '#ffffff',
+      userSelect: 'none'
+    }}>
+      {/* Background radial glow */}
+      <div style={{
+        position: 'absolute',
+        top: '40%',
+        left: '50%',
+        transform: 'translate(-50%, -50%)',
+        width: '450px',
+        height: '450px',
+        background: 'radial-gradient(circle, rgba(59, 130, 246, 0.08) 0%, rgba(0, 0, 0, 0) 70%)',
+        pointerEvents: 'none',
+        borderRadius: '50%'
+      }} />
+
+      {/* Massive Clean 404 Number */}
+      <h1 style={{
+        fontSize: '120px',
+        fontWeight: 800,
+        margin: 0,
+        color: '#ffffff',
+        lineHeight: 1,
+        letterSpacing: '-0.04em',
+        fontFamily: "'Inter', sans-serif"
+      }}>
+        404
+      </h1>
+
+      {/* Title & Description text */}
+      <h2 style={{ fontSize: '24px', fontWeight: 800, margin: '20px 0 10px', color: '#ffffff' }}>
+        ไม่พบหน้าที่คุณต้องการ หรือไม่มีสิทธิ์เข้าถึง
+      </h2>
+
+      <p style={{
+        maxWidth: 460,
+        fontSize: '14.5px',
+        color: '#94a3b8',
+        lineHeight: 1.6,
+        margin: '0 0 32px',
+        fontWeight: 400
+      }}>
+        ขออภัย เส้นทาง URL ที่คุณพิมพ์เข้ามาอาจไม่ถูกต้อง ถูกลบออก หรือคุณไม่มีสิทธิ์เข้าถึงหน้านี้ กรุณากลับสู่หน้าหลักเพื่อใช้งานต่อ
+      </p>
+
+      {/* Button */}
+      <button
+        type="button"
+        onClick={() => {
+          try {
+            if (onGoHome) onGoHome();
+          } catch { /* ignore */ }
+          window.history.pushState({}, '', '/');
+          window.location.assign('/');
+        }}
+        style={{
+          position: 'relative',
+          zIndex: 1000000,
+          pointerEvents: 'auto',
+          background: '#ffffff',
+          color: '#090a0f',
+          border: 'none',
+          borderRadius: 8,
+          padding: '12px 24px',
+          fontSize: '14.5px',
+          fontWeight: 700,
+          cursor: 'pointer',
+          transition: 'all 0.2s ease',
+          boxShadow: '0 4px 14px rgba(255, 255, 255, 0.12)',
+          display: 'inline-flex',
+          alignItems: 'center',
+          gap: 8
+        }}
+        onMouseEnter={e => {
+          e.currentTarget.style.background = '#e2e8f0';
+          e.currentTarget.style.transform = 'translateY(-1px)';
+        }}
+        onMouseLeave={e => {
+          e.currentTarget.style.background = '#ffffff';
+          e.currentTarget.style.transform = 'none';
+        }}
+      >
+        <i className="fa-solid fa-house"></i>
+        <span>กลับสู่หน้าหลัก</span>
+      </button>
+    </div>
+  );
+}
 
 
 // ── Toast notifications ──
@@ -135,141 +241,189 @@ function Topbar({ onCreateTicket }) {
 
         {/* Notifications */}
         <div style={{ position: 'relative' }}>
-          <div 
+          <button 
             className="icon-btn" 
             id="notif-btn"
             onClick={() => setShowNotif(!showNotif)}
+            style={{
+              position: 'relative',
+              background: showNotif ? 'var(--bg-main)' : 'transparent',
+              border: '1px solid var(--border-light)',
+              borderRadius: 'var(--radius-md)',
+              width: 38,
+              height: 38,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              cursor: 'pointer',
+              transition: 'all 0.2s ease',
+            }}
           >
-            <i className={`fa-solid fa-bell ${unreadCount > 0 ? 'bell-ringing' : ''}`}></i>
-            {unreadCount > 0 && <span className="notification-badge">{unreadCount > 99 ? '99+' : unreadCount}</span>}
-          </div>
-
-          {showNotif && (
-            <>
-              <div 
-                onClick={() => setShowNotif(false)}
-                style={{
-                  position: 'fixed',
-                  top: 0, left: 0, right: 0, bottom: 0,
-                  zIndex: 999,
-                  background: 'transparent'
-                }}
-              />
-              <div 
+            <i className={`fa-solid fa-bell ${unreadCount > 0 ? 'bell-ringing' : ''}`} style={{ fontSize: 16, color: 'var(--text-secondary)' }}></i>
+            {unreadCount > 0 ? (
+              <span
                 style={{
                   position: 'absolute',
-                  top: 'calc(100% + 8px)',
-                  right: 0,
-                  width: '320px',
-                  background: 'var(--bg-card)',
-                  border: '1px solid var(--border-light)',
-                  borderRadius: 'var(--radius-lg)',
-                  boxShadow: 'var(--shadow-lg)',
-                  zIndex: 1000,
-                  overflow: 'hidden',
+                  top: 2,
+                  right: 2,
+                  width: 10,
+                  height: 10,
+                  borderRadius: '50%',
+                  background: '#10b981',
+                  border: '2px solid var(--bg-card)',
+                  boxShadow: '0 0 0 2px rgba(16, 185, 129, 0.25)',
+                  animation: 'pulseGreen 2s infinite',
                 }}
-                className="notif-dropdown"
-              >
-                {/* Header */}
-                <div style={{
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  alignItems: 'center',
-                  padding: '12px 16px',
-                  borderBottom: '1px solid var(--border-light)',
-                  background: 'var(--bg-main)'
-                }}>
-                  <span style={{ fontWeight: 700, fontSize: 13, color: 'var(--text-primary)' }}>การแจ้งเตือน</span>
-                  {unreadCount > 0 && (
-                    <button 
-                      onClick={clearAllNotifications}
-                      style={{ border: 'none', background: 'transparent', color: 'var(--primary)', fontSize: 11, cursor: 'pointer', fontWeight: 600, padding: 0 }}
-                    >
-                      อ่านทั้งหมด
-                    </button>
-                  )}
-                </div>
+              />
+            ) : (
+              <span
+                style={{
+                  position: 'absolute',
+                  top: 2,
+                  right: 2,
+                  width: 8,
+                  height: 8,
+                  borderRadius: '50%',
+                  background: '#9ca3af',
+                  border: '1.5px solid var(--bg-card)',
+                }}
+              />
+            )}
+          </button>
 
-                {/* List */}
-                <div style={{ maxHeight: '280px', overflowY: 'auto' }}>
-                  {notifications.length === 0 ? (
-                    <div style={{ padding: '24px 16px', textAlign: 'center', color: 'var(--text-muted)', fontSize: 12.5 }}>
-                      <i className="fa-solid fa-bell-slash" style={{ fontSize: 24, marginBottom: 8, color: 'var(--text-muted)', opacity: 0.5, display: 'block' }}></i>
-                      ไม่มีการแจ้งเตือนใหม่
-                    </div>
-                  ) : (
-                    notifications.map(n => (
-                      <div 
-                        key={n.id}
-                        onClick={() => {
-                          markNotifAsRead(n.id);
-                          if (n.ticketId && n.ticketId !== 'N/A') {
-                            openTicketDetail(n.ticketId);
-                          }
-                          setShowNotif(false);
-                        }}
-                        style={{
-                          padding: '12px 16px',
-                          borderBottom: '1px solid var(--border-light)',
-                          background: n.read ? 'transparent' : 'var(--primary-pale)',
-                          cursor: 'pointer',
-                          transition: 'var(--transition)',
-                          display: 'flex',
-                          gap: 12,
-                          alignItems: 'flex-start'
-                        }}
-                        className="notif-item"
+          <AnimatePresence>
+            {showNotif && (
+              <>
+                <div 
+                  onClick={() => setShowNotif(false)}
+                  style={{
+                    position: 'fixed',
+                    top: 0, left: 0, right: 0, bottom: 0,
+                    zIndex: 999,
+                    background: 'transparent'
+                  }}
+                />
+                <motion.div 
+                  initial={{ opacity: 0, y: -10, scale: 0.95 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  exit={{ opacity: 0, y: -10, scale: 0.95 }}
+                  transition={{ duration: 0.18, ease: [0.16, 1, 0.3, 1] }}
+                  style={{
+                    position: 'absolute',
+                    top: 'calc(100% + 8px)',
+                    right: 0,
+                    width: '320px',
+                    background: 'var(--bg-card)',
+                    border: '1px solid var(--border-light)',
+                    borderRadius: 'var(--radius-lg)',
+                    boxShadow: '0 10px 30px rgba(0,0,0,0.12), 0 2px 6px rgba(0,0,0,0.06)',
+                    zIndex: 1000,
+                    overflow: 'hidden',
+                    transformOrigin: 'top right',
+                  }}
+                  className="notif-dropdown"
+                >
+                  {/* Header */}
+                  <div style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    padding: '12px 16px',
+                    borderBottom: '1px solid var(--border-light)',
+                    background: 'var(--bg-main)'
+                  }}>
+                    <span style={{ fontWeight: 700, fontSize: 13, color: 'var(--text-primary)' }}>การแจ้งเตือน</span>
+                    {unreadCount > 0 && (
+                      <button 
+                        onClick={clearAllNotifications}
+                        style={{ border: 'none', background: 'transparent', color: 'var(--primary)', fontSize: 11, cursor: 'pointer', fontWeight: 600, padding: 0 }}
                       >
-                        <div style={{ position: 'relative', flexShrink: 0 }}>
-                          <div style={{
-                            width: '32px',
-                            height: '32px',
-                            borderRadius: 'var(--radius-md)',
-                            background: n.type === 'success' ? 'var(--success-pale)' : n.type === 'error' ? 'var(--danger-pale)' : n.type === 'warning' ? 'var(--warning-pale)' : 'var(--primary-pale)',
-                            color: n.type === 'success' ? 'var(--success)' : n.type === 'error' ? 'var(--danger)' : n.type === 'warning' ? 'var(--warning)' : 'var(--primary)',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            fontSize: '13px'
-                          }}>
-                            <i className={`fa-solid fa-${n.type === 'success' ? 'check' : n.type === 'error' ? 'triangle-exclamation' : n.type === 'warning' ? 'circle-exclamation' : 'circle-info'}`}></i>
-                          </div>
-                          {!n.read && (
-                            <span style={{
-                              position: 'absolute',
-                              top: '-2px',
-                              right: '-2px',
-                              width: '8px',
-                              height: '8px',
-                              background: 'var(--primary)',
-                              borderRadius: '50%',
-                              border: '1.5px solid var(--bg-card)'
-                            }} />
-                          )}
-                        </div>
-                        <div style={{ flex: 1, minWidth: 0 }}>
-                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 2 }}>
-                            <span style={{ fontWeight: 700, fontSize: 12, color: 'var(--text-primary)', textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap' }}>
-                              {renderTextWithIcons(n.title)}
-                            </span>
-                            <span style={{ fontSize: 10, color: 'var(--text-muted)', flexShrink: 0, marginLeft: 6 }}>
-                              {n.time}
-                            </span>
-                          </div>
-                          <p style={{ fontSize: 11.5, color: 'var(--text-secondary)', margin: 0, lineHeight: 1.4 }}>
-                            {renderTextWithIcons(n.message)}
-                          </p>
-                          <span style={{ fontSize: 9.5, color: 'var(--primary)', fontWeight: 600, marginTop: 4, display: 'inline-block' }}>
-                            {n.ticketId}
-                          </span>
-                        </div>
+                        อ่านทั้งหมด
+                      </button>
+                    )}
+                  </div>
+
+                  {/* List */}
+                  <div style={{ maxHeight: '280px', overflowY: 'auto' }}>
+                    {notifications.length === 0 ? (
+                      <div style={{ padding: '24px 16px', textAlign: 'center', color: 'var(--text-muted)', fontSize: 12.5 }}>
+                        <i className="fa-solid fa-bell-slash" style={{ fontSize: 24, marginBottom: 8, color: 'var(--text-muted)', opacity: 0.5, display: 'block' }}></i>
+                        ไม่มีการแจ้งเตือนใหม่
                       </div>
-                    ))
-                  )}
-                </div>
-              </div>
-            </>
-          )}
+                    ) : (
+                      notifications.map(n => (
+                        <div 
+                          key={n.id}
+                          onClick={() => {
+                            markNotifAsRead(n.id);
+                            if (n.ticketId && n.ticketId !== 'N/A') {
+                              openTicketDetail(n.ticketId);
+                            }
+                            setShowNotif(false);
+                          }}
+                          style={{
+                            padding: '12px 16px',
+                            borderBottom: '1px solid var(--border-light)',
+                            background: n.read ? 'transparent' : 'var(--primary-pale)',
+                            cursor: 'pointer',
+                            transition: 'var(--transition)',
+                            display: 'flex',
+                            gap: 12,
+                            alignItems: 'flex-start'
+                          }}
+                          className="notif-item"
+                        >
+                          <div style={{ position: 'relative', flexShrink: 0 }}>
+                            <div style={{
+                              width: '32px',
+                              height: '32px',
+                              borderRadius: 'var(--radius-md)',
+                              background: n.type === 'success' ? 'var(--success-pale)' : n.type === 'error' ? 'var(--danger-pale)' : n.type === 'warning' ? 'var(--warning-pale)' : 'var(--primary-pale)',
+                              color: n.type === 'success' ? 'var(--success)' : n.type === 'error' ? 'var(--danger)' : n.type === 'warning' ? 'var(--warning)' : 'var(--primary)',
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              fontSize: '13px'
+                            }}>
+                              <i className={`fa-solid fa-${n.type === 'success' ? 'check' : n.type === 'error' ? 'triangle-exclamation' : n.type === 'warning' ? 'circle-exclamation' : 'circle-info'}`}></i>
+                            </div>
+                            {!n.read && (
+                              <span style={{
+                                position: 'absolute',
+                                top: '-2px',
+                                right: '-2px',
+                                width: '8px',
+                                height: '8px',
+                                background: 'var(--primary)',
+                                borderRadius: '50%',
+                                border: '1.5px solid var(--bg-card)'
+                              }} />
+                            )}
+                          </div>
+                          <div style={{ flex: 1, minWidth: 0 }}>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 2 }}>
+                              <span style={{ fontWeight: 700, fontSize: 12, color: 'var(--text-primary)', textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap' }}>
+                                {renderTextWithIcons(n.title)}
+                              </span>
+                              <span style={{ fontSize: 10, color: 'var(--text-muted)', flexShrink: 0, marginLeft: 6 }}>
+                                {n.time}
+                              </span>
+                            </div>
+                            <p style={{ fontSize: 11.5, color: 'var(--text-secondary)', margin: 0, lineHeight: 1.4 }}>
+                              {renderTextWithIcons(n.message)}
+                            </p>
+                            <span style={{ fontSize: 9.5, color: 'var(--primary)', fontWeight: 600, marginTop: 4, display: 'inline-block' }}>
+                              {n.ticketId}
+                            </span>
+                          </div>
+                        </div>
+                      ))
+                    )}
+                  </div>
+                </motion.div>
+              </>
+            )}
+          </AnimatePresence>
         </div>
 
         {/* Profile + Logout */}
@@ -423,6 +577,9 @@ function MainContent() {
       case 'faq':
         return <PlaceholderView title="คู่มือความปลอดภัย / FAQ" icon="question" />;
 
+      case '404':
+        return <NotFoundView onGoHome={() => changeActiveNav('dashboard')} />;
+
       default:
         return <DashboardView />;
     }
@@ -457,6 +614,15 @@ function AppShell() {
     return (
       <>
         <LoginView />
+        <ToastContainer />
+      </>
+    );
+  }
+
+  if (activeNav === '404') {
+    return (
+      <>
+        <NotFoundView onGoHome={() => changeActiveNav('dashboard')} />
         <ToastContainer />
       </>
     );

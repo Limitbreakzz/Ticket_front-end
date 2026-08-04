@@ -212,6 +212,7 @@ export default function SettingsView({ defaultActiveTab }) {
     allowPrivateTickets: false
   });
   const [testingId, setTestingId] = useState(null);
+  const [togglingWebhooks, setTogglingWebhooks] = useState({});
   // cooldowns: { [webhookId]: secondsRemaining }
   const [cooldowns, setCooldowns] = useState({});
   const COOLDOWN_SEC = 30;
@@ -375,12 +376,23 @@ export default function SettingsView({ defaultActiveTab }) {
   };
 
   const handleToggleWebhook = async (webhook) => {
+    if (togglingWebhooks[webhook.id]) return; // Prevent spam clicking while request is pending
+
+    const nextState = !webhook.isActive;
+    setTogglingWebhooks(prev => ({ ...prev, [webhook.id]: true }));
+    // Optimistic UI update for instant sliding animation
+    setWebhooks(prev => prev.map(w => w.id === webhook.id ? { ...w, isActive: nextState } : w));
+
     try {
-      await api.updateWebhook(webhook.id, { isActive: !webhook.isActive });
+      await api.updateWebhook(webhook.id, { isActive: nextState });
       addToast(`เปลี่ยนสถานะการใช้งานสำเร็จ`, 'success');
       loadWebhooks(true, true);
     } catch (err) {
+      // Revert back on error
+      setWebhooks(prev => prev.map(w => w.id === webhook.id ? { ...w, isActive: webhook.isActive } : w));
       addToast(err.message, 'error');
+    } finally {
+      setTogglingWebhooks(prev => ({ ...prev, [webhook.id]: false }));
     }
   };
 
@@ -750,20 +762,48 @@ export default function SettingsView({ defaultActiveTab }) {
                             </button>
                             <button
                               onClick={() => handleToggleWebhook(wh)}
+                              disabled={!!togglingWebhooks[wh.id]}
                               className="btn btn-xs"
+                              title={wh.isActive ? 'ปิดการใช้งาน Webhook' : 'เปิดการใช้งาน Webhook'}
                               style={{
                                 color: wh.isActive ? 'var(--success)' : 'var(--danger)',
                                 backgroundColor: wh.isActive ? 'var(--success-pale)' : 'var(--danger-pale)',
                                 borderColor: wh.isActive ? 'rgba(16,185,129,0.3)' : 'rgba(239,68,68,0.3)',
                                 borderWidth: '1px',
                                 borderStyle: 'solid',
+                                borderRadius: '20px',
                                 display: 'inline-flex',
                                 alignItems: 'center',
-                                gap: 6
+                                gap: 8,
+                                padding: '3px 10px 3px 6px',
+                                cursor: togglingWebhooks[wh.id] ? 'not-allowed' : 'pointer',
+                                opacity: togglingWebhooks[wh.id] ? 0.7 : 1
                               }}
                             >
-                              <i className={`fa-solid fa-${wh.isActive ? 'toggle-on' : 'toggle-off'}`} style={{ fontSize: 13 }}></i>
-                              {wh.isActive ? 'เปิดใช้งาน' : 'ปิดใช้งาน'}
+                              {/* Sliding Switch Track (Only part with sliding animation) */}
+                              <span style={{
+                                width: 28,
+                                height: 16,
+                                borderRadius: 10,
+                                background: wh.isActive ? 'var(--success)' : '#cbd5e1',
+                                display: 'inline-flex',
+                                alignItems: 'center',
+                                padding: '2px',
+                                position: 'relative',
+                                transition: 'background-color 0.2s cubic-bezier(0.4, 0, 0.2, 1)'
+                              }}>
+                                {/* Sliding Handle Circle */}
+                                <span style={{
+                                  width: 12,
+                                  height: 12,
+                                  borderRadius: '50%',
+                                  background: '#ffffff',
+                                  transform: wh.isActive ? 'translateX(12px)' : 'translateX(0px)',
+                                  transition: 'transform 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
+                                  boxShadow: '0 1px 3px rgba(0,0,0,0.3)'
+                                }} />
+                              </span>
+                              <span>{wh.isActive ? 'เปิดใช้งาน' : 'ปิดใช้งาน'}</span>
                             </button>
                             <button
                               onClick={() => handleDeleteWebhook(wh.id)}

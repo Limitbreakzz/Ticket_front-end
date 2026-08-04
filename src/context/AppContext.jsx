@@ -24,17 +24,18 @@ export function AppProvider({ children }) {
   const [activeNav, setActiveNav]   = useState(() => {
     if (typeof window === 'undefined') return 'dashboard';
     const path = window.location.pathname;
+    if (path === '/' || path === '') return 'dashboard';
     if (path.startsWith('/tickets/')) {
-      return sessionStorage.getItem('last_active_nav') || 'dashboard';
+      return sessionStorage.getItem('last_active_nav') || 'track';
     }
-    const nav = path.replace('/', '') || 'dashboard';
+    const nav = path.replace('/', '');
     const validNavs = [
       'dashboard', 'my-own-tickets', 'track', 'my-sent-tickets',
       'all-dept-tickets', 'dept-tickets', 'all-tickets',
       'escalated', 'approval', 'approved-history', 'sla', 'profile',
       'reports', 'settings', 'team', 'faq'
     ];
-    return validNavs.includes(nav) ? nav : 'dashboard';
+    return validNavs.includes(nav) ? '404' : '404';
   });
   const [activeTicketId, setActiveTicketId] = useState(() => {
     if (typeof window === 'undefined') return null;
@@ -403,35 +404,17 @@ export function AppProvider({ children }) {
     }
   }, [activeNav]);
 
-  // Sync state to/from URL pathname
+  // Handle manual URL path navigation for 404 page
   const handleLocationChange = useCallback(() => {
     const path = window.location.pathname;
-    if (path.startsWith('/tickets/')) {
+    if (path === '/' || path === '') {
+      setActiveTicketId(null);
+    } else if (path.startsWith('/tickets/')) {
       const id = path.split('/').pop();
       setActiveTicketId(id);
-      const cachedNav = sessionStorage.getItem('last_active_nav') || 'dashboard';
-      setActiveNav(cachedNav);
     } else {
+      setActiveNav('404');
       setActiveTicketId(null);
-      const nav = path.replace('/', '') || 'dashboard';
-      const validNavs = [
-        'dashboard', 'my-own-tickets', 'track', 'my-sent-tickets',
-        'all-dept-tickets', 'create-ticket', 'dept-tickets', 'all-tickets',
-        'escalated', 'approval', 'approved-history', 'sla', 'profile',
-        'reports', 'settings', 'team', 'faq'
-      ];
-      if (nav === 'sla-settings') {
-        window.history.replaceState({ navName: 'dashboard' }, '', '/');
-        setActiveNav('dashboard');
-      } else if (nav === 'create-ticket') {
-        window.history.replaceState({ navName: 'dashboard' }, '', '/');
-        setActiveNav('dashboard');
-        setShowCreateModal(true);
-      } else if (validNavs.includes(nav)) {
-        setActiveNav(nav);
-      } else {
-        setActiveNav('dashboard');
-      }
     }
   }, []);
 
@@ -450,10 +433,8 @@ export function AppProvider({ children }) {
     }
     setActiveNav(nav);
     setActiveTicketId(null);
-    let path = `/${nav}`;
-    if (nav === 'dashboard') path = '/';
-    if (window.location.pathname !== path) {
-      window.history.pushState({ navName: nav }, '', path);
+    if (window.location.pathname !== '/') {
+      window.history.pushState({ navName: nav }, '', '/');
     }
   }, []);
 
@@ -466,10 +447,8 @@ export function AppProvider({ children }) {
 
   const closeTicketDetail = useCallback(() => {
     setActiveTicketId(null);
-    let path = `/${activeNav}`;
-    if (activeNav === 'dashboard') path = '/';
-    if (window.location.pathname !== path) {
-      window.history.pushState({ navName: activeNav }, '', path);
+    if (window.location.pathname.startsWith('/tickets/')) {
+      window.history.pushState({ navName: activeNav }, '', '/');
     }
   }, [activeNav]);
 
@@ -563,9 +542,9 @@ export function AppProvider({ children }) {
     }
   }, [loadData]);
 
-  const createTicket = useCallback(async (data, file) => {
+  const createTicket = useCallback(async (data, file, files = []) => {
     try {
-      const newTicket = await api.createTicket(data, file);
+      const newTicket = await api.createTicket(data, file, files);
       addToast(`สร้าง Ticket ${newTicket.id} สำเร็จ!`, 'success');
       await loadData(false, true); // Force-refresh so new ticket appears instantly
       return newTicket;

@@ -97,12 +97,38 @@ export default function TicketFormModal({ onClose }) {
     return e;
   };
 
-  const handleFile = (f) => {
-    if (!f) return;
-    if (f.size > 10 * 1024 * 1024) { setFileErr('ขนาดไฟล์ต้องไม่เกิน 10MB'); return; }
-    if (!f.type.startsWith('image/')) { setFileErr('อนุญาตเฉพาะไฟล์รูปภาพเท่านั้น'); return; }
+  const [files, setFiles]     = useState([]);
+
+  const handleFiles = (incomingFiles) => {
+    if (!incomingFiles || incomingFiles.length === 0) return;
+    const fileList = Array.from(incomingFiles);
+    
+    // Check non-image files
+    const nonImages = fileList.filter(f => !f.type.startsWith('image/'));
+    if (nonImages.length > 0) {
+      setFileErr('อนุญาตเฉพาะไฟล์รูปภาพเท่านั้น (JPG, PNG, GIF, WEBP)');
+      return;
+    }
+
+    // Check oversized files (>10MB)
+    const overSized = fileList.filter(f => f.size > 10 * 1024 * 1024);
+    if (overSized.length > 0) {
+      setFileErr('ขนาดไฟล์รูปภาพแต่ละไฟล์ต้องไม่เกิน 10MB');
+      return;
+    }
+
+    // Check limit max 5 files
+    if (files.length + fileList.length > 5) {
+      setFileErr(`สามารถแนบรูปภาพได้สูงสุดไม่เกิน 5 รูป (ปัจจุบันมี ${files.length} รูป)`);
+      return;
+    }
+
     setFileErr('');
-    setFile(f);
+    setFiles(prev => [...prev, ...fileList]);
+  };
+
+  const removeFile = (index) => {
+    setFiles(prev => prev.filter((_, i) => i !== index));
   };
 
   const handleSubmit = (e) => {
@@ -114,7 +140,7 @@ export default function TicketFormModal({ onClose }) {
       return; 
     }
     setSubmitting(true);
-    createTicket(form, file)
+    createTicket(form, files.length > 0 ? files[0] : null, files)
       .then((newTicket) => {
         setSubmitting(false);
         onClose();
@@ -653,11 +679,21 @@ export default function TicketFormModal({ onClose }) {
                 <textarea
                   id="form-description"
                   className="form-textarea"
+                  maxLength={250}
                   placeholder="อธิบายปัญหาเพิ่มเติม เช่น เกิดขึ้นเมื่อไหร่ ขั้นตอนที่ทำก่อนเกิดปัญหา ข้อความ Error ที่แสดง..."
                   value={form.description}
                   onChange={e => set('description', e.target.value)}
                   rows={4}
                 />
+                <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: 4 }}>
+                  <span style={{ 
+                    fontSize: 11.5, 
+                    fontWeight: 600,
+                    color: form.description.length >= 250 ? 'var(--danger)' : form.description.length >= 220 ? '#d97706' : 'var(--text-muted)' 
+                  }}>
+                    {form.description.length}/250
+                  </span>
+                </div>
                 {errors.description && (
                   <span className="form-error">
                     <i className="fa-solid fa-triangle-exclamation" style={{ marginRight: 4 }} aria-hidden="true"></i>
@@ -716,84 +752,114 @@ export default function TicketFormModal({ onClose }) {
                 )}
               </div>
 
-              {/* ── File Upload ── */}
+              {/* ── File Upload (Multi-image up to 5) ── */}
               <div className="form-group">
-                <label className="form-label">
-                  <i className="fa-solid fa-paperclip" style={{ marginRight: 6, color: 'var(--primary)' }} aria-hidden="true"></i>
-                  แนบรูปภาพ (ไม่บังคับ)
-                </label>
-                {!file && (
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
+                  <label className="form-label" style={{ margin: 0 }}>
+                    <i className="fa-solid fa-paperclip" style={{ marginRight: 6, color: 'var(--primary)' }} aria-hidden="true"></i>
+                    แนบรูปภาพประกอบ (ไม่บังคับ)
+                  </label>
+                  <span style={{ fontSize: 11.5, fontWeight: 600, color: files.length >= 5 ? 'var(--danger)' : 'var(--text-muted)' }}>
+                    {files.length}/5 รูป
+                  </span>
+                </div>
+
+                {/* Dropzone */}
+                {files.length < 5 && (
                   <div
                     className={`upload-area${drag ? ' drag-over' : ''}`}
                     onClick={() => fileRef.current?.click()}
                     onDragOver={e => { e.preventDefault(); setDrag(true); }}
                     onDragLeave={() => setDrag(false)}
-                    onDrop={e => { e.preventDefault(); setDrag(false); handleFile(e.dataTransfer.files[0]); }}
+                    onDrop={e => { e.preventDefault(); setDrag(false); handleFiles(e.dataTransfer.files); }}
                     id="upload-area"
+                    style={{
+                      border: `2px dashed ${drag ? 'var(--primary)' : 'var(--border)'}`,
+                      borderRadius: 'var(--radius-lg)',
+                      padding: '24px 16px',
+                      textAlign: 'center',
+                      background: drag ? 'var(--primary-pale)' : 'var(--bg-main)',
+                      cursor: 'pointer',
+                      transition: 'all 0.2s ease',
+                    }}
                   >
-                    <div className="upload-icon">
-                      <i className="fa-solid fa-cloud-arrow-up" style={{ fontSize: 32, color: 'var(--primary-lighter)' }} aria-hidden="true"></i>
+                    <div className="upload-icon" style={{ marginBottom: 8 }}>
+                      <i className="fa-solid fa-cloud-arrow-up" style={{ fontSize: 32, color: 'var(--primary)' }} aria-hidden="true"></i>
                     </div>
-                    <div className="upload-label">คลิกหรือลากไฟล์มาวางที่นี่</div>
-                    <div className="upload-hint">รองรับ PNG, JPG, GIF — ขนาดไม่เกิน 10MB</div>
+                    <div className="upload-label" style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-primary)' }}>
+                      คลิกเพื่อเลือกไฟล์ หรือลากรูปภาพมาวางที่นี่
+                    </div>
+                    <div className="upload-hint" style={{ fontSize: 11.5, color: 'var(--text-muted)', marginTop: 4 }}>
+                      รองรับเฉพาะไฟล์รูปภาพ (JPG, PNG, GIF, WEBP) สูงสุด 5 รูป (ไม่เกิน 10MB/รูป)
+                    </div>
                     <input
                       ref={fileRef}
                       type="file"
                       accept="image/*"
+                      multiple
                       style={{ display: 'none' }}
-                      onChange={e => handleFile(e.target.files[0])}
+                      onChange={e => handleFiles(e.target.files)}
                       id="file-input"
                     />
                   </div>
                 )}
+
                 {fileErr && (
-                  <span className="form-error">
+                  <span className="form-error" style={{ marginTop: 6 }}>
                     <i className="fa-solid fa-triangle-exclamation" style={{ marginRight: 4 }} aria-hidden="true"></i>
                     {fileErr}
                   </span>
                 )}
-                {file && (
-                  <div className="upload-preview" style={{ flexDirection: 'column', alignItems: 'stretch', gap: 8, padding: 12 }}>
-                    <div style={{ position: 'relative', borderRadius: 'var(--radius-sm)', overflow: 'hidden' }}>
-                      <div
-                        onClick={() => setViewImage(URL.createObjectURL(file))}
-                        className="preview-image-container"
-                      >
-                        <img 
-                          src={URL.createObjectURL(file)} 
-                          alt="preview" 
-                        />
-                        <div className="preview-image-overlay">
-                          <i className="fa-solid fa-magnifying-glass-plus" aria-hidden="true"></i>
-                          <span>คลิกเพื่อดูรูปขนาดเต็ม</span>
+
+                {/* Uploaded files grid list */}
+                {files.length > 0 && (
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(100px, 1fr))', gap: 10, marginTop: 12 }}>
+                    {files.map((f, idx) => {
+                      const imgUrl = URL.createObjectURL(f);
+                      return (
+                        <div
+                          key={idx}
+                          style={{
+                            position: 'relative',
+                            borderRadius: 'var(--radius-md)',
+                            overflow: 'hidden',
+                            border: '1px solid var(--border-light)',
+                            aspectRatio: '1',
+                            background: 'var(--bg-main)',
+                            boxShadow: 'var(--shadow-sm)'
+                          }}
+                        >
+                          <img
+                            src={imgUrl}
+                            alt={`preview-${idx}`}
+                            style={{ width: '100%', height: '100%', objectFit: 'cover', cursor: 'pointer' }}
+                            onClick={() => setViewImage(imgUrl)}
+                          />
+                          {/* Remove button */}
+                          <button
+                            type="button"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              removeFile(idx);
+                            }}
+                            title="ลบรูปภาพ"
+                            style={{
+                              position: 'absolute', top: 4, right: 4,
+                              background: 'rgba(239, 68, 68, 0.85)', color: '#fff',
+                              border: 'none', borderRadius: '50%',
+                              width: 22, height: 22,
+                              display: 'flex', alignItems: 'center', justifyContent: 'center',
+                              cursor: 'pointer',
+                              zIndex: 10,
+                              fontSize: 10,
+                              boxShadow: '0 2px 4px rgba(0,0,0,0.2)'
+                            }}
+                          >
+                            <i className="fa-solid fa-xmark" aria-hidden="true"></i>
+                          </button>
                         </div>
-                      </div>
-
-
-                      <button
-                        type="button"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setFile(null);
-                        }}
-                        title="ลบไฟล์"
-                        style={{
-                          position: 'absolute', top: 8, right: 8,
-                          background: 'rgba(0,0,0,0.6)', color: '#fff',
-                          border: 'none', borderRadius: '50%',
-                          width: 28, height: 28,
-                          display: 'flex', alignItems: 'center', justifyContent: 'center',
-                          cursor: 'pointer',
-                          zIndex: 10,
-                        }}
-                      >
-                        <i className="fa-solid fa-xmark"  aria-hidden="true"></i>
-                      </button>
-                    </div>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                      <div className="upload-preview-name" style={{ margin: 0 }}>{file.name}</div>
-                      <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>{(file.size / 1024).toFixed(1)} KB</div>
-                    </div>
+                      );
+                    })}
                   </div>
                 )}
               </div>
