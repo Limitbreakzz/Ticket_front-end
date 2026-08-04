@@ -1892,6 +1892,14 @@ export default function TicketDetailModal({ ticket, onClose }) {
                       placeholder="พิมพ์ข้อความตอบกลับ..."
                       value={commentText}
                       onChange={e => setCommentText(e.target.value)}
+                      onKeyDown={e => {
+                        if (e.key === 'Enter' && !e.shiftKey && !e.nativeEvent.isComposing) {
+                          e.preventDefault();
+                          if (!postingComment && (commentText.trim() || commentFile)) {
+                            handlePostComment(e);
+                          }
+                        }
+                      }}
                       style={{
                         flex: 1,
                         background: 'transparent',
@@ -2683,12 +2691,26 @@ export default function TicketDetailModal({ ticket, onClose }) {
                           <i className="fa-solid fa-circle-exclamation" style={{ marginRight: 6 }} aria-hidden="true"></i>
                           โหลดข้อมูลแผนกล้มเหลว: {deptsLoadError}
                         </div>
+                      ) : !deptsList || deptsList.length === 0 ? (
+                        <div style={{ padding: '12px 14px', display: 'flex', flexDirection: 'column', gap: 8 }}>
+                          {[1, 2, 3].map(i => (
+                            <div
+                              key={i}
+                              className="skeleton-box"
+                              style={{
+                                height: 28,
+                                borderRadius: 6,
+                                width: i === 1 ? '85%' : i === 2 ? '65%' : '90%',
+                              }}
+                            />
+                          ))}
+                        </div>
                       ) : deptsList
                         .filter(d => d.name !== detailTicket.targetDepartment)
                         .filter(d => d.name !== detailTicket.department)
                         .filter(d => d.name.toLowerCase().includes(transferDeptSearch.toLowerCase())).length === 0 ? (
-                        <div style={{ padding: '8px 12px', fontSize: 13, color: 'var(--text-muted)', textAlign: 'center' }}>
-                          <i className="fa-solid fa-triangle-exclamation" style={{ marginRight: 6 }} aria-hidden="true"></i>
+                        <div style={{ padding: '12px', fontSize: 13, color: 'var(--text-muted)', textAlign: 'center', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}>
+                          <i className="fa-solid fa-triangle-exclamation" aria-hidden="true"></i>
                           ไม่พบแผนกที่ค้นหา
                         </div>
                       ) : (

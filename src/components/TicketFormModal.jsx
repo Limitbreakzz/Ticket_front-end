@@ -11,7 +11,7 @@ const CAT_THEME = {
 };
 
 export default function TicketFormModal({ onClose }) {
-  const { createTicket, addToast, depts, currentUser, managers, openTicketDetail } = useApp();
+  const { createTicket, addToast, depts, departmentsLoading, currentUser, managers, openTicketDetail } = useApp();
   const fileRef = useRef();
 
   const [form, setForm] = useState({
@@ -321,9 +321,23 @@ export default function TicketFormModal({ onClose }) {
 
                       {/* Options List */}
                       <div style={{ maxHeight: '160px', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: 2 }}>
-                        {filteredDepts.length === 0 ? (
-                          <div style={{ padding: '8px 12px', fontSize: 13, color: 'var(--text-muted)', textAlign: 'center' }}>
-                            <i className="fa-solid fa-triangle-exclamation" style={{ marginRight: 6 }} aria-hidden="true"></i>
+                        {departmentsLoading || (!depts || depts.length === 0) ? (
+                          <div style={{ padding: '12px 14px', display: 'flex', flexDirection: 'column', gap: 8 }}>
+                            {[1, 2, 3].map(i => (
+                              <div
+                                key={i}
+                                className="skeleton-box"
+                                style={{
+                                  height: 28,
+                                  borderRadius: 6,
+                                  width: i === 1 ? '85%' : i === 2 ? '65%' : '90%',
+                                }}
+                              />
+                            ))}
+                          </div>
+                        ) : filteredDepts.length === 0 ? (
+                          <div style={{ padding: '12px', fontSize: 13, color: 'var(--text-muted)', textAlign: 'center', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}>
+                            <i className="fa-solid fa-triangle-exclamation" aria-hidden="true"></i>
                             ไม่พบแผนกที่ค้นหา
                           </div>
                         ) : (

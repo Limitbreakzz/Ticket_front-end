@@ -76,10 +76,15 @@ export function AppProvider({ children }) {
     });
   }, []);
 
-  const addToast = useCallback((msg, type = 'success') => {
+  const addToast = useCallback((msg, type = 'success', title = null) => {
     const id = Date.now();
-    setToasts(t => [...t, { id, msg, type }]);
-    setTimeout(() => setToasts(t => t.filter(x => x.id !== id)), 3500);
+    if (typeof msg === 'object' && msg !== null && !msg.$$typeof) {
+      // If passed as an object { message, title, type }
+      setToasts(t => [...t, { id, msg: msg.message || msg.msg, type: msg.type || type, title: msg.title || title }]);
+    } else {
+      setToasts(t => [...t, { id, msg, type, title }]);
+    }
+    setTimeout(() => setToasts(t => t.filter(x => x.id !== id)), 4000);
   }, []);
 
   const removeToast = useCallback((id) => {

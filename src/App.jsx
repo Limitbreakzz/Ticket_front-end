@@ -32,24 +32,24 @@ import PageTransition from './components/PageTransition';
 
 import { renderTextWithIcons } from './utils/render';
 
+import ToastNotification from './components/ToastNotification';
 import './index.css';
 
 
 // ── Toast notifications ──
 function ToastContainer() {
   const { toasts, removeToast } = useApp();
-  const typeIcon = { success: 'circle-check', error: 'circle-xmark', warning: 'triangle-exclamation', info: 'circle-info' };
   
   return createPortal(
     <div className="toast-container">
       {toasts.map(t => (
-        <div key={t.id} className={`toast ${t.type}`}>
-          <span className="toast-icon"><i className={`fa-solid fa-${typeIcon[t.type] || 'circle-check'}`} aria-hidden="true"></i></span>
-          <span className="toast-msg">{renderTextWithIcons(t.msg)}</span>
-          <button className="toast-close" onClick={() => removeToast(t.id)} aria-label="Close">
-            <i className="fa-solid fa-xmark" aria-hidden="true"></i>
-          </button>
-        </div>
+        <ToastNotification
+          key={t.id}
+          variant={t.type || "success"}
+          title={t.title || (t.type === 'error' ? 'เกิดข้อผิดพลาด' : t.type === 'warning' ? 'คำเตือน' : t.type === 'info' ? 'แจ้งเตือน' : 'สำเร็จ')}
+          message={typeof t.msg === 'string' ? t.msg : (t.msg?.props?.children || t.msg)}
+          onClose={() => removeToast(t.id)}
+        />
       ))}
     </div>,
     document.body
