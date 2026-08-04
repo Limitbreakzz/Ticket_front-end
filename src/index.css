@@ -2948,34 +2948,45 @@ tbody td {
   .full-screen-detail-view {
     padding: 0 !important;
     overflow-y: auto !important;
+    overflow-x: hidden !important;
+    max-width: 100vw !important;
+    box-sizing: border-box !important;
   }
   
   .detail-body-container {
-    padding: 16px 14px !important;
-    gap: 24px !important;
+    padding: 16px 12px !important;
+    gap: 20px !important;
     padding-bottom: 96px !important; /* Prevent bottom nav overlapping and add breathing room */
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+    overflow-x: hidden !important;
   }
 
   .detail-steps-card {
     position: relative !important;
-    padding: 48px 16px 18px 16px !important; /* Make room for actions at top right */
+    padding: 48px 12px 16px 12px !important; /* Make room for actions at top right */
     flex-direction: column !important;
     align-items: stretch !important;
     gap: 16px !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+    overflow-x: hidden !important;
   }
 
   .detail-steps-flex {
     width: 100% !important;
-    gap: 8px !important;
+    gap: 4px !important;
     justify-content: space-between !important;
+    box-sizing: border-box !important;
   }
 
   .detail-step-item {
     flex-direction: column !important;
     align-items: center !important;
     text-align: center !important;
-    gap: 6px !important;
+    gap: 4px !important;
     flex: 1 !important;
+    min-width: 0 !important;
   }
 
   .detail-step-text {
@@ -2983,12 +2994,15 @@ tbody td {
     flex-direction: column !important;
     align-items: center !important;
     text-align: center !important;
+    width: 100% !important;
   }
 
   .detail-step-text div:first-child {
-    font-size: 12px !important;
+    font-size: 11px !important;
     font-weight: 800 !important;
     color: var(--text-primary) !important;
+    word-break: break-word !important;
+    line-height: 1.2 !important;
   }
 
   .detail-step-text div:last-child {
@@ -2996,10 +3010,11 @@ tbody td {
   }
 
   .detail-step-line {
-    margin-top: 18px !important; /* Align line center-vertically with the 36px step circles */
+    margin-top: 14px !important; /* Align line center-vertically with the step circles */
     height: 2px !important;
-    min-width: 10px !important;
-    max-width: 80px !important;
+    min-width: 4px !important;
+    max-width: 40px !important;
+    flex: 1 1 auto !important;
   }
 
   .detail-header-actions {
@@ -3362,18 +3377,25 @@ tbody td {
   .full-screen-detail-view {
     height: auto !important;
     overflow-y: auto !important;
+    overflow-x: hidden !important;
+    max-width: 100vw !important;
+    box-sizing: border-box !important;
   }
 
   .detail-body-container {
     height: auto !important;
-    overflow: visible !important;
-    padding: 24px 18px 120px 18px !important;
+    overflow-x: hidden !important;
+    padding: 16px 12px 120px 12px !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
   }
 
   .detail-grid-container {
     grid-template-columns: 1fr !important;
     height: auto !important;
-    overflow: visible !important;
+    overflow-x: hidden !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
   }
 
   .detail-info-card {
