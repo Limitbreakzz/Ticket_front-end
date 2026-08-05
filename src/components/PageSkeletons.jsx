@@ -406,16 +406,11 @@ export function ReportsSkeleton() {
         gridTemplateColumns: isMobile ? '1fr 1fr' : 'repeat(auto-fit, minmax(260px, 1fr))',
         gap: isMobile ? '12px' : '20px'
       }}>
-        {[
-          { border: '1.5px solid #474d55ff', bg: 'linear-gradient(135deg, var(--bg-card) 0%, rgba(37,99,235,0.03) 100%)' },
-          { border: '1.5px solid #F59E0B', bg: 'linear-gradient(135deg, var(--bg-card) 0%, rgba(245,158,11,0.03) 100%)' },
-          { border: '1.5px solid #10b981', bg: 'linear-gradient(135deg, var(--bg-card) 0%, rgba(34,197,94,0.03) 100%)' },
-          { border: '1.5px solid #8b5cf6', bg: 'linear-gradient(135deg, var(--bg-card) 0%, rgba(139,92,246,0.03) 100%)' }
-        ].map((styleOpt, i) => (
+        {[1, 2, 3, 4].map(i => (
           <div key={i} className="kpi-card" style={{ 
             padding: isMobile ? '14px 16px' : '20px 24px', 
-            background: styleOpt.bg, 
-            border: styleOpt.border, 
+            background: 'var(--bg-card)', 
+            border: '1px solid var(--border-light)', 
             borderRadius: '16px', 
             minHeight: isMobile ? '100px' : '120px', 
             display: 'flex', 
