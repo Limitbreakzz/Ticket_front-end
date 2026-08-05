@@ -2130,7 +2130,7 @@ export default function TicketDetailModal({ ticket, onClose }) {
                       <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
                         {((!detailTicket.assignedTo || detailTicket.assignedTo === 'รอมอบหมาย') && canClaim) ? (
                           <span style={{ fontSize: 13, color: 'var(--danger)', fontStyle: 'italic', fontWeight: 600, display: 'flex', alignItems: 'center', gap: 6 }}>
-                            <i className="fa-solid fa-circle-exclamation"></i> กรุณากดปุ่ม "รับผิดชอบงานนี้" ขวาก่อนเพื่อจัดการสถานะตั๋ว
+                            <i className="fa-solid fa-circle-exclamation"></i> กรุณากดปุ่ม "รับผิดชอบงานนี้" ก่อนเพื่อจัดการสถานะตั๋ว
                           </span>
                         ) : (
                           <>
