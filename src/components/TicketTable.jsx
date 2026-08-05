@@ -771,7 +771,7 @@ export default function TicketTable({ tickets, title = 'รายการ Ticke
                         transition: 'all 0.2s'
                       }} 
                     />
-                    <span>เฉพาะเคสส่งตรงถึงฉัน</span>
+                    <span>แสดงเฉพาะ Ticket ส่วนตัว</span>
                     <span style={{
                       background: personalFilter ? '#e11d48' : 'var(--bg-main)',
                       color: personalFilter ? '#ffffff' : 'var(--text-secondary)',
@@ -1307,7 +1307,7 @@ export default function TicketTable({ tickets, title = 'รายการ Ticke
                 alignItems: 'center',
                 gap: 6
               }}>
-                <i className="fa-solid fa-lock" style={{ fontSize: 9, color: '#e11d48' }} /> เฉพาะเคสส่งตรงถึงฉัน
+                <i className="fa-solid fa-lock" style={{ fontSize: 9, color: '#e11d48' }} /> แสดงเฉพาะ Ticket ส่วนตัว
                 <button type="button" onClick={() => { setPersonalFilter(false); setCurrentPage(1); }} style={{ border: 'none', background: 'transparent', cursor: 'pointer', color: 'var(--text-muted)', fontSize: 10, padding: 0 }}><i className="fa-solid fa-xmark" /></button>
               </span>
             )}
@@ -1922,7 +1922,7 @@ export default function TicketTable({ tickets, title = 'รายการ Ticke
                         transition: 'all 0.2s'
                       }} 
                     />
-                    <span style={{ flex: 1 }}>เฉพาะเคสส่งตรงถึงฉัน</span>
+                    <span style={{ flex: 1 }}>แสดงเฉพาะ Ticket ส่วนตัว</span>
                     <span style={{
                       background: personalFilter ? '#e11d48' : 'var(--bg-main)',
                       color: personalFilter ? '#ffffff' : 'var(--text-secondary)',
