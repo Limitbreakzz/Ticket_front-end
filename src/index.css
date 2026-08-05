@@ -65,8 +65,21 @@
   --sidebar-width: 260px;
   --topbar-height: 64px;
 
-  --transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-  --transition-slow: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+  --ios-ease: cubic-bezier(0.32, 0.72, 0, 1);
+  --transition: all 0.22s cubic-bezier(0.32, 0.72, 0, 1);
+  --transition-fast: all 0.15s cubic-bezier(0.32, 0.72, 0, 1);
+  --transition-slow: all 0.35s cubic-bezier(0.32, 0.72, 0, 1);
+}
+
+/* ── iOS TOUCH OPTIMIZATION & NO TAP HIGHLIGHT ── */
+*, *::before, *::after {
+  -webkit-tap-highlight-color: transparent !important;
+}
+
+/* ── iOS SMOOTH INERTIA SCROLLING ── */
+html, body, .view-container, .table-responsive-wrapper, .modal-body, .sidebar, .app-main {
+  -webkit-overflow-scrolling: touch;
+  scroll-behavior: smooth;
 }
 
 html, body {
@@ -91,6 +104,107 @@ html, body {
   border: none;
   min-height: 100dvh;
   display: block;
+}
+
+/* ── iOS TACTILE PRESS DOWN EFFECT (:active) FOR ALL INTERACTIVE ELEMENTS ── */
+button:active,
+.btn:active,
+.nav-item:active,
+.kpi-card:active,
+.ticket-card:active,
+.mobile-nav-item:active,
+.filter-chip:active,
+.dropdown-item:active,
+.tab-button:active,
+.action-btn:active,
+.card-clickable:active,
+.quick-stat-card:active {
+  transform: scale(0.965) translateY(1px) !important;
+  opacity: 0.88 !important;
+  transition: transform 0.1s cubic-bezier(0.32, 0.72, 0, 1), opacity 0.1s cubic-bezier(0.32, 0.72, 0, 1) !important;
+}
+
+/* ── iOS SMOOTH HOVER LIFT & TRANSITIONS ── */
+button,
+.btn,
+.nav-item,
+.kpi-card,
+.ticket-card,
+.tab-button,
+.filter-chip,
+.modal-content,
+.dropdown-menu,
+.mobile-nav-item {
+  transition: transform 0.22s cubic-bezier(0.32, 0.72, 0, 1), 
+              box-shadow 0.22s cubic-bezier(0.32, 0.72, 0, 1), 
+              background-color 0.2s cubic-bezier(0.32, 0.72, 0, 1),
+              border-color 0.2s cubic-bezier(0.32, 0.72, 0, 1),
+              opacity 0.2s cubic-bezier(0.32, 0.72, 0, 1);
+}
+
+/* Hover Elevation */
+.kpi-card:hover,
+.ticket-card:hover,
+.dashboard-card:hover,
+.report-chart-card:hover {
+  transform: translateY(-3px) scale(1.008);
+  box-shadow: 0 12px 28px -6px rgba(15, 23, 42, 0.08), 0 4px 10px -2px rgba(15, 23, 42, 0.04);
+}
+
+.btn:hover,
+button:not(:disabled):hover {
+  transform: translateY(-1px);
+}
+
+/* ── iOS SPRING KEYFRAME ANIMATIONS ── */
+@keyframes iosSlideUp {
+  0% {
+    transform: translateY(22px) scale(0.97);
+    opacity: 0;
+  }
+  100% {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes iosScaleIn {
+  0% {
+    transform: scale(0.92);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes iosFadeIn {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+/* Apply iOS Entrance Animations */
+.modal-content,
+.detail-modal-card {
+  animation: iosSlideUp 0.3s cubic-bezier(0.32, 0.72, 0, 1) forwards;
+}
+
+.modal-overlay {
+  animation: iosFadeIn 0.22s cubic-bezier(0.32, 0.72, 0, 1) forwards;
+}
+
+.view-container {
+  animation: iosFadeIn 0.25s cubic-bezier(0.32, 0.72, 0, 1) forwards;
+}
+
+.dropdown-menu {
+  animation: iosScaleIn 0.2s cubic-bezier(0.32, 0.72, 0, 1) forwards;
+  transform-origin: top right;
 }
 
 /* ── SCROLLBAR ── */
