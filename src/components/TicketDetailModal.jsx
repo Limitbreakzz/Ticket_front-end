@@ -3205,74 +3205,73 @@ export default function TicketDetailModal({ ticket, onClose }) {
             </button>
           </div>
 
-          {/* Previous Button (Left Arrow) */}
+          {/* Bottom Floating Navigation Toolbar (Prev, Counter, Next) */}
           {viewImageList.length > 1 && (
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                const prevIdx = (viewImageIndex - 1 + viewImageList.length) % viewImageList.length;
-                setViewImageIndex(prevIdx);
-                setViewImage(viewImageList[prevIdx]);
-                setZoomScale(1);
-              }}
-              title="รูปภาพถัดไปก่อนหน้า (ลูกศรซ้าย)"
+            <div 
+              onClick={(e) => e.stopPropagation()}
               style={{
-                position: 'absolute', left: 24, top: '50%', transform: 'translateY(-50%)',
-                background: 'rgba(255,255,255,0.18)', border: 'none',
-                borderRadius: '50%', width: 48, height: 48,
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                color: '#fff', cursor: 'pointer', fontSize: 20, transition: 'all 0.2s ease',
-                backdropFilter: 'blur(4px)',
-                boxShadow: '0 4px 14px rgba(0,0,0,0.4)',
-                zIndex: 100000
+                position: 'absolute', bottom: 24,
+                display: 'flex', alignItems: 'center', gap: 10,
+                background: 'rgba(15, 23, 42, 0.85)',
+                padding: '6px 10px', borderRadius: 30,
+                backdropFilter: 'blur(10px)',
+                WebkitBackdropFilter: 'blur(10px)',
+                border: '1px solid rgba(255,255,255,0.18)',
+                boxShadow: '0 10px 30px rgba(0,0,0,0.6)',
+                zIndex: 100001
               }}
-              onMouseEnter={e => { e.currentTarget.style.background = 'rgba(255,255,255,0.35)'; e.currentTarget.style.transform = 'translateY(-50%) scale(1.08)'; }}
-              onMouseLeave={e => { e.currentTarget.style.background = 'rgba(255,255,255,0.18)'; e.currentTarget.style.transform = 'translateY(-50%) scale(1)'; }}
             >
-              <i className="fa-solid fa-chevron-left"></i>
-            </button>
-          )}
+              {/* Previous Button */}
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  const prevIdx = (viewImageIndex - 1 + viewImageList.length) % viewImageList.length;
+                  setViewImageIndex(prevIdx);
+                  setViewImage(viewImageList[prevIdx]);
+                  setZoomScale(1);
+                }}
+                title="รูปภาพก่อนหน้า (ลูกศรซ้าย)"
+                style={{
+                  background: 'rgba(255,255,255,0.15)', border: 'none',
+                  borderRadius: '50%', width: 38, height: 38,
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  color: '#fff', cursor: 'pointer', fontSize: 14, transition: 'all 0.2s ease'
+                }}
+                onMouseEnter={e => e.currentTarget.style.background = 'rgba(255,255,255,0.35)'}
+                onMouseLeave={e => e.currentTarget.style.background = 'rgba(255,255,255,0.15)'}
+              >
+                <i className="fa-solid fa-chevron-left"></i>
+              </button>
 
-          {/* Next Button (Right Arrow) */}
-          {viewImageList.length > 1 && (
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                const nextIdx = (viewImageIndex + 1) % viewImageList.length;
-                setViewImageIndex(nextIdx);
-                setViewImage(viewImageList[nextIdx]);
-                setZoomScale(1);
-              }}
-              title="รูปภาพถัดไป (ลูกศรอิสระขวา)"
-              style={{
-                position: 'absolute', right: 24, top: '50%', transform: 'translateY(-50%)',
-                background: 'rgba(255,255,255,0.18)', border: 'none',
-                borderRadius: '50%', width: 48, height: 48,
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                color: '#fff', cursor: 'pointer', fontSize: 20, transition: 'all 0.2s ease',
-                backdropFilter: 'blur(4px)',
-                boxShadow: '0 4px 14px rgba(0,0,0,0.4)',
-                zIndex: 100000
-              }}
-              onMouseEnter={e => { e.currentTarget.style.background = 'rgba(255,255,255,0.35)'; e.currentTarget.style.transform = 'translateY(-50%) scale(1.08)'; }}
-              onMouseLeave={e => { e.currentTarget.style.background = 'rgba(255,255,255,0.18)'; e.currentTarget.style.transform = 'translateY(-50%) scale(1)'; }}
-            >
-              <i className="fa-solid fa-chevron-right"></i>
-            </button>
-          )}
+              {/* Counter Badge */}
+              <span style={{
+                color: '#ffffff', fontSize: 13, fontWeight: 800,
+                padding: '0 10px', letterSpacing: '1px', userSelect: 'none'
+              }}>
+                {viewImageIndex + 1} / {viewImageList.length}
+              </span>
 
-          {/* Counter Badge */}
-          {viewImageList.length > 1 && (
-            <div style={{
-              position: 'absolute', bottom: 24,
-              background: 'rgba(15, 23, 42, 0.75)', color: '#ffffff',
-              padding: '6px 16px', borderRadius: 20,
-              fontSize: 13, fontWeight: 700,
-              backdropFilter: 'blur(4px)',
-              border: '1px solid rgba(255,255,255,0.15)',
-              letterSpacing: '1px'
-            }}>
-              {viewImageIndex + 1} / {viewImageList.length}
+              {/* Next Button */}
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  const nextIdx = (viewImageIndex + 1) % viewImageList.length;
+                  setViewImageIndex(nextIdx);
+                  setViewImage(viewImageList[nextIdx]);
+                  setZoomScale(1);
+                }}
+                title="รูปภาพถัดไป (ลูกศรขวา)"
+                style={{
+                  background: 'rgba(255,255,255,0.15)', border: 'none',
+                  borderRadius: '50%', width: 38, height: 38,
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  color: '#fff', cursor: 'pointer', fontSize: 14, transition: 'all 0.2s ease'
+                }}
+                onMouseEnter={e => e.currentTarget.style.background = 'rgba(255,255,255,0.35)'}
+                onMouseLeave={e => e.currentTarget.style.background = 'rgba(255,255,255,0.15)'}
+              >
+                <i className="fa-solid fa-chevron-right"></i>
+              </button>
             </div>
           )}
         </div>,
