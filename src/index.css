@@ -3049,6 +3049,7 @@ tbody td {
     height: auto !important;
     width: 100% !important;
     max-width: 100% !important;
+    min-width: 0 !important;
     box-sizing: border-box !important;
   }
 
@@ -3059,6 +3060,7 @@ tbody td {
     overflow-y: visible !important;
     width: 100% !important;
     max-width: 100% !important;
+    min-width: 0 !important;
     box-sizing: border-box !important;
   }
 
