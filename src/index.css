@@ -2924,13 +2924,17 @@ tbody td {
     flex-shrink: 0 !important;
   }
   .topbar-brand .topbar-logo-icon {
-    width: 32px !important;
-    height: 32px !important;
-    font-size: 14px !important;
+    width: 28px !important;
+    height: 28px !important;
+    font-size: 12.5px !important;
     flex-shrink: 0 !important;
   }
   .topbar-brand .topbar-logo-text {
-    display: none !important;
+    display: inline-block !important;
+    font-size: 13.5px !important;
+    font-weight: 800 !important;
+    color: var(--text-primary) !important;
+    white-space: nowrap !important;
   }
   .topbar-actions {
     gap: 6px !important;
@@ -2943,15 +2947,15 @@ tbody td {
     border: 1px solid var(--border-light) !important;
     border-radius: var(--radius-lg) !important;
     padding: 4px 8px !important;
-    gap: 6px !important;
+    gap: 5px !important;
     flex-shrink: 1 !important;
-    max-width: 220px !important;
+    max-width: 175px !important;
     overflow: hidden !important;
   }
   .topbar-profile-avatar-container {
-    width: 28px !important;
-    height: 28px !important;
-    font-size: 11px !important;
+    width: 26px !important;
+    height: 26px !important;
+    font-size: 10px !important;
     flex-shrink: 0 !important;
   }
   .topbar-profile-info {
@@ -2961,24 +2965,26 @@ tbody td {
     overflow: hidden !important;
   }
   .topbar-profile-name {
-    font-size: 11.5px !important;
-    max-width: 95px !important;
+    font-size: 11px !important;
+    max-width: 75px !important;
     white-space: nowrap !important;
     overflow: hidden !important;
     text-overflow: ellipsis !important;
   }
   .topbar-profile-badges {
     display: flex !important;
-    gap: 3px !important;
+    gap: 2px !important;
   }
-  .topbar-profile-role-badge,
-  .topbar-profile-dept-badge {
-    font-size: 8.5px !important;
-    padding: 0.5px 5px !important;
-    max-width: 65px !important;
+  .topbar-profile-role-badge {
+    font-size: 8px !important;
+    padding: 0.5px 4px !important;
+    max-width: 60px !important;
     white-space: nowrap !important;
     overflow: hidden !important;
     text-overflow: ellipsis !important;
+  }
+  .topbar-profile-dept-badge {
+    display: none !important;
   }
   .icon-btn {
     width: 32px !important;
