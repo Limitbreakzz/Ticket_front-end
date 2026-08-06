@@ -205,17 +205,20 @@ export default function CommandMenu({
 					}}
 				>
 					{allSections.map((section, secIdx) => (
-						<div key={section.label || secIdx} style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+						<div key={section.label || secIdx} style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
 							{secIdx > 0 && section.label && <hr style={{ border: 'none', borderTop: '1px solid var(--border-light, #cbd5e1)', margin: '4px 0' }} />}
 							{section.label && (
 								<span style={{ fontSize: '11px', color: 'var(--text-muted)', paddingLeft: '8px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
 									{section.label}
 								</span>
 							)}
-							<div className={section.grid ? 'grid grid-cols-2 gap-1' : 'flex flex-col gap-0.5'}>
-								{section.items.map((item) => {
+							<div style={{ display: 'flex', flexDirection: 'column', gap: 0 }}>
+								{section.items.map((item, itemIdx) => {
 									const index = items.indexOf(item);
 									const isSelected = selected === index;
+									const isLogout = item.name.includes('ออกจากระบบ');
+									const isLast = itemIdx === section.items.length - 1;
+
 									return (
 										<button
 											key={item.name}
@@ -233,21 +236,34 @@ export default function CommandMenu({
 												display: 'flex',
 												alignItems: 'center',
 												justifyContent: item.centered ? 'center' : 'flex-start',
-												gap: '8px',
+												gap: '10px',
 												width: '100%',
-												padding: '8px 12px',
-												borderRadius: '8px',
+												padding: '9px 8px',
+												borderRadius: '6px',
 												border: 'none',
-												background: isSelected ? 'var(--primary-pale, #eff6ff)' : 'transparent',
-												color: isSelected ? 'var(--primary, #3b82f6)' : 'var(--text-primary)',
-												fontSize: '12px',
+												borderBottom: !isLast ? '1px solid var(--border-light)' : 'none',
+												background: isSelected 
+													? (isLogout ? 'rgba(239, 68, 68, 0.08)' : 'var(--primary-pale)') 
+													: 'transparent',
+												color: isLogout 
+													? 'var(--danger, #ef4444)' 
+													: (isSelected ? 'var(--primary)' : 'var(--text-primary)'),
+												fontSize: '12.5px',
 												fontWeight: isSelected ? 700 : 500,
 												cursor: 'pointer',
-												transition: 'all 0.15s ease',
-												outline: item.active ? '1px solid var(--primary)' : 'none'
+												transition: 'all 0.15s ease'
 											}}
 										>
-											{item.icon}
+											<div style={{
+												width: 24,
+												height: 24,
+												display: 'flex',
+												alignItems: 'center',
+												justifyContent: 'center',
+												flexShrink: 0
+											}}>
+												{item.icon}
+											</div>
 											<span>{item.name}</span>
 										</button>
 									);
