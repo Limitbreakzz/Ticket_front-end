@@ -322,24 +322,7 @@ export default function HelpModal({ onClose }) {
           )}
         </div>
 
-        {/* Footer */}
-        <div className="modal-footer" style={{ padding: isMobile ? '12px 16px' : '16px 24px', borderTop: 'none' }}>
-          <button
-            className="btn btn-primary"
-            onClick={onClose}
-            style={{
-              padding: isMobile ? '11px 16px' : '9px 24px',
-              fontSize: 13,
-              fontWeight: 700,
-              width: isMobile ? '100%' : 'auto',
-              borderRadius: '10px',
-              border: 'none'
-            }}
-            id="close-help-btn"
-          >
-            ปิดหน้าต่าง
-          </button>
-        </div>
+
       </div>
     </div>
   );
