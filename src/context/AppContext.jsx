@@ -53,8 +53,45 @@ export function AppProvider({ children }) {
   const [depts, setDepts]           = useState([]);
   const [managers, setManagers]     = useState([]);
   const [showCreateModal, setShowCreateModal] = useState(false);
+  const [showHelp, setShowHelp] = useState(false);
   const [showMobileSidebar, setShowMobileSidebar] = useState(false);
   const [globalConfirm, setGlobalConfirm] = useState(null);
+
+  const [theme, setTheme] = useState(() => {
+    if (typeof window === 'undefined') return 'light';
+    return localStorage.getItem('theme') || 'light';
+  });
+
+  useEffect(() => {
+    const root = window.document.documentElement;
+    const updateTheme = () => {
+      if (!currentUser) {
+        root.classList.remove('dark');
+        return;
+      }
+      if (theme === 'dark') {
+        root.classList.add('dark');
+      } else if (theme === 'light') {
+        root.classList.remove('dark');
+      } else {
+        const systemTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+        if (systemTheme === 'dark') {
+          root.classList.add('dark');
+        } else {
+          root.classList.remove('dark');
+        }
+      }
+    };
+    updateTheme();
+    localStorage.setItem('theme', theme);
+
+    if (theme === 'system') {
+      const media = window.matchMedia('(prefers-color-scheme: dark)');
+      const listener = () => updateTheme();
+      media.addEventListener('change', listener);
+      return () => media.removeEventListener('change', listener);
+    }
+  }, [theme, currentUser]);
 
   const showConfirm = useCallback(({ title, message, showInput = false, inputPlaceholder = '', requiredInput = false }) => {
     return new Promise((resolve) => {
@@ -649,6 +686,10 @@ export function AppProvider({ children }) {
       globalConfirm,
       showConfirm,
       setGlobalConfirm,
+      theme,
+      setTheme,
+      showHelp,
+      setShowHelp,
     }}>
       {children}
     </AppContext.Provider>

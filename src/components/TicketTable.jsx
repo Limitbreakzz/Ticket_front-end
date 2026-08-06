@@ -676,7 +676,8 @@ export default function TicketTable({ tickets, title = 'รายการ Ticke
                     alignItems: 'center',
                     gap: 10,
                     outline: 'none',
-                    userSelect: 'none'
+                    userSelect: 'none',
+                    flexWrap: 'nowrap'
                   }}
                 >
                   {/* Switch track */}
@@ -687,7 +688,8 @@ export default function TicketTable({ tickets, title = 'รายการ Ticke
                     background: hideCompleted ? 'var(--primary)' : '#cbd5e1',
                     borderRadius: 24,
                     transition: 'background 0.25s cubic-bezier(0.4, 0, 0.2, 1)',
-                    display: 'inline-block'
+                    display: 'inline-block',
+                    flexShrink: 0
                   }}>
                     {/* Switch knob */}
                     <span style={{
@@ -706,7 +708,8 @@ export default function TicketTable({ tickets, title = 'รายการ Ticke
                     fontSize: 13.5,
                     fontWeight: 700,
                     color: 'var(--text-primary)',
-                    transition: 'color 0.2s ease'
+                    transition: 'color 0.2s ease',
+                    whiteSpace: 'nowrap'
                   }}>
                     ซ่อนเคสที่สำเร็จ / ปิดแล้ว / ยกเลิก
                   </span>

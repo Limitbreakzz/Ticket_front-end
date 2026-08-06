@@ -510,12 +510,12 @@ export default function ApprovalView({ isEmbedded = false }) {
               <button
                 type="button"
                 onClick={() => { setHideCompleted(!hideCompleted); setCurrentPage(1); }}
-                style={{ background: 'transparent', border: 'none', padding: 0, cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: 10, outline: 'none', userSelect: 'none' }}
+                style={{ background: 'transparent', border: 'none', padding: 0, cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: 10, outline: 'none', userSelect: 'none', flexWrap: 'nowrap' }}
               >
                 <span style={{
                   position: 'relative', width: 44, height: 24,
                   background: hideCompleted ? 'var(--primary)' : '#cbd5e1',
-                  borderRadius: 24, transition: 'background 0.25s cubic-bezier(0.4, 0, 0.2, 1)', display: 'inline-block'
+                  borderRadius: 24, transition: 'background 0.25s cubic-bezier(0.4, 0, 0.2, 1)', display: 'inline-block', flexShrink: 0
                 }}>
                   <span style={{
                     position: 'absolute', top: 3, left: hideCompleted ? 23 : 3,
@@ -523,7 +523,7 @@ export default function ApprovalView({ isEmbedded = false }) {
                     boxShadow: '0 1px 4px rgba(0,0,0,0.18)', transition: 'left 0.25s cubic-bezier(0.4, 0, 0.2, 1)'
                   }} />
                 </span>
-                <span style={{ fontSize: 13.5, fontWeight: 700, color: 'var(--text-primary)', textAlign: 'left' }}>
+                <span style={{ fontSize: 13.5, fontWeight: 700, color: 'var(--text-primary)', textAlign: 'left', whiteSpace: 'nowrap' }}>
                   ซ่อนเคสที่สำเร็จ / ปิดแล้ว / ยกเลิก
                 </span>
               </button>

@@ -4,6 +4,7 @@ import { AppProvider, useApp } from './context/AppContext';
 import { ROLES, ROLE_INFO } from './data/mockData';
 
 import Sidebar from './components/Sidebar';
+import CommandMenu from './components/CommandMenu';
 import BottomNav from './components/BottomNav';
 import TicketFormModal from './components/TicketFormModal';
 import TicketDetailModal from './components/TicketDetailModal';
@@ -73,11 +74,34 @@ function PlaceholderView({ title, icon }) {
 
 // ── Topbar ──
 function Topbar({ onCreateTicket }) {
-  const { role, activeNav, setActiveNav, notifications, clearAllNotifications, markNotifAsRead, openTicketDetail, currentUser, setShowMobileSidebar } = useApp();
+  const { role, activeNav, setActiveNav, notifications, clearAllNotifications, markNotifAsRead, openTicketDetail, currentUser, setShowMobileSidebar, theme, setTheme, logoutUser, setShowHelp } = useApp();
   const info = ROLE_INFO[role];
   const [showNotif, setShowNotif] = useState(false);
 
   const unreadCount = notifications.filter(n => n.read === false || n.isRead === false).length;
+
+  const commandSections = [
+    {
+      label: '',
+      items: [
+        {
+          name: 'แก้ไขโปรไฟล์',
+          icon: <i className="fa-solid fa-user-gear" style={{ fontSize: 13.5, color: 'var(--primary)' }}></i>,
+          onSelect: () => setActiveNav('profile')
+        },
+        {
+          name: 'คู่มือการใช้งาน (Help)',
+          icon: <i className="fa-regular fa-circle-question" style={{ fontSize: 13.5, color: 'var(--text-muted)' }}></i>,
+          onSelect: () => setShowHelp(true)
+        },
+        {
+          name: 'ออกจากระบบ',
+          icon: <i className="fa-solid fa-right-from-bracket" style={{ fontSize: 13.5, color: 'var(--danger)' }}></i>,
+          onSelect: async () => { await logoutUser(); }
+        }
+      ]
+    }
+  ];
 
   return (
     <header className="topbar">
@@ -320,37 +344,59 @@ function Topbar({ onCreateTicket }) {
           </AnimatePresence>
         </div>
 
-        {/* Profile + Logout */}
-        <div 
-          className="topbar-profile-box" 
-          onClick={() => setActiveNav('profile')}
-          style={{ cursor: 'pointer' }}
-        >
-          <div className="topbar-profile-avatar-container" style={{ background: currentUser?.avatarUrl ? 'transparent' : info.color }}>
-            {currentUser?.avatarUrl ? (
-              <img src={currentUser.avatarUrl} alt="avatar" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-            ) : (
-              currentUser?.name ? currentUser.name.trim().charAt(0).toUpperCase() : info.initials
-            )}
-          </div>
-          <div className="topbar-profile-info">
-            <span className="topbar-profile-name">
-              {currentUser?.name || info.name}
-            </span>
+        {/* Profile + Logout replaced with CommandMenu */}
+        <CommandMenu
+          title={currentUser?.name || info.name}
+          avatar={
+            <div className="topbar-profile-avatar-container" style={{ background: currentUser?.avatarUrl ? 'transparent' : info.color, margin: '2px' }}>
+              {currentUser?.avatarUrl ? (
+                <img src={currentUser.avatarUrl} alt="avatar" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+              ) : (
+                currentUser?.name ? currentUser.name.trim().charAt(0).toUpperCase() : info.initials
+              )}
+            </div>
+          }
+          badges={
             <div className="topbar-profile-badges">
               <span className="topbar-profile-role-badge" style={{
-                background: role === ROLES.ADMIN ? 'var(--critical-pale)' : role === ROLES.MANAGER ? 'var(--success-pale)' : 'var(--primary-pale)',
-                color: role === ROLES.ADMIN ? 'var(--critical)' : role === ROLES.MANAGER ? '#065f46' : 'var(--primary)',
-                border: `1px solid ${role === ROLES.ADMIN ? 'rgba(124,58,237,0.3)' : role === ROLES.MANAGER ? 'rgba(16,185,129,0.3)' : 'rgba(37,99,235,0.3)'}`
+                background: role === ROLES.ADMIN ? 'rgba(168, 85, 247, 0.15)' : role === ROLES.MANAGER ? 'rgba(16, 185, 129, 0.15)' : 'rgba(59, 130, 246, 0.15)',
+                color: role === ROLES.ADMIN ? '#c084fc' : role === ROLES.MANAGER ? '#34d399' : '#60a5fa',
+                border: `1px solid ${role === ROLES.ADMIN ? 'rgba(168, 85, 247, 0.3)' : role === ROLES.MANAGER ? 'rgba(16, 185, 129, 0.3)' : 'rgba(59, 130, 246, 0.3)'}`,
+                padding: '1px 7px',
+                borderRadius: '5px',
+                fontSize: '10px',
+                fontWeight: 600,
+                lineHeight: 1.4
               }}>
                 {info.label}
               </span>
-              <span className="topbar-profile-dept-badge">
-                {currentUser?.department?.name || ''}
-              </span>
+              {currentUser?.department?.name && (
+                <span className="topbar-profile-dept-badge" style={{
+                  background: 'rgba(148, 163, 184, 0.12)',
+                  color: 'var(--text-muted)',
+                  border: '1px solid rgba(148, 163, 184, 0.2)',
+                  padding: '1px 7px',
+                  borderRadius: '5px',
+                  fontSize: '10px',
+                  fontWeight: 500,
+                  lineHeight: 1.4
+                }}>
+                  {currentUser.department.name}
+                </span>
+              )}
             </div>
-          </div>
-        </div>
+          }
+          sections={commandSections}
+          theme={theme}
+          onThemeChange={setTheme}
+          labels={{
+            theme: 'โหมดหน้าจอ',
+            light: 'สว่าง',
+            dark: 'มืด',
+            system: 'ระบบ'
+          }}
+          className="topbar-command-menu"
+        />
 
       </div>
     </header>

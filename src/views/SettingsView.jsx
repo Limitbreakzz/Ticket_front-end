@@ -656,8 +656,8 @@ export default function SettingsView({ defaultActiveTab }) {
                                   padding: '2px 8px',
                                   borderRadius: 10,
                                   fontWeight: 700,
-                                  background: 'rgba(124,58,237,0.1)',
-                                  color: 'rgb(124,58,237)',
+                                  background: 'var(--critical-pale)',
+                                  color: 'var(--critical)',
                                   whiteSpace: 'nowrap'
                                 }}>
                                   <i className="fa-solid fa-lock" style={{ marginRight: 4 }} />Private Ticket

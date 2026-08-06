@@ -16,6 +16,16 @@ export default function ProfileView() {
   const [saving, setSaving] = useState(false);
   const [avatarHovered, setAvatarHovered] = useState(false);
 
+  // Cropper states
+  const [cropSrc, setCropSrc] = useState('');
+  const [zoom, setZoom] = useState(1);
+  const [offset, setOffset] = useState({ x: 0, y: 0 });
+  const [isDragging, setIsDragging] = useState(false);
+  const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
+  const [imgDimensions, setImgDimensions] = useState({ width: 0, height: 0, naturalWidth: 0, naturalHeight: 0 });
+
+  const cropperImgRef = useRef(null);
+
   useEffect(() => {
     if (currentUser) {
       Promise.resolve().then(() => {
@@ -40,12 +50,105 @@ export default function ProfileView() {
       return;
     }
 
-    setAvatarFile(file);
     const reader = new FileReader();
     reader.onload = () => {
-      setAvatarPreview(reader.result);
+      setCropSrc(reader.result);
+      setZoom(1);
+      setOffset({ x: 0, y: 0 });
+      // Reset file input value so same file can be selected again if needed
+      e.target.value = '';
     };
     reader.readAsDataURL(file);
+  };
+
+  const handleImageLoaded = (e) => {
+    const img = e.target;
+    const aspect = img.naturalWidth / img.naturalHeight;
+    let renderWidth, renderHeight;
+    // Fit the crop area (220px)
+    if (aspect >= 1) {
+      renderHeight = 220;
+      renderWidth = 220 * aspect;
+    } else {
+      renderWidth = 220;
+      renderHeight = 220 / aspect;
+    }
+    setImgDimensions({
+      width: renderWidth,
+      height: renderHeight,
+      naturalWidth: img.naturalWidth,
+      naturalHeight: img.naturalHeight
+    });
+  };
+
+  // Dragging event handlers
+  const handleStart = (clientX, clientY) => {
+    setIsDragging(true);
+    setDragStart({ x: clientX - offset.x, y: clientY - offset.y });
+  };
+
+  const handleMove = (clientX, clientY) => {
+    if (!isDragging) return;
+    setOffset({
+      x: clientX - dragStart.x,
+      y: clientY - dragStart.y
+    });
+  };
+
+  const handleEnd = () => {
+    setIsDragging(false);
+  };
+
+  const handleMouseDown = (e) => handleStart(e.clientX, e.clientY);
+  const handleMouseMove = (e) => handleMove(e.clientX, e.clientY);
+  const handleMouseUp = () => handleEnd();
+
+  const handleTouchStart = (e) => {
+    if (e.touches.length === 1) {
+      handleStart(e.touches[0].clientX, e.touches[0].clientY);
+    }
+  };
+  const handleTouchMove = (e) => {
+    if (e.touches.length === 1) {
+      handleMove(e.touches[0].clientX, e.touches[0].clientY);
+    }
+  };
+  const handleTouchEnd = () => handleEnd();
+
+  const handleCropSave = () => {
+    if (!cropperImgRef.current) return;
+
+    const canvas = document.createElement('canvas');
+    canvas.width = 256;
+    canvas.height = 256;
+    const ctx = canvas.getContext('2d');
+
+    // Clear canvas with white background
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(0, 0, 256, 256);
+
+    // Apply transformation
+    ctx.translate(128, 128);
+    const ratio = 256 / 220;
+    ctx.scale(ratio * zoom, ratio * zoom);
+    ctx.translate(offset.x, offset.y);
+
+    // Draw the image centered
+    ctx.drawImage(
+      cropperImgRef.current,
+      -imgDimensions.width / 2,
+      -imgDimensions.height / 2,
+      imgDimensions.width,
+      imgDimensions.height
+    );
+
+    canvas.toBlob((blob) => {
+      if (!blob) return;
+      const croppedFile = new File([blob], 'cropped-avatar.jpg', { type: 'image/jpeg' });
+      setAvatarFile(croppedFile);
+      setAvatarPreview(URL.createObjectURL(croppedFile));
+      setCropSrc('');
+    }, 'image/jpeg', 0.95);
   };
 
   // Submit profile changes
@@ -373,6 +476,175 @@ export default function ProfileView() {
         </div>
 
       </form>
+
+      {/* ── Image Cropping Modal (Drag & Zoom) ── */}
+      {cropSrc && (
+        <div style={{
+          position: 'fixed',
+          inset: 0,
+          background: 'rgba(15, 23, 42, 0.75)',
+          backdropFilter: 'blur(8px)',
+          WebkitBackdropFilter: 'blur(8px)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 11000,
+          padding: '16px',
+          fontFamily: "inherit"
+        }}>
+          <div style={{
+            background: 'var(--bg-card, #ffffff)',
+            border: '1px solid var(--border-light, #e2e8f0)',
+            borderRadius: '24px',
+            padding: '24px',
+            width: '100%',
+            maxWidth: '360px',
+            boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            gap: '20px'
+          }}>
+            <h3 style={{ margin: 0, fontSize: '17px', fontWeight: 800, color: 'var(--text-primary, #0f172a)', textAlign: 'center' }}>
+              ปรับตำแหน่งรูปโปรไฟล์
+            </h3>
+
+            {/* Viewport container */}
+            <div 
+              style={{
+                position: 'relative',
+                width: '280px',
+                height: '280px',
+                overflow: 'hidden',
+                borderRadius: '16px',
+                border: '1px solid var(--border-light, #e2e8f0)',
+                cursor: 'move',
+                userSelect: 'none',
+                background: '#0f172a',
+                touchAction: 'none'
+              }}
+              onMouseDown={handleMouseDown}
+              onMouseMove={handleMouseMove}
+              onMouseUp={handleMouseUp}
+              onMouseLeave={handleMouseUp}
+              onTouchStart={handleTouchStart}
+              onTouchMove={handleTouchMove}
+              onTouchEnd={handleTouchEnd}
+            >
+              {imgDimensions.width > 0 && (
+                <img
+                  ref={cropperImgRef}
+                  src={cropSrc}
+                  alt="Crop Preview"
+                  style={{
+                    position: 'absolute',
+                    width: imgDimensions.width,
+                    height: imgDimensions.height,
+                    left: 140 - imgDimensions.width / 2 + offset.x,
+                    top: 140 - imgDimensions.height / 2 + offset.y,
+                    transform: `scale(${zoom})`,
+                    transformOrigin: 'center center',
+                    pointerEvents: 'none',
+                    userSelect: 'none'
+                  }}
+                />
+              )}
+              {/* Semi-transparent mask with circular hole */}
+              <div style={{
+                position: 'absolute',
+                width: '220px',
+                height: '220px',
+                top: '30px',
+                left: '30px',
+                borderRadius: '50%',
+                border: '3px solid var(--primary, #3b82f6)',
+                boxShadow: '0 0 0 9999px rgba(15, 23, 42, 0.65)',
+                pointerEvents: 'none',
+                zIndex: 2
+              }} />
+
+              {/* Invisible loader to calculate sizes */}
+              <img 
+                src={cropSrc} 
+                alt="Invisible Loader" 
+                style={{ display: 'none' }} 
+                onLoad={handleImageLoaded} 
+              />
+            </div>
+
+            <p style={{ fontSize: '12px', color: 'var(--text-secondary, #64748b)', margin: 0, textAlign: 'center', lineHeight: 1.4 }}>
+              คลิกค้างแล้วลากรูปภาพเพื่อปรับตำแหน่ง <br />
+              ส่วนที่อยู่นอกวงกลมสีฟ้าจะถูกตัดออก
+            </p>
+
+            {/* Zoom Slider Control */}
+            <div style={{ width: '100%', display: 'flex', alignItems: 'center', gap: '12px' }}>
+              <i className="fa-solid fa-magnifying-glass-minus" style={{ color: 'var(--text-secondary, #64748b)', fontSize: '14px' }}></i>
+              <input 
+                type="range"
+                min="1"
+                max="3"
+                step="0.05"
+                value={zoom}
+                onChange={(e) => setZoom(parseFloat(e.target.value))}
+                style={{
+                  flex: 1,
+                  height: '6px',
+                  borderRadius: '3px',
+                  outline: 'none',
+                  cursor: 'pointer',
+                  accentColor: 'var(--primary, #3b82f6)'
+                }}
+              />
+              <i className="fa-solid fa-magnifying-glass-plus" style={{ color: 'var(--text-secondary, #64748b)', fontSize: '14px' }}></i>
+            </div>
+
+            {/* Action Buttons */}
+            <div style={{ display: 'flex', width: '100%', gap: '12px' }}>
+              <button
+                type="button"
+                onClick={() => setCropSrc('')}
+                style={{
+                  flex: 1,
+                  padding: '10px 16px',
+                  borderRadius: '12px',
+                  border: '1px solid var(--border-light, #cbd5e1)',
+                  background: 'var(--bg-card, #ffffff)',
+                  color: 'var(--text-secondary, #475569)',
+                  fontSize: '14px',
+                  fontWeight: 700,
+                  cursor: 'pointer',
+                  transition: 'all 0.15s'
+                }}
+                onMouseEnter={e => e.currentTarget.style.background = 'var(--bg-main, #f8fafc)'}
+                onMouseLeave={e => e.currentTarget.style.background = 'var(--bg-card, #ffffff)'}
+              >
+                ยกเลิก
+              </button>
+              <button
+                type="button"
+                onClick={handleCropSave}
+                style={{
+                  flex: 1,
+                  padding: '10px 16px',
+                  borderRadius: '12px',
+                  border: 'none',
+                  background: 'var(--primary, #3b82f6)',
+                  color: '#ffffff',
+                  fontSize: '14px',
+                  fontWeight: 700,
+                  cursor: 'pointer',
+                  transition: 'all 0.15s'
+                }}
+                onMouseEnter={e => e.currentTarget.style.background = '#2563eb'}
+                onMouseLeave={e => e.currentTarget.style.background = 'var(--primary, #3b82f6)'}
+              >
+                ยืนยันการตัดรูป
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

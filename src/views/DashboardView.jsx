@@ -402,8 +402,7 @@ export default function DashboardView() {
                     onClick={() => openTicketDetail(t.id)}
                     style={{ cursor: 'pointer' }}
                   >
-                    {/* Icon category */}
-                    <div style={{ width: 34, height: 34, borderRadius: 10, background: 'var(--bg-main)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-muted)', flexShrink: 0 }}>
+                    <div className="feed-icon-box" style={{ width: 34, height: 34, borderRadius: 10, background: 'var(--bg-main)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-muted)', flexShrink: 0 }}>
                       <i className={`fa-solid fa-${catInfo?.icon || 'ticket'}`} style={{ fontSize: 14 }}></i>
                     </div>
                     
@@ -463,8 +462,7 @@ export default function DashboardView() {
                     onClick={() => openTicketDetail(t.id)}
                     style={{ cursor: 'pointer' }}
                   >
-                    {/* Icon category */}
-                    <div style={{ width: 34, height: 34, borderRadius: 10, background: 'var(--bg-main)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-muted)', flexShrink: 0 }}>
+                    <div className="feed-icon-box" style={{ width: 34, height: 34, borderRadius: 10, background: 'var(--bg-main)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-muted)', flexShrink: 0 }}>
                       <i className={`fa-solid fa-${catInfo?.icon || 'ticket'}`} style={{ fontSize: 14 }}></i>
                     </div>
                     

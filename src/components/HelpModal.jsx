@@ -1,7 +1,14 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 export default function HelpModal({ onClose }) {
   const [activeTab, setActiveTab] = useState('roles');
+  const [isMobile, setIsMobile] = useState(() => typeof window !== 'undefined' && window.innerWidth <= 768);
+
+  useEffect(() => {
+    const handleResize = () => setIsMobile(window.innerWidth <= 768);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   const tabs = [
     { id: 'roles', label: 'แนะนำบทบาท', icon: 'fa-user-gear' },
@@ -10,18 +17,32 @@ export default function HelpModal({ onClose }) {
   ];
 
   return (
-    <div className="modal-overlay" onClick={onClose} style={{ zIndex: 1000 }}>
-      <div className="modal" onClick={e => e.stopPropagation()} style={{ maxWidth: '640px', width: '100%', height: '80vh', display: 'flex', flexDirection: 'column' }}>
+    <div className="modal-overlay" onClick={onClose} style={{ zIndex: 1000, padding: isMobile ? 0 : 16, alignItems: isMobile ? 'flex-end' : 'center' }}>
+      <div 
+        className="modal" 
+        onClick={e => e.stopPropagation()} 
+        style={{ 
+          maxWidth: '640px', 
+          width: '100%', 
+          maxHeight: isMobile ? '92dvh' : '85vh',
+          height: isMobile ? '90dvh' : '80vh', 
+          display: 'flex', 
+          flexDirection: 'column',
+          borderRadius: isMobile ? '20px 20px 0 0' : 'var(--radius-xl)',
+          overflow: 'hidden',
+          animation: isMobile ? 'iosSlideUp 0.3s cubic-bezier(0.32, 0.72, 0, 1)' : undefined
+        }}
+      >
         {/* Header */}
-        <div className="modal-header">
+        <div className="modal-header" style={{ padding: isMobile ? '14px 16px' : '20px 24px' }}>
           <div className="modal-title-wrap">
             <div className="modal-icon-title">
-              <div className="modal-header-icon">
+              <div className="modal-header-icon" style={{ width: isMobile ? 28 : 34, height: isMobile ? 28 : 34, fontSize: isMobile ? 14 : 16 }}>
                 <i className="fa-solid fa-circle-question" style={{ color: 'var(--primary)' }}></i>
               </div>
-              <span className="modal-title">คู่มือและเอกสารช่วยเหลือ (Help Hub)</span>
+              <span className="modal-title" style={{ fontSize: isMobile ? 15 : 17, fontWeight: 800 }}>คู่มือการใช้งาน (Help Hub)</span>
             </div>
-            <span className="modal-subtitle">ข้อมูลการใช้งานระบบช่วยเหลือ Ticket Hub สำหรับผู้ใช้ทุกบทบาท</span>
+            <span className="modal-subtitle" style={{ fontSize: isMobile ? 11.5 : 13, marginTop: 2 }}>ข้อมูลการใช้งานระบบช่วยเหลือ Ticket Hub สำหรับผู้ใช้ทุกบทบาท</span>
           </div>
           <button className="modal-close" onClick={onClose} id="close-help-modal">
             <i className="fa-solid fa-xmark"></i>
@@ -33,8 +54,11 @@ export default function HelpModal({ onClose }) {
           display: 'flex',
           borderBottom: '1px solid var(--border-light)',
           background: 'var(--bg-card)',
-          padding: '0 28px',
-          gap: 16
+          padding: isMobile ? '0 8px' : '0 24px',
+          gap: isMobile ? 4 : 16,
+          overflowX: 'auto',
+          scrollbarWidth: 'none',
+          msOverflowStyle: 'none'
         }}>
           {tabs.map(tab => (
             <button
@@ -44,115 +68,119 @@ export default function HelpModal({ onClose }) {
               style={{
                 display: 'flex',
                 alignItems: 'center',
-                gap: 8,
-                padding: '14px 4px',
+                justifyContent: 'center',
+                gap: isMobile ? 6 : 8,
+                padding: isMobile ? '11px 10px' : '14px 4px',
                 border: 'none',
-                borderBottom: activeTab === tab.id ? '2px solid var(--primary)' : '2px solid transparent',
+                borderBottom: activeTab === tab.id ? '2.5px solid var(--primary)' : '2.5px solid transparent',
                 background: 'transparent',
                 color: activeTab === tab.id ? 'var(--primary)' : 'var(--text-secondary)',
-                fontSize: 13.5,
+                fontSize: isMobile ? 12 : 13.5,
                 fontWeight: activeTab === tab.id ? 700 : 500,
                 cursor: 'pointer',
                 transition: 'all 0.15s ease',
-                fontFamily: 'inherit'
+                fontFamily: 'inherit',
+                whiteSpace: 'nowrap',
+                flex: isMobile ? 1 : 'initial',
+                textAlign: 'center'
               }}
             >
-              <i className={`fa-solid ${tab.icon}`}></i>
+              <i className={`fa-solid ${tab.icon}`} style={{ fontSize: isMobile ? 12 : 14 }}></i>
               {tab.label}
             </button>
           ))}
         </div>
 
         {/* Body content */}
-        <div className="modal-body" style={{ background: 'var(--bg-main)', padding: '24px 28px' }}>
+        <div className="modal-body" style={{ background: 'var(--bg-main)', padding: isMobile ? '14px 14px' : '24px 28px', flex: 1, overflowY: 'auto' }}>
           {activeTab === 'roles' && (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: isMobile ? 12 : 16 }}>
               {/* Introduction */}
-              <div style={{ fontSize: 13.5, color: 'var(--text-secondary)', lineHeight: 1.6 }}>
+              <div style={{ fontSize: isMobile ? 12.5 : 13.5, color: 'var(--text-secondary)', lineHeight: 1.5 }}>
                 ระบบ Ticket Hub แบ่งบทบาทหน้าที่การทำงานออกเป็น 3 บทบาทหลัก เพื่อให้ขั้นตอนการดำเนินการขอความช่วยเหลือทาง IT เป็นไปอย่างเป็นระบบและปลอดภัย:
               </div>
 
               {/* Roles list */}
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: isMobile ? 10 : 12 }}>
                 {/* User */}
                 <div style={{
                   background: 'var(--bg-card)',
                   border: '1.5px solid var(--border-light)',
                   borderRadius: 'var(--radius-lg)',
-                  padding: '16px',
+                  padding: isMobile ? '12px' : '16px',
                   display: 'flex',
-                  gap: 14,
+                  gap: isMobile ? 10 : 14,
                   alignItems: 'flex-start'
                 }}>
                   <div style={{
-                    width: 38, height: 38, borderRadius: 'var(--radius-md)',
+                    width: isMobile ? 32 : 38, height: isMobile ? 32 : 38, borderRadius: 'var(--radius-md)',
                     background: 'rgba(59, 130, 246, 0.1)', color: 'var(--primary)',
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    fontSize: 16, flexShrink: 0
+                    fontSize: isMobile ? 14 : 16, flexShrink: 0
                   }}>
                     <i className="fa-solid fa-user"></i>
                   </div>
                   <div>
-                    <div style={{ fontWeight: 800, fontSize: 14, color: 'var(--text-primary)', marginBottom: 4 }}>
+                    <div style={{ fontWeight: 800, fontSize: isMobile ? 13 : 14, color: 'var(--text-primary)', marginBottom: 2 }}>
                       ผู้ใช้งานทั่วไป (USER)
                     </div>
-                    <div style={{ fontSize: 13, color: 'var(--text-secondary)', lineHeight: 1.5 }}>
+                    <div style={{ fontSize: isMobile ? 12 : 13, color: 'var(--text-secondary)', lineHeight: 1.45 }}>
                       ยื่นแจ้งปัญหาหรือส่งคำขอช่วยเหลือ ติดตามสถานะความคืบหน้าของ Ticket ของตนเอง ส่งแชทข้อความพร้อมภาพแนบตอบโต้กับเจ้าหน้าที่ และสามารถยกเลิก Ticket ของตนเองได้เมื่อยังไม่มีผู้รับเคส
                     </div>
                   </div>
                 </div>
- 
+
                 {/* Manager */}
                 <div style={{
                   background: 'var(--bg-card)',
                   border: '1.5px solid var(--border-light)',
                   borderRadius: 'var(--radius-lg)',
-                  padding: '16px',
+                  padding: isMobile ? '12px' : '16px',
                   display: 'flex',
-                  gap: 14,
+                  gap: isMobile ? 10 : 14,
                   alignItems: 'flex-start'
                 }}>
                   <div style={{
-                    width: 38, height: 38, borderRadius: 'var(--radius-md)',
+                    width: isMobile ? 32 : 38, height: isMobile ? 32 : 38, borderRadius: 'var(--radius-md)',
                     background: 'rgba(16, 185, 129, 0.1)', color: 'var(--success)',
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    fontSize: 16, flexShrink: 0
+                    fontSize: isMobile ? 14 : 16, flexShrink: 0
                   }}>
                     <i className="fa-solid fa-user-tie"></i>
                   </div>
                   <div>
-                    <div style={{ fontWeight: 800, fontSize: 14, color: 'var(--text-primary)', marginBottom: 4 }}>
+                    <div style={{ fontWeight: 800, fontSize: isMobile ? 13 : 14, color: 'var(--text-primary)', marginBottom: 2 }}>
                       หัวหน้างาน / ผู้จัดการ (MANAGER)
                     </div>
-                    <div style={{ fontSize: 13, color: 'var(--text-secondary)', lineHeight: 1.5 }}>
+                    <div style={{ fontSize: isMobile ? 12 : 13, color: 'var(--text-secondary)', lineHeight: 1.45 }}>
                       เข้าถึง Ticket ระดับแผนก ตรวจสอบพิจารณาและอนุมัติ/ปฏิเสธ Ticket ที่รอการอนุมัติ (Wait Approve) ของลูกทีม ดูแลติดตามระดับประสิทธิภาพเวลาแก้ไข (SLA) และเข้าดูรายงานสถิติต่างๆ
                     </div>
                   </div>
                 </div>
- 
+
                 {/* Admin */}
                 <div style={{
                   background: 'var(--bg-card)',
                   border: '1.5px solid var(--border-light)',
                   borderRadius: 'var(--radius-lg)',
-                  padding: '16px',
+                  padding: isMobile ? '12px' : '16px',
                   display: 'flex',
-                  gap: 14,
+                  gap: isMobile ? 10 : 14,
                   alignItems: 'flex-start'
                 }}>
                   <div style={{
-                    width: 38, height: 38, borderRadius: 'var(--radius-md)',
+                    width: isMobile ? 32 : 38, height: isMobile ? 32 : 38, borderRadius: 'var(--radius-md)',
                     background: 'rgba(124, 58, 237, 0.1)', color: 'rgb(124, 58, 237)',
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    fontSize: 16, flexShrink: 0
+                    fontSize: isMobile ? 14 : 16, flexShrink: 0
                   }}>
                     <i className="fa-solid fa-user-shield"></i>
                   </div>
                   <div>
-                    <div style={{ fontWeight: 800, fontSize: 14, color: 'var(--text-primary)', marginBottom: 4 }}>
+                    <div style={{ fontWeight: 800, fontSize: isMobile ? 13 : 14, color: 'var(--text-primary)', marginBottom: 2 }}>
                       ผู้ดูแลระบบ (ADMIN)
                     </div>
-                    <div style={{ fontSize: 13, color: 'var(--text-secondary)', lineHeight: 1.5 }}>
+                    <div style={{ fontSize: isMobile ? 12 : 13, color: 'var(--text-secondary)', lineHeight: 1.45 }}>
                       สิทธิ์สูงสุดในการจัดการระบบ บริหารจัดการรายชื่อผู้ใช้ แผนกโครงสร้างองค์กร หมวดหมู่ Ticket ปัญหา จัดการตั้งค่าระบบและคู่มือ และเข้าดูแดชบอร์ดรายงานผลวิเคราะห์ข้อมูลเชิงลึกทั้งหมดของระบบ
                     </div>
                   </div>
@@ -162,14 +190,14 @@ export default function HelpModal({ onClose }) {
           )}
 
           {activeTab === 'lifecycle' && (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: isMobile ? 12 : 16 }}>
               {/* Introduction */}
-              <div style={{ fontSize: 13.5, color: 'var(--text-secondary)', lineHeight: 1.6 }}>
+              <div style={{ fontSize: isMobile ? 12.5 : 13.5, color: 'var(--text-secondary)', lineHeight: 1.5 }}>
                 Ticket แต่ละใบจะดำเนินตามขั้นตอนต่อไปนี้ตามลำดับ จนกว่าจะได้รับการแก้ไขเสร็จสิ้น:
               </div>
 
               {/* Status List */}
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: isMobile ? 6 : 8 }}>
                 {[
                   { label: 'รอดำเนินการ (Pending)', desc: 'Ticket ถูกสร้างใหม่เรียบร้อย รอคัดแยกประเภท คาดคะเนระดับความสำคัญ และส่งต่อหรือมอบหมายงานให้กับช่างเทคนิค', color: 'rgb(59, 130, 246)', icon: 'fa-clock' },
                   { label: 'กำลังดำเนินการ (In Progress)', desc: 'ช่างเทคนิคหรือผู้ดูแลระบบที่ได้รับมอบหมายกำลังดำเนินการเข้าช่วยเหลือตรวจสอบและแก้ไขปัญหา', color: 'rgb(245, 158, 11)', icon: 'fa-screwdriver-wrench' },
@@ -181,24 +209,24 @@ export default function HelpModal({ onClose }) {
                   <div key={idx} style={{
                     display: 'flex',
                     alignItems: 'flex-start',
-                    gap: 12,
-                    padding: '12px 16px',
+                    gap: isMobile ? 10 : 12,
+                    padding: isMobile ? '10px 12px' : '12px 16px',
                     background: 'var(--bg-card)',
                     border: '1.5px solid var(--border-light)',
                     borderRadius: 'var(--radius-md)'
                   }}>
                     <div style={{
-                      width: 28, height: 28, borderRadius: '50%',
+                      width: isMobile ? 24 : 28, height: isMobile ? 24 : 28, borderRadius: '50%',
                       background: `${s.color}18`, color: s.color,
-                      fontSize: 12, flexShrink: 0, fontWeight: 'bold', display: 'flex', alignItems: 'center', justifyContent: 'center'
+                      fontSize: isMobile ? 11 : 12, flexShrink: 0, fontWeight: 'bold', display: 'flex', alignItems: 'center', justifyContent: 'center'
                     }}>
                       <i className={`fa-solid ${s.icon}`}></i>
                     </div>
                     <div>
-                      <span style={{ fontWeight: 800, fontSize: 13.5, color: 'var(--text-primary)', display: 'block', marginBottom: 2 }}>
+                      <span style={{ fontWeight: 800, fontSize: isMobile ? 12.5 : 13.5, color: 'var(--text-primary)', display: 'block', marginBottom: 2 }}>
                         {s.label}
                       </span>
-                      <span style={{ fontSize: 12.5, color: 'var(--text-secondary)', lineHeight: 1.4 }}>
+                      <span style={{ fontSize: isMobile ? 11.5 : 12.5, color: 'var(--text-secondary)', lineHeight: 1.4 }}>
                         {s.desc}
                       </span>
                     </div>
@@ -209,15 +237,15 @@ export default function HelpModal({ onClose }) {
           )}
 
           {activeTab === 'guide' && (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: isMobile ? 12 : 16 }}>
               {/* Step By Step Guide */}
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: isMobile ? 10 : 14 }}>
                 {/* Step 1 */}
-                <div style={{ display: 'flex', gap: 12, alignItems: 'flex-start' }}>
-                  <div style={{ fontSize: 18, fontWeight: 800, color: 'var(--primary)', width: 24, textAlign: 'center' }}>01</div>
+                <div style={{ display: 'flex', gap: isMobile ? 10 : 12, alignItems: 'flex-start' }}>
+                  <div style={{ fontSize: isMobile ? 16 : 18, fontWeight: 800, color: 'var(--primary)', width: 22, textAlign: 'center' }}>01</div>
                   <div>
-                    <div style={{ fontWeight: 800, fontSize: 13.5, color: 'var(--text-primary)', marginBottom: 2 }}>การแจ้งและสร้าง Ticket ใหม่</div>
-                    <div style={{ fontSize: 12.5, color: 'var(--text-secondary)', lineHeight: 1.5 }}>
+                    <div style={{ fontWeight: 800, fontSize: isMobile ? 13 : 13.5, color: 'var(--text-primary)', marginBottom: 2 }}>การแจ้งและสร้าง Ticket ใหม่</div>
+                    <div style={{ fontSize: isMobile ? 12 : 12.5, color: 'var(--text-secondary)', lineHeight: 1.45 }}>
                       ไปที่เมนู "สร้าง Ticket" กรอกรายละเอียด อธิบายปัญหาและเลือกหมวดหมู่ที่เหมาะสม พร้อมระดับความเร่งด่วน แนบภาพหลักฐานความเสียหายเพื่อให้ผู้ดูแลเข้าใจปัญหาได้รวดเร็วขึ้น
                     </div>
                   </div>
@@ -226,12 +254,12 @@ export default function HelpModal({ onClose }) {
                 <div style={{ height: 1, background: 'var(--border-light)' }} />
 
                 {/* Step 2 */}
-                <div style={{ display: 'flex', gap: 12, alignItems: 'flex-start' }}>
-                  <div style={{ fontSize: 18, fontWeight: 800, color: 'var(--primary)', width: 24, textAlign: 'center' }}>02</div>
+                <div style={{ display: 'flex', gap: isMobile ? 10 : 12, alignItems: 'flex-start' }}>
+                  <div style={{ fontSize: isMobile ? 16 : 18, fontWeight: 800, color: 'var(--primary)', width: 22, textAlign: 'center' }}>02</div>
                   <div>
-                    <div style={{ fontWeight: 800, fontSize: 13.5, color: 'var(--text-primary)', marginBottom: 2 }}>ติดตามสถานะและตอบโต้กับเจ้าหน้าที่</div>
-                    <div style={{ fontSize: 12.5, color: 'var(--text-secondary)', lineHeight: 1.5 }}>
-                      คุณสามารถตรวจสอบความคืบหน้าของปัญหากดที่ Ticket ของตนเองในหน้า "ติดตามสถานะ" และแชทเพื่อแจ้งข้อมูลเพิ่มเติมส่งรูปแนบ หรือดูประวัติความเคลื่อนไหวระบบได้ทันที โดยแบ่งออกเป็นแท็บ "แชทสนทนา" และ "ประวัติระบบ" แยกกันอย่างชัดเจน พร้อมพื้นที่เลื่อนแชท (Chat Scroll) ที่เป็นสัดส่วน
+                    <div style={{ fontWeight: 800, fontSize: isMobile ? 13 : 13.5, color: 'var(--text-primary)', marginBottom: 2 }}>ติดตามสถานะและตอบโต้กับเจ้าหน้าที่</div>
+                    <div style={{ fontSize: isMobile ? 12 : 12.5, color: 'var(--text-secondary)', lineHeight: 1.45 }}>
+                      คุณสามารถตรวจสอบความคืบหน้าของปัญหากดที่ Ticket ของตนเองในหน้า "ติดตามสถานะ" และแชทเพื่อแจ้งข้อมูลเพิ่มเติมส่งรูปแนบ หรือดูประวัติความเคลื่อนไหวระบบได้ทันที โดยแบ่งออกเป็นแท็บ "แชทสนทนา" และ "ประวัติระบบ" แยกกันอย่างชัดเจน
                     </div>
                   </div>
                 </div>
@@ -239,12 +267,12 @@ export default function HelpModal({ onClose }) {
                 <div style={{ height: 1, background: 'var(--border-light)' }} />
 
                 {/* Step 3 */}
-                <div style={{ display: 'flex', gap: 12, alignItems: 'flex-start' }}>
-                  <div style={{ fontSize: 18, fontWeight: 800, color: 'var(--primary)', width: 24, textAlign: 'center' }}>03</div>
+                <div style={{ display: 'flex', gap: isMobile ? 10 : 12, alignItems: 'flex-start' }}>
+                  <div style={{ fontSize: isMobile ? 16 : 18, fontWeight: 800, color: 'var(--primary)', width: 22, textAlign: 'center' }}>03</div>
                   <div>
-                    <div style={{ fontWeight: 800, fontSize: 13.5, color: 'var(--text-primary)', marginBottom: 2 }}>การยกเลิกเคสและการเสร็จสิ้นงาน</div>
-                    <div style={{ fontSize: 12.5, color: 'var(--text-secondary)', lineHeight: 1.5 }}>
-                      หากต้องการยกเลิก Ticket สามารถทำได้เฉพาะในตอนที่ **ยังไม่มีเจ้าหน้าที่ไอทีรับมอบหมาย/กดรับงาน** เท่านั้น (ปุ่มจะซ่อนทันทีเมื่อมีช่างดูแลแล้ว) และเมื่อแก้สำเร็จสถานะจะเป็น แก้ไขเสร็จสิ้น (Resolved) คุณสามารถเข้าไปตรวจสอบความถูกต้องของผลลัพธ์ผ่านระบบได้ทันที
+                    <div style={{ fontWeight: 800, fontSize: isMobile ? 13 : 13.5, color: 'var(--text-primary)', marginBottom: 2 }}>การยกเลิกเคสและการเสร็จสิ้นงาน</div>
+                    <div style={{ fontSize: isMobile ? 12 : 12.5, color: 'var(--text-secondary)', lineHeight: 1.45 }}>
+                      หากต้องการยกเลิก Ticket สามารถทำได้เฉพาะในตอนที่ **ยังไม่มีเจ้าหน้าที่ไอทีรับมอบหมาย/กดรับงาน** เท่านั้น และเมื่อแก้สำเร็จสถานะจะเป็น แก้ไขเสร็จสิ้น (Resolved)
                     </div>
                   </div>
                 </div>
@@ -255,14 +283,14 @@ export default function HelpModal({ onClose }) {
                 background: 'var(--primary-bg)',
                 border: '1px solid var(--border-light)',
                 borderRadius: 'var(--radius-md)',
-                padding: '12px 16px',
-                marginTop: 8,
+                padding: isMobile ? '10px 12px' : '12px 16px',
+                marginTop: 4,
                 display: 'flex',
                 gap: 10,
                 alignItems: 'center'
               }}>
-                <i className="fa-solid fa-circle-info" style={{ color: 'var(--primary)', fontSize: 14 }}></i>
-                <div style={{ fontSize: 12, color: 'var(--primary)', fontWeight: 600 }}>
+                <i className="fa-solid fa-circle-info" style={{ color: 'var(--primary)', fontSize: 14, flexShrink: 0 }}></i>
+                <div style={{ fontSize: isMobile ? 11.5 : 12, color: 'var(--primary)', fontWeight: 600, lineHeight: 1.4 }}>
                   หากมีข้อสงสัยหรือข้อขัดข้องเกี่ยวกับระบบ กรุณาติดต่อสายด่วน IT Service Desk โทร. 1234
                 </div>
               </div>
@@ -271,8 +299,8 @@ export default function HelpModal({ onClose }) {
         </div>
 
         {/* Footer */}
-        <div className="modal-footer">
-          <button className="btn btn-outline" onClick={onClose} style={{ padding: '8px 20px', fontSize: 13, fontWeight: 700 }} id="close-help-btn">
+        <div className="modal-footer" style={{ padding: isMobile ? '12px 16px' : '16px 24px', borderTop: 'none' }}>
+          <button className="btn btn-outline" onClick={onClose} style={{ padding: isMobile ? '10px' : '8px 20px', fontSize: 13, fontWeight: 700, width: isMobile ? '100%' : 'auto' }} id="close-help-btn">
             ปิดหน้าต่าง
           </button>
         </div>

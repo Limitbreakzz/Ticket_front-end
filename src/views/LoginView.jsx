@@ -130,6 +130,17 @@ export default function LoginView() {
           color: '#ffffff'
         }}
       >
+        {/* GIF Background Overlay (Faded) */}
+        <div style={{
+          position: 'absolute',
+          inset: 0,
+          backgroundImage: 'url(/bg.gif)',
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          opacity: 0.07,
+          zIndex: 0,
+          pointerEvents: 'none'
+        }} />
         {/* Exact Decorative Wavy SVG Background */}
         <div style={{ position: 'absolute', inset: 0, overflow: 'hidden', zIndex: 1, pointerEvents: 'none' }}>
           <svg viewBox="0 0 1440 800" style={{ position: 'absolute', bottom: 0, left: 0, width: '100%', height: 'auto', minHeight: '60%', opacity: 0.8 }} preserveAspectRatio="none">

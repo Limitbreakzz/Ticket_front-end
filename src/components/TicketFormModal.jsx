@@ -11,8 +11,10 @@ const CAT_THEME = {
 };
 
 export default function TicketFormModal({ onClose }) {
-  const { createTicket, addToast, depts, departmentsLoading, currentUser, managers, openTicketDetail } = useApp();
+  const { createTicket, addToast, depts, departmentsLoading, currentUser, managers, openTicketDetail, theme } = useApp();
   const fileRef = useRef();
+
+  const isDark = theme === 'dark' || (theme === 'system' && window.matchMedia?.('(prefers-color-scheme: dark)').matches);
 
   const [form, setForm] = useState({
     subject: '',
@@ -582,8 +584,8 @@ export default function TicketFormModal({ onClose }) {
                           gap: 8,
                           padding: '14px 8px',
                           borderRadius: 'var(--radius-lg)',
-                          border: `2px solid ${isActive ? theme.active : theme.border}`,
-                          background: isActive ? theme.active : theme.bg,
+                          border: `2px solid ${isActive ? theme.active : (isDark ? 'rgba(255, 255, 255, 0.08)' : theme.border)}`,
+                          background: isActive ? theme.active : (isDark ? '#1e293b' : theme.bg),
                           cursor: 'pointer',
                           transition: 'all 0.18s cubic-bezier(0.4,0,0.2,1)',
                           fontFamily: 'inherit',
@@ -595,19 +597,19 @@ export default function TicketFormModal({ onClose }) {
                         <div style={{
                           width: 42, height: 42,
                           borderRadius: '50%',
-                          background: isActive ? 'rgba(255,255,255,0.2)' : 'white',
+                          background: isActive ? 'rgba(255,255,255,0.2)' : (isDark ? '#0f172a' : 'white'),
                           display: 'flex', alignItems: 'center', justifyContent: 'center',
                           boxShadow: isActive ? 'none' : '0 2px 6px rgba(0,0,0,0.08)',
                         }}>
                           <i className={`fa-solid fa-${cat.icon}`} style={{
                               fontSize: 18,
-                              color: isActive ? '#fff' : theme.iconColor,
+                              color: isActive ? '#fff' : (isDark ? '#94a3b8' : theme.iconColor),
                             }} aria-hidden="true"></i>
                         </div>
                         <span style={{
                           fontSize: 11,
                           fontWeight: 700,
-                          color: isActive ? '#fff' : 'var(--text-primary)',
+                          color: isActive ? '#fff' : (isDark ? 'var(--text-secondary)' : 'var(--text-primary)'),
                           textAlign: 'center',
                           lineHeight: 1.3,
                         }}>

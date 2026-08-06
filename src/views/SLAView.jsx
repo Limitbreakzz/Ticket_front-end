@@ -885,12 +885,12 @@ export default function SLAView() {
                 <button
                   type="button"
                   onClick={() => { setHideCompleted(!hideCompleted); setCurrentPage(1); }}
-                  style={{ background: 'transparent', border: 'none', padding: 0, cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: 10, outline: 'none', userSelect: 'none' }}
+                  style={{ background: 'transparent', border: 'none', padding: 0, cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: 10, outline: 'none', userSelect: 'none', flexWrap: 'nowrap' }}
                 >
                   <span style={{
                     position: 'relative', width: 44, height: 24,
                     background: hideCompleted ? 'var(--primary)' : '#cbd5e1',
-                    borderRadius: 24, transition: 'background 0.25s cubic-bezier(0.4, 0, 0.2, 1)', display: 'inline-block'
+                    borderRadius: 24, transition: 'background 0.25s cubic-bezier(0.4, 0, 0.2, 1)', display: 'inline-block', flexShrink: 0
                   }}>
                     <span style={{
                       position: 'absolute', top: 3, left: hideCompleted ? 23 : 3,
@@ -898,7 +898,7 @@ export default function SLAView() {
                       boxShadow: '0 1px 4px rgba(0,0,0,0.18)', transition: 'left 0.25s cubic-bezier(0.4, 0, 0.2, 1)'
                     }} />
                   </span>
-                  <span style={{ fontSize: 13.5, fontWeight: 700, color: 'var(--text-primary)' }}>
+                  <span style={{ fontSize: 13.5, fontWeight: 700, color: 'var(--text-primary)', whiteSpace: 'nowrap' }}>
                     ซ่อนเคสที่สำเร็จ / ปิดแล้ว / ยกเลิก
                   </span>
                 </button>
@@ -1211,7 +1211,7 @@ export default function SLAView() {
             pointerEvents: 'auto'
           }}>
             <div className="mobile-search-bar" style={{
-              flex: 1, background: 'var(--bg-main)',
+              flex: 1, background: 'var(--bg-card)',
               border: '1.5px solid var(--border-light)',
               borderRadius: 'var(--radius-md)',
               display: 'flex', alignItems: 'center',
@@ -1420,7 +1420,8 @@ export default function SLAView() {
 
                       {/* Section 4: Details & Assignee */}
                       <div style={{
-                        background: 'var(--bg-main)',
+                        background: 'var(--primary-bg)',
+                        border: '1px solid var(--border-light)',
                         borderRadius: 10,
                         padding: 10,
                         fontSize: 12,
@@ -1450,20 +1451,22 @@ export default function SLAView() {
                       <button
                         type="button"
                         onClick={() => openTicketDetail(t.id)}
-                        className="btn btn-outline btn-sm"
+                        className="mobile-card-view-btn"
                         style={{
                           width: '100%',
-                          height: 38,
+                          height: 40,
                           borderRadius: 10,
                           fontSize: 12.5,
                           fontWeight: 700,
+                          cursor: 'pointer',
                           display: 'flex',
                           alignItems: 'center',
                           justifyContent: 'center',
                           gap: 6
                         }}
                       >
-                        ดูรายละเอียด <i className="fa-solid fa-arrow-right" />
+                        <span>ดูรายละเอียด</span>
+                        <i className="fa-solid fa-arrow-right" style={{ fontSize: 10 }} />
                       </button>
 
                     </div>

@@ -3910,4 +3910,356 @@ button:active,
   }
 }
 
+/* ── HIGH-CONTRAST PREMIUM DROPDOWN CUSTOM STYLES ── */
+.custom-hc-trigger {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 10px 14px;
+  border-radius: var(--radius-lg, 12px) !important;
+  border: 2px solid var(--text-primary, #0f172a) !important;
+  background: var(--bg-card, #ffffff) !important;
+  color: var(--text-primary, #0f172a) !important;
+  cursor: pointer;
+  outline: none;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  box-shadow: var(--shadow-sm);
+}
+.custom-hc-trigger:hover {
+  background: var(--text-primary, #0f172a) !important;
+  color: var(--bg-card, #ffffff) !important;
+}
+.custom-hc-trigger:hover i,
+.custom-hc-trigger:hover span {
+  color: var(--bg-card, #ffffff) !important;
+}
+.custom-hc-panel {
+  position: absolute;
+  background: var(--bg-card, #ffffff) !important;
+  border: 2px solid var(--text-primary, #0f172a) !important;
+  border-radius: var(--radius-lg, 12px) !important;
+  box-shadow: var(--shadow-lg);
+  z-index: 1000;
+  overflow: hidden;
+}
+.custom-hc-option {
+  width: 100%;
+  padding: 10px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  background: transparent;
+  color: var(--text-primary, #0f172a) !important;
+  border: none;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 500;
+  text-align: left;
+  transition: all 0.2s ease;
+}
+.custom-hc-option:hover {
+  background: var(--text-primary, #0f172a) !important;
+  color: var(--bg-card, #ffffff) !important;
+}
+.custom-hc-option:hover span,
+.custom-hc-option:hover i {
+  color: var(--bg-card, #ffffff) !important;
+}
+.custom-hc-option.selected {
+  background: var(--primary-pale, #eff6ff) !important;
+  color: var(--primary, #3b82f6) !important;
+  font-weight: 700;
+}
+
+/* ── DARK THEME OVERRIDES ── */
+html.dark {
+  --bg-main: #0e1726;          /* Soft modern Slate Navy background */
+  --bg-card: #192438;          /* Slate 800 cards for warm, visible contrast */
+  --bg-sidebar: #0e1726;       /* Matching sidebar background */
+  --primary: #60a5fa;          /* Lighter blue for dark mode readability */
+  --primary-bg: #121c2d;       /* Soft inner section background */
+  --text-primary: #f8fafc;     /* Clean bright white/gray */
+  --text-secondary: #cbd5e1;   /* Medium gray */
+  --text-muted: #94a3b8;       /* Slate 400 */
+  --border: rgba(255, 255, 255, 0.1);
+  --border-light: rgba(255, 255, 255, 0.06);
+  --border-strong: rgba(255, 255, 255, 0.2);
+  
+  /* Pale overlay color variables for dark mode */
+  --primary-pale: rgba(59, 130, 246, 0.18);
+  --secondary-pale: rgba(6, 182, 212, 0.18);
+  --accent-pale: rgba(99, 102, 241, 0.18);
+  --success-pale: rgba(16, 185, 129, 0.18);
+  --warning-pale: rgba(245, 158, 11, 0.18);
+  --danger-pale: rgba(239, 68, 68, 0.18);
+  --critical-pale: rgba(139, 92, 246, 0.2);
+  
+  /* Standard status colors made lighter/brighter for dark mode contrast */
+  --critical: #c084fc;         /* Purple for Admin/Critical */
+  --success: #34d399;          /* Green */
+  --warning: #fbbf24;          /* Yellow/Orange */
+  --danger: #f87171;           /* Red */
+}
+
+/* Adjust scrollbar colors in dark mode */
+html.dark ::-webkit-scrollbar-track {
+  background: #0e1726;
+}
+html.dark ::-webkit-scrollbar-thumb {
+  background: #233148;
+  border-radius: 4px;
+}
+html.dark ::-webkit-scrollbar-thumb:hover {
+  background: #334155;
+}
+
+/* Override default input focus and backgrounds in dark mode */
+html.dark input, 
+html.dark select, 
+html.dark textarea {
+  background-color: #121c2d !important;
+  color: #f8fafc !important;
+  border-color: rgba(255, 255, 255, 0.12) !important;
+}
+html.dark input:disabled, 
+html.dark select:disabled, 
+html.dark textarea:disabled {
+  background-color: #0e1726 !important;
+  color: #64748b !important;
+}
+html.dark .modal-body,
+html.dark .modal-footer,
+html.dark .modal-header {
+  background-color: #192438 !important;
+  border-color: rgba(255, 255, 255, 0.08) !important;
+}
+html.dark .badge-info,
+html.dark .badge-primary {
+  background-color: rgba(59, 130, 246, 0.18) !important;
+  color: #60a5fa !important;
+}
+html.dark .badge-success {
+  background-color: rgba(16, 185, 129, 0.18) !important;
+  color: #34d399 !important;
+}
+html.dark .badge-warning {
+  background-color: rgba(245, 158, 11, 0.18) !important;
+  color: #fbbf24 !important;
+}
+html.dark .badge-danger {
+  background-color: rgba(239, 68, 68, 0.18) !important;
+  color: #f87171 !important;
+}
+html.dark .card,
+html.dark .detail-desc-content {
+  background-color: #192438 !important;
+  border-color: rgba(255, 255, 255, 0.08) !important;
+}
+
+/* Dark mode inner cards, mobile buttons and detail boxes */
+html.dark .mobile-card-view-btn {
+  background-color: rgba(255, 255, 255, 0.06) !important;
+  border-color: rgba(255, 255, 255, 0.12) !important;
+  color: #f8fafc !important;
+}
+html.dark .mobile-card-view-btn:hover {
+  background-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+html.dark .mobile-bottom-nav {
+  background-color: #192438 !important;
+  border-top-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+/* Specific overrides to fix white table headers in dark mode */
+html.dark thead th {
+  background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%) !important;
+  color: var(--text-secondary) !important;
+  border-bottom: 2px solid rgba(255, 255, 255, 0.08) !important;
+}
+
+/* Ensure Topbar is solid dark blue-gray in dark mode */
+html.dark .topbar {
+  background-color: #151f32 !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+}
+
+/* Dark mode dashboard hero adjustments */
+html.dark .hero-section {
+  background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+}
+
+/* Dark mode table row hover background */
+html.dark tbody tr:hover {
+  background: rgba(255, 255, 255, 0.02) !important;
+}
+html.dark tbody tr {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06) !important;
+}
+html.dark tbody td {
+  color: var(--text-primary) !important;
+}
+
+/* Global Dark Mode Skeleton Shimmer overrides */
+html.dark .skeleton-shimmer {
+  background-color: rgba(255, 255, 255, 0.06) !important;
+}
+html.dark .skeleton-shimmer::after {
+  background-image: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 0.05) 20%,
+    rgba(255, 255, 255, 0.1) 60%,
+    rgba(255, 255, 255, 0) 100%
+  ) !important;
+}
+
+/* Force all toolbar/search inputs to be transparent and prevent browser white backgrounds */
+.topbar-search input,
+.mobile-search-bar input,
+#ticket-search,
+html.dark .topbar-search input,
+html.dark .mobile-search-bar input,
+html.dark #ticket-search {
+  background: transparent !important;
+  background-color: transparent !important;
+  color: var(--text-primary) !important;
+  box-shadow: none !important;
+}
+
+/* Handle Chrome/Safari autofill background overrides */
+.topbar-search input:-webkit-autofill,
+.mobile-search-bar input:-webkit-autofill {
+  -webkit-text-fill-color: var(--text-primary) !important;
+  transition: background-color 5000s ease-in-out 0s !important;
+}
+
+
+/* Dark mode ticket ID chip override */
+html.dark .ticket-id {
+  background: rgba(96, 165, 250, 0.15) !important;
+  border-color: rgba(96, 165, 250, 0.25) !important;
+  color: #60a5fa !important;
+}
+
+/* Dark mode KPI Stats Card Icon Box overrides */
+html.dark .kpi-icon-box:has(.fa-ticket) {
+  background: rgba(255, 255, 255, 0.08) !important;
+  color: #94a3b8 !important;
+}
+html.dark .kpi-icon-box:has(.fa-square-plus) {
+  background: rgba(56, 189, 248, 0.15) !important;
+  color: #38bdf8 !important;
+}
+html.dark .kpi-icon-box:has(.fa-screwdriver-wrench) {
+  background: rgba(245, 158, 11, 0.15) !important;
+  color: #fbbf24 !important;
+}
+html.dark .kpi-icon-box:has(.fa-circle-check) {
+  background: rgba(34, 197, 94, 0.15) !important;
+  color: #4ade80 !important;
+}
+
+/* Dark mode Dashboard Feed Icon box adjustments */
+html.dark .feed-icon-box {
+  background: #1e293b !important;
+  color: var(--text-secondary) !important;
+  border: 1px solid rgba(255, 255, 255, 0.05) !important;
+}
+
+/* Dark mode status tags overrides for standard contrast */
+html.dark .status-pending { background: rgba(148, 163, 184, 0.15) !important; color: #cbd5e1 !important; border: 1px solid rgba(148, 163, 184, 0.3) !important; }
+html.dark .status-progress { background: rgba(59, 130, 246, 0.15) !important; color: #60a5fa !important; border: 1px solid rgba(59, 130, 246, 0.3) !important; }
+html.dark .status-wait-approve { background: rgba(245, 158, 11, 0.15) !important; color: #fbbf24 !important; border: 1px solid rgba(245, 158, 11, 0.3) !important; }
+html.dark .status-approved { background: rgba(16, 185, 129, 0.15) !important; color: #34d399 !important; border: 1px solid rgba(16, 185, 129, 0.3) !important; }
+html.dark .status-rejected { background: rgba(239, 68, 68, 0.15) !important; color: #f87171 !important; border: 1px solid rgba(239, 68, 68, 0.3) !important; }
+html.dark .status-forwarded { background: rgba(168, 85, 247, 0.15) !important; color: #c084fc !important; border: 1px solid rgba(168, 85, 247, 0.3) !important; }
+html.dark .status-wait-parts { background: rgba(217, 119, 6, 0.15) !important; color: #f59e0b !important; border: 1px solid rgba(217, 119, 6, 0.3) !important; }
+html.dark .status-resolved { background: rgba(34, 197, 94, 0.15) !important; color: #4ade80 !important; border: 1px solid rgba(34, 197, 94, 0.3) !important; }
+html.dark .status-closed { background: rgba(148, 163, 184, 0.12) !important; color: #94a3b8 !important; border: 1px solid rgba(148, 163, 184, 0.2) !important; }
+html.dark .status-cancelled { background: rgba(239, 68, 68, 0.15) !important; color: #f87171 !important; border: 1px solid rgba(239, 68, 68, 0.3) !important; }
+
+/* Additional dark mode KPI Stats Card Icon Box overrides for SLA & Reports views */
+html.dark .kpi-icon-box:has(.fa-chart-pie) {
+  background: rgba(139, 92, 246, 0.15) !important;
+  color: #c084fc !important;
+}
+html.dark .kpi-icon-box:has(.fa-clock) {
+  background: rgba(99, 102, 241, 0.15) !important;
+  color: #818cf8 !important;
+}
+html.dark .kpi-icon-box:has(.fa-check) {
+  background: rgba(59, 130, 246, 0.15) !important;
+  color: #60a5fa !important;
+}
+html.dark .kpi-icon-box:has(.fa-triangle-exclamation),
+html.dark .kpi-icon-box:has(.fa-exclamation-triangle) {
+  background: rgba(245, 158, 11, 0.15) !important;
+  color: #fbbf24 !important;
+}
+html.dark .kpi-icon-box:has(.fa-circle-xmark),
+html.dark .kpi-icon-box:has(.fa-xmark),
+html.dark .kpi-icon-box:has(.fa-times-circle) {
+  background: rgba(239, 68, 68, 0.15) !important;
+  color: #f87171 !important;
+}
+html.dark .kpi-icon-box:has(.fa-trophy) {
+  background: rgba(34, 197, 94, 0.15) !important;
+  color: #4ade80 !important;
+}
+html.dark .kpi-icon-box:has(.fa-circle-info),
+html.dark .kpi-icon-box:has(.fa-info-circle),
+html.dark .kpi-icon-box:has(.fa-info) {
+  background: rgba(148, 163, 184, 0.15) !important;
+  color: #cbd5e1 !important;
+}
+
+/* Approval view extra KPI icon box overrides */
+html.dark .kpi-icon-box:has(.fa-list-check) {
+  background: rgba(99, 102, 241, 0.15) !important;
+  color: #818cf8 !important;
+}
+html.dark .kpi-icon-box:has(.fa-hourglass-half) {
+  background: rgba(245, 158, 11, 0.15) !important;
+  color: #fbbf24 !important;
+}
+html.dark .kpi-icon-box:has(.fa-check-double) {
+  background: rgba(16, 185, 129, 0.15) !important;
+  color: #34d399 !important;
+}
+
+/* Dark mode Urgency/Priority Badge overrides */
+html.dark .badge-low { background: rgba(22, 163, 74, 0.15) !important; color: #4ade80 !important; }
+html.dark .badge-medium { background: rgba(249, 115, 22, 0.15) !important; color: #fdba74 !important; }
+html.dark .badge-high { background: rgba(239, 68, 68, 0.15) !important; color: #f87171 !important; }
+html.dark .badge-critical { background: rgba(168, 85, 247, 0.18) !important; color: #c084fc !important; }
+
+/* Dark mode Ticket Category Badge overrides */
+html.dark .badge-hardware { background: rgba(245, 158, 11, 0.15) !important; color: #fbbf24 !important; }
+html.dark .badge-software { background: rgba(59, 130, 246, 0.15) !important; color: #60a5fa !important; }
+html.dark .badge-network { background: rgba(6, 182, 212, 0.15) !important; color: #67e8f9 !important; }
+html.dark .badge-access { background: rgba(139, 92, 246, 0.15) !important; color: #c084fc !important; }
+html.dark .badge-other { background: rgba(148, 163, 184, 0.15) !important; color: #cbd5e1 !important; }
+
+/* Dark mode Ticket State Badge overrides */
+html.dark .badge-open { background: rgba(59, 130, 246, 0.15) !important; color: #60a5fa !important; }
+html.dark .badge-in-progress { background: rgba(245, 158, 11, 0.15) !important; color: #fbbf24 !important; }
+html.dark .badge-pending { background: rgba(139, 92, 246, 0.15) !important; color: #c084fc !important; }
+html.dark .badge-closed { background: rgba(148, 163, 184, 0.12) !important; color: #94a3b8 !important; border: 1px solid rgba(148, 163, 184, 0.2) !important; }
+
+
+
+
+
+
+
+
+
+
+
 

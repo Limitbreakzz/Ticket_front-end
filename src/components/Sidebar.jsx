@@ -6,9 +6,8 @@ import HelpModal from './HelpModal';
 
 
 export default function Sidebar() {
-  const { role, activeNav, setActiveNav, logoutUser, currentUser, tickets, showMobileSidebar, setShowMobileSidebar } = useApp();
+  const { role, activeNav, setActiveNav, logoutUser, currentUser, tickets, showMobileSidebar, setShowMobileSidebar, showHelp, setShowHelp } = useApp();
   const [showRoleDropdown, setShowRoleDropdown] = useState(false);
-  const [showHelp, setShowHelp] = useState(false);
   const info = ROLE_INFO[role];
   const sections = NAV_CONFIG[role] || [];
 
@@ -144,85 +143,6 @@ export default function Sidebar() {
         })}
       </nav>
 
-      {/* Footer */}
-      <div className="sidebar-footer" style={{ position: 'relative', display: 'flex', flexDirection: 'column', gap: 8 }}>
-        
-        {/* Help Button */}
-        <div 
-          className="sidebar-footer-btn" 
-          onClick={() => setShowHelp(true)}
-          style={{ display: 'flex', alignItems: 'center', gap: 10, cursor: 'pointer' }}
-          id="help-button"
-        >
-          <i className="fa-regular fa-circle-question" style={{ fontSize: 16 }}></i>
-          <span>คู่มือการใช้งาน (Help)</span>
-        </div>
-
-        {/* Role Switcher in Footer */}
-        <div className="profile-box" onClick={() => setShowRoleDropdown(v => !v)}>
-          <div className="profile-avatar" style={{ overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center', background: currentUser?.avatarUrl ? 'transparent' : info.color, color: '#fff', width: 36, height: 36, borderRadius: '50%', fontWeight: 700, fontSize: 13.5, flexShrink: 0 }}>
-            {currentUser?.avatarUrl ? (
-              <img src={currentUser.avatarUrl} alt="avatar" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-            ) : (
-              currentUser?.name ? currentUser.name.trim().charAt(0).toUpperCase() : info.initials
-            )}
-          </div>
-          <div className="profile-info">
-            <span className="profile-name">{currentUser?.name || info.name}</span>
-            <span className="profile-email">
-              {currentUser?.email || (role === ROLES.EMPLOYEE ? 'somchai.j@factory.com' : role === ROLES.MANAGER ? 'wipa.r@factory.com' : 'thana.s@factory.com')}
-            </span>
-          </div>
-          <i className="fa-solid fa-arrows-up-down profile-chevron" aria-hidden="true"></i>
-        </div>
-
-        {showRoleDropdown && (
-          <>
-            <div 
-              onClick={() => setShowRoleDropdown(false)}
-              style={{
-                position: 'fixed',
-                top: 0, left: 0, right: 0, bottom: 0,
-                zIndex: 999,
-                background: 'transparent'
-              }}
-            />
-            <div className="shadcn-dropdown">
-              {/* Header */}
-              <div className="shadcn-dropdown-header">
-                <div className="profile-avatar" style={{ width: 36, height: 36, fontSize: 13.5, overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center', background: currentUser?.avatarUrl ? 'transparent' : info.color, color: '#fff', borderRadius: '50%', fontWeight: 700, flexShrink: 0 }}>
-                  {currentUser?.avatarUrl ? (
-                    <img src={currentUser.avatarUrl} alt="avatar" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                  ) : (
-                    currentUser?.name ? currentUser.name.trim().charAt(0).toUpperCase() : info.initials
-                  )}
-                </div>
-                <div className="profile-info">
-                  <span className="profile-name" style={{ fontSize: 13.5 }}>{currentUser?.name || info.name}</span>
-                  <span className="profile-email">
-                    {currentUser?.email || (role === ROLES.EMPLOYEE ? 'somchai.j@factory.com' : role === ROLES.MANAGER ? 'wipa.r@factory.com' : 'thana.s@factory.com')}
-                  </span>
-                </div>
-              </div>
-
-
-              {/* Actions Section */}
-              <div className="shadcn-dropdown-item" onClick={() => { setActiveNav('profile'); setShowRoleDropdown(false); }}>
-                <span className="item-icon" style={{ color: 'var(--primary)' }}><i className="fa-solid fa-user-gear"></i></span>
-                <span>ตั้งค่าโปรไฟล์</span>
-              </div>
-
-              <div className="shadcn-dropdown-divider" />
-
-              {/* Logout */}
-              <div className="shadcn-dropdown-item danger" onClick={async () => { setShowRoleDropdown(false); await logoutUser(); }}>
-                <span className="item-icon" style={{ color: 'var(--danger)' }}><i className="fa-solid fa-right-from-bracket"></i></span>
-                <span>ออกจากระบบ</span>
-              </div>
-            </div>
-          </>
-        )}
-      </div>
       {showHelp && createPortal(
         <HelpModal onClose={() => setShowHelp(false)} />,
         document.body
