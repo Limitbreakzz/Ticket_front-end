@@ -141,14 +141,16 @@ export default function CommandMenu({
 		<div
 			ref={containerRef}
 			id={id}
-			onMouseEnter={() => !isTransitioning.current && setIsOpen(true)}
-			onMouseLeave={() => !isTransitioning.current && setIsOpen(false)}
 			style={{ position: 'relative', display: 'inline-block' }}
 			className={className}
 		>
 			{/* Trigger Pill */}
 			<div
 				className="topbar-profile-box"
+				onClick={(e) => {
+					e.stopPropagation();
+					setIsOpen(prev => !prev);
+				}}
 				style={{
 					cursor: 'pointer',
 					display: 'flex',
