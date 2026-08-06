@@ -189,6 +189,7 @@ export default function CommandMenu({
 						top: 'calc(100% + 6px)',
 						right: 0,
 						width: '280px',
+						maxWidth: 'calc(100vw - 20px)',
 						background: 'var(--bg-card, #ffffff)',
 						border: '1px solid var(--border-light, #cbd5e1)',
 						borderRadius: '16px',

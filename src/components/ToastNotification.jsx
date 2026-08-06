@@ -102,7 +102,7 @@ export const ToastNotification = ({
         }
       `}</style>
       <div
-        className={className}
+        className={`toast-notification-card ${className || ''}`}
         style={{
           alignItems: "center",
           animation: `framecn-toast-enter ${enterMs}ms cubic-bezier(0.16, 1, 0.3, 1) both`,
