@@ -7,31 +7,47 @@ export default function PullToRefresh({ children, onRefresh }) {
   const [isRefreshing, setIsRefreshing] = useState(false);
   const touchStartY = useRef(0);
   const isPulling = useRef(false);
+  const pullDistanceRef = useRef(0);
 
   const THRESHOLD = 65;
   const MAX_PULL = 90;
 
+  // Helper to get scroll top of current scroll container (.page-content or window)
+  const getScrollTop = () => {
+    const pageContent = document.querySelector('.page-content');
+    if (pageContent) return pageContent.scrollTop;
+    return window.scrollY || document.documentElement.scrollTop || 0;
+  };
+
   useEffect(() => {
     const handleTouchStart = (e) => {
-      const scrollTop = window.scrollY || document.documentElement.scrollTop;
-      if (scrollTop <= 5 && !isRefreshing) {
+      const scrollTop = getScrollTop();
+      if (scrollTop <= 2 && !isRefreshing) {
         touchStartY.current = e.touches[0].clientY;
         isPulling.current = true;
+      } else {
+        isPulling.current = false;
       }
     };
 
     const handleTouchMove = (e) => {
       if (!isPulling.current || isRefreshing) return;
+
+      const scrollTop = getScrollTop();
       const currentY = e.touches[0].clientY;
       const deltaY = currentY - touchStartY.current;
 
-      const scrollTop = window.scrollY || document.documentElement.scrollTop;
-      if (scrollTop <= 5 && deltaY > 0) {
-        // Damping formula for natural elastic feel
+      // Only pull down if scroll position is at the very top AND user is pulling downwards
+      if (scrollTop <= 2 && deltaY > 0) {
         const distance = Math.min(MAX_PULL, deltaY * 0.42);
+        pullDistanceRef.current = distance;
         setPullDistance(distance);
       } else {
-        setPullDistance(0);
+        if (pullDistanceRef.current !== 0) {
+          pullDistanceRef.current = 0;
+          setPullDistance(0);
+        }
+        isPulling.current = false;
       }
     };
 
@@ -39,9 +55,11 @@ export default function PullToRefresh({ children, onRefresh }) {
       if (!isPulling.current) return;
       isPulling.current = false;
 
-      if (pullDistance >= THRESHOLD && !isRefreshing) {
+      const currentDistance = pullDistanceRef.current;
+      if (currentDistance >= THRESHOLD && !isRefreshing) {
         setIsRefreshing(true);
-        setPullDistance(54); // Hold indicator while loading
+        pullDistanceRef.current = 54;
+        setPullDistance(54);
 
         try {
           if (onRefresh) {
@@ -55,10 +73,12 @@ export default function PullToRefresh({ children, onRefresh }) {
         } finally {
           setTimeout(() => {
             setIsRefreshing(false);
+            pullDistanceRef.current = 0;
             setPullDistance(0);
-          }, 650);
+          }, 600);
         }
       } else {
+        pullDistanceRef.current = 0;
         setPullDistance(0);
       }
     };
@@ -72,7 +92,7 @@ export default function PullToRefresh({ children, onRefresh }) {
       window.removeEventListener('touchmove', handleTouchMove);
       window.removeEventListener('touchend', handleTouchEnd);
     };
-  }, [pullDistance, isRefreshing, onRefresh, reloadTickets, addToast]);
+  }, [isRefreshing, onRefresh, reloadTickets, addToast]);
 
   const progress = Math.min(1, pullDistance / THRESHOLD);
   const rotation = progress * 360;
@@ -139,7 +159,7 @@ export default function PullToRefresh({ children, onRefresh }) {
       {/* Main Page Content Container Shift */}
       <div
         style={{
-          transform: `translateY(${pullDistance * 0.4}px)`,
+          transform: pullDistance > 0 ? `translateY(${pullDistance * 0.4}px)` : 'none',
           transition: isPulling.current ? 'none' : 'transform 0.3s cubic-bezier(0.32, 0.72, 0, 1)'
         }}
       >

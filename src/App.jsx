@@ -524,18 +524,20 @@ function MainContent() {
   };
 
   return (
-    <PullToRefresh>
+    <>
       <Topbar onCreateTicket={() => setShowCreateModal(true)} />
       <main className="page-content">
-        <AnimatePresence mode="wait">
-          <PageTransition key={activeNav}>
-            {renderView()}
-          </PageTransition>
-        </AnimatePresence>
-        {activeTicketId && <TicketDetailModal ticket={{ id: activeTicketId }} onClose={closeTicketDetail} />}
+        <PullToRefresh>
+          <AnimatePresence mode="wait">
+            <PageTransition key={activeNav}>
+              {renderView()}
+            </PageTransition>
+          </AnimatePresence>
+          {activeTicketId && <TicketDetailModal ticket={{ id: activeTicketId }} onClose={closeTicketDetail} />}
+        </PullToRefresh>
       </main>
       {showCreateModal && <TicketFormModal onClose={() => setShowCreateModal(false)} />}
-    </PullToRefresh>
+    </>
   );
 }
 
