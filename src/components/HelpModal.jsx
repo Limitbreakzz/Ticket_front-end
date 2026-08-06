@@ -19,18 +19,21 @@ export default function HelpModal({ onClose }) {
   return (
     <div className="modal-overlay" onClick={onClose} style={{ zIndex: 1000, padding: isMobile ? 0 : 16, alignItems: isMobile ? 'flex-end' : 'center' }}>
       <div 
-        className="modal" 
+        className="modal help-modal-fixed-container" 
         onClick={e => e.stopPropagation()} 
         style={{ 
           maxWidth: '640px', 
           width: '100%', 
-          maxHeight: isMobile ? '92dvh' : '85vh',
-          height: isMobile ? '90dvh' : '80vh', 
+          maxHeight: isMobile ? '85dvh' : '600px',
+          height: isMobile ? '85dvh' : '600px', 
+          minHeight: isMobile ? '85dvh' : '600px',
           display: 'flex', 
           flexDirection: 'column',
           borderRadius: isMobile ? '20px 20px 0 0' : 'var(--radius-xl)',
           overflow: 'hidden',
-          animation: isMobile ? 'iosSlideUp 0.3s cubic-bezier(0.32, 0.72, 0, 1)' : undefined
+          animation: isMobile 
+            ? 'iosSlideUp 0.35s cubic-bezier(0.32, 0.72, 0, 1) forwards' 
+            : 'iosScaleIn 0.28s cubic-bezier(0.32, 0.72, 0, 1) forwards'
         }}
       >
         {/* Header */}
@@ -54,11 +57,10 @@ export default function HelpModal({ onClose }) {
           display: 'flex',
           borderBottom: '1px solid var(--border-light)',
           background: 'var(--bg-card)',
-          padding: isMobile ? '0 8px' : '0 24px',
-          gap: isMobile ? 4 : 16,
-          overflowX: 'auto',
-          scrollbarWidth: 'none',
-          msOverflowStyle: 'none'
+          padding: isMobile ? '0 6px' : '0 24px',
+          gap: isMobile ? 2 : 16,
+          width: '100%',
+          boxSizing: 'border-box'
         }}>
           {tabs.map(tab => (
             <button
@@ -69,32 +71,54 @@ export default function HelpModal({ onClose }) {
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                gap: isMobile ? 6 : 8,
-                padding: isMobile ? '11px 10px' : '14px 4px',
+                gap: isMobile ? 5 : 8,
+                padding: isMobile ? '12px 4px' : '14px 12px',
                 border: 'none',
                 borderBottom: activeTab === tab.id ? '2.5px solid var(--primary)' : '2.5px solid transparent',
                 background: 'transparent',
                 color: activeTab === tab.id ? 'var(--primary)' : 'var(--text-secondary)',
                 fontSize: isMobile ? 12 : 13.5,
-                fontWeight: activeTab === tab.id ? 700 : 500,
+                fontWeight: 600,
                 cursor: 'pointer',
-                transition: 'all 0.15s ease',
+                transition: 'color 0.15s ease, border-color 0.15s ease',
                 fontFamily: 'inherit',
                 whiteSpace: 'nowrap',
-                flex: isMobile ? 1 : 'initial',
+                flex: isMobile ? '1 1 0px' : 'initial',
+                minWidth: 0,
                 textAlign: 'center'
               }}
             >
-              <i className={`fa-solid ${tab.icon}`} style={{ fontSize: isMobile ? 12 : 14 }}></i>
-              {tab.label}
+              <i className={`fa-solid ${tab.icon}`} style={{ fontSize: isMobile ? 12 : 14, flexShrink: 0 }}></i>
+              <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{tab.label}</span>
             </button>
           ))}
         </div>
 
         {/* Body content */}
-        <div className="modal-body" style={{ background: 'var(--bg-main)', padding: isMobile ? '14px 14px' : '24px 28px', flex: 1, overflowY: 'auto' }}>
+        <div className="modal-body" style={{ background: 'var(--bg-main)', padding: isMobile ? '14px 14px' : '24px 28px', flex: 1, minHeight: 0, overflowY: 'auto' }}>
+          <style>{`
+            @keyframes iosTabSwitch {
+              0% {
+                opacity: 0;
+                transform: translateY(14px) scale(0.982);
+              }
+              60% {
+                opacity: 0.85;
+                transform: translateY(-1px) scale(1.002);
+              }
+              100% {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+              }
+            }
+            .help-tab-animated {
+              animation: iosTabSwitch 0.32s cubic-bezier(0.32, 0.72, 0, 1) both;
+              will-change: transform, opacity;
+            }
+          `}</style>
+
           {activeTab === 'roles' && (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: isMobile ? 12 : 16 }}>
+            <div key="tab-roles" className="help-tab-animated" style={{ display: 'flex', flexDirection: 'column', gap: isMobile ? 12 : 16 }}>
               {/* Introduction */}
               <div style={{ fontSize: isMobile ? 12.5 : 13.5, color: 'var(--text-secondary)', lineHeight: 1.5 }}>
                 ระบบ Ticket Hub แบ่งบทบาทหน้าที่การทำงานออกเป็น 3 บทบาทหลัก เพื่อให้ขั้นตอนการดำเนินการขอความช่วยเหลือทาง IT เป็นไปอย่างเป็นระบบและปลอดภัย:
@@ -190,7 +214,7 @@ export default function HelpModal({ onClose }) {
           )}
 
           {activeTab === 'lifecycle' && (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: isMobile ? 12 : 16 }}>
+            <div key="tab-lifecycle" className="help-tab-animated" style={{ display: 'flex', flexDirection: 'column', gap: isMobile ? 12 : 16 }}>
               {/* Introduction */}
               <div style={{ fontSize: isMobile ? 12.5 : 13.5, color: 'var(--text-secondary)', lineHeight: 1.5 }}>
                 Ticket แต่ละใบจะดำเนินตามขั้นตอนต่อไปนี้ตามลำดับ จนกว่าจะได้รับการแก้ไขเสร็จสิ้น:
@@ -237,7 +261,7 @@ export default function HelpModal({ onClose }) {
           )}
 
           {activeTab === 'guide' && (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: isMobile ? 12 : 16 }}>
+            <div key="tab-guide" className="help-tab-animated" style={{ display: 'flex', flexDirection: 'column', gap: isMobile ? 12 : 16 }}>
               {/* Step By Step Guide */}
               <div style={{ display: 'flex', flexDirection: 'column', gap: isMobile ? 10 : 14 }}>
                 {/* Step 1 */}
@@ -300,7 +324,19 @@ export default function HelpModal({ onClose }) {
 
         {/* Footer */}
         <div className="modal-footer" style={{ padding: isMobile ? '12px 16px' : '16px 24px', borderTop: 'none' }}>
-          <button className="btn btn-outline" onClick={onClose} style={{ padding: isMobile ? '10px' : '8px 20px', fontSize: 13, fontWeight: 700, width: isMobile ? '100%' : 'auto' }} id="close-help-btn">
+          <button
+            className="btn btn-primary"
+            onClick={onClose}
+            style={{
+              padding: isMobile ? '11px 16px' : '9px 24px',
+              fontSize: 13,
+              fontWeight: 700,
+              width: isMobile ? '100%' : 'auto',
+              borderRadius: '10px',
+              border: 'none'
+            }}
+            id="close-help-btn"
+          >
             ปิดหน้าต่าง
           </button>
         </div>

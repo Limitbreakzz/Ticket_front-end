@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
+import { createPortal } from 'react-dom';
 import { useApp } from '../context/AppContext';
 import { ROLES, STATUS_LABEL, CATEGORIES } from '../data/mockData';
 import PageSizeDropdown from '../components/PageSizeDropdown';
@@ -1624,138 +1625,141 @@ export default function SLAView() {
       </div>
 
       {/* ─── Mobile Filter Bottom Sheet ─── */}
-      <>
-        {/* Backdrop */}
-        <div
-          className="bottom-sheet-backdrop"
-          onClick={() => setShowMobileFilters(false)}
-          style={{
-            position: 'fixed',
-            inset: 0,
-            background: 'rgba(15, 23, 42, 0.4)',
-            backdropFilter: 'blur(2px)',
-            zIndex: 2500,
-            opacity: showMobileFilters ? 1 : 0,
-            pointerEvents: showMobileFilters ? 'auto' : 'none',
-            transition: 'opacity 0.25s ease'
-          }}
-        />
-        {/* Sheet */}
-        <div
-          className="bottom-sheet-content"
-          style={{
-            position: 'fixed',
-            bottom: 0,
-            left: 0,
-            right: 0,
-            background: 'var(--bg-card)',
-            borderTopLeftRadius: 24,
-            borderTopRightRadius: 24,
-            borderTop: '1px solid var(--border-light)',
-            zIndex: 2501,
-            padding: '20px 16px 32px 16px',
-            display: 'flex',
-            flexDirection: 'column',
-            gap: 16,
-            maxHeight: '85vh',
-            overflowY: 'auto',
-            boxShadow: '0 -8px 32px rgba(15, 23, 42, 0.15)',
-            transform: showMobileFilters ? 'translateY(0)' : 'translateY(100%)',
-            opacity: showMobileFilters ? 1 : 0,
-            transition: 'transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.25s ease',
-            pointerEvents: showMobileFilters ? 'auto' : 'none'
-          }}
-        >
-            {/* Header */}
-            <div className="bottom-sheet-header" style={{
+      {createPortal(
+        <>
+          {/* Backdrop */}
+          <div
+            className="bottom-sheet-backdrop"
+            onClick={() => setShowMobileFilters(false)}
+            style={{
+              position: 'fixed',
+              inset: 0,
+              background: 'rgba(15, 23, 42, 0.45)',
+              backdropFilter: 'blur(3px)',
+              WebkitBackdropFilter: 'blur(3px)',
+              zIndex: 10000,
+              opacity: showMobileFilters ? 1 : 0,
+              pointerEvents: showMobileFilters ? 'auto' : 'none',
+              transition: 'opacity 0.25s ease'
+            }}
+          />
+          {/* Sheet */}
+          <div
+            className="bottom-sheet-content"
+            style={{
+              position: 'fixed',
+              bottom: 0,
+              left: 0,
+              right: 0,
+              background: 'var(--bg-card)',
+              borderTopLeftRadius: 24,
+              borderTopRightRadius: 24,
+              borderTop: '1px solid var(--border-light)',
+              zIndex: 10001,
+              padding: '20px 16px 32px 16px',
               display: 'flex',
-              justifyContent: 'space-between',
-              alignItems: 'center',
-              borderBottom: '1px solid var(--border-light)',
-              paddingBottom: 12
-            }}>
-              <h3 style={{ margin: 0, fontSize: 16, fontWeight: 800, color: 'var(--text-primary)' }}>ตัวกรองข้อมูล</h3>
-              <button
-                type="button"
-                className="close-btn"
-                onClick={() => setShowMobileFilters(false)}
-                style={{
-                  background: 'var(--bg-main)',
-                  border: '1px solid var(--border-light)',
-                  width: 32,
-                  height: 32,
-                  borderRadius: '50%',
-                  cursor: 'pointer',
+              flexDirection: 'column',
+              gap: 16,
+              maxHeight: '85vh',
+              overflowY: 'auto',
+              boxShadow: '0 -8px 32px rgba(15, 23, 42, 0.2)',
+              transform: showMobileFilters ? 'translateY(0)' : 'translateY(100%)',
+              opacity: showMobileFilters ? 1 : 0,
+              transition: 'transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.25s ease',
+              pointerEvents: showMobileFilters ? 'auto' : 'none'
+            }}
+          >
+              {/* Header */}
+              <div className="bottom-sheet-header" style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                borderBottom: '1px solid var(--border-light)',
+                paddingBottom: 12
+              }}>
+                <h3 style={{ margin: 0, fontSize: 16, fontWeight: 800, color: 'var(--text-primary)' }}>ตัวกรองข้อมูล</h3>
+                <button 
+                  type="button" 
+                  className="close-btn" 
+                  onClick={() => setShowMobileFilters(false)}
+                  style={{
+                    background: 'var(--bg-main)',
+                    border: '1px solid var(--border-light)',
+                    width: 32,
+                    height: 32,
+                    borderRadius: '50%',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    color: 'var(--text-secondary)'
+                  }}
+                >
+                  <i className="fa-solid fa-xmark" />
+                </button>
+              </div>
+
+              {/* Body */}
+              <div className="bottom-sheet-body" style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+                {/* SLA Filter */}
+                <div className="filter-group" style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                  <label style={{ fontSize: 12, fontWeight: 700, color: 'var(--text-muted)' }}>SLA</label>
+                  <MobileCustomSelect
+                    value={pendingFilter}
+                    onChange={v => setPendingFilter(v)}
+                    placeholder="ทั้งหมด"
+                    icon="list"
+                    options={[
+                      { value: 'active', label: 'กำลังดำเนินการ', icon: 'spinner', iconColor: 'rgb(59,130,246)' },
+                      { value: 'met', label: 'เสร็จทันกำหนด', icon: 'circle-check', iconColor: 'rgb(16,185,129)' },
+                      { value: 'at-risk', label: 'ใกล้หมดเวลา', icon: 'clock', iconColor: 'rgb(245,158,11)' },
+                      { value: 'breached', label: 'เกินกำหนด (กำลังทำ)', icon: 'triangle-exclamation', iconColor: 'rgb(239,68,68)' },
+                      { value: 'missed', label: 'เกินกำหนด (ปิดแล้ว)', icon: 'circle-xmark', iconColor: 'rgb(124,58,237)' }
+                    ]}
+                  />
+                </div>
+
+                {/* Hide Completed Switch */}
+                <div className="filter-group" style={{
                   display: 'flex',
                   alignItems: 'center',
-                  justifyContent: 'center',
-                  color: 'var(--text-secondary)'
-                }}
-              >
-                <i className="fa-solid fa-xmark" />
-              </button>
-            </div>
-
-            {/* Body */}
-            <div className="bottom-sheet-body" style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
-              {/* SLA Filter */}
-            <div className="filter-group" style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-              <label style={{ fontSize: 12, fontWeight: 700, color: 'var(--text-muted)' }}>SLA</label>
-               <MobileCustomSelect
-                 value={pendingFilter}
-                 onChange={v => setPendingFilter(v)}
-                 placeholder="ทั้งหมด"
-                 icon="list"
-                 options={[
-                  { value: 'active',   label: `กำลังดำเนินการ`, icon: 'spinner', iconColor: 'rgb(59,130,246)' },
-                  { value: 'met',      label: `เสร็จทันกำหนด`, icon: 'circle-check', iconColor: 'rgb(16,185,129)' },
-                  { value: 'at-risk',  label: `ใกล้หมดเวลา `, icon: 'clock', iconColor: 'rgb(245,158,11)' },
-                  { value: 'breached', label: `เกินกำหนด (กำลังทำ)`, icon: 'triangle-exclamation', iconColor: 'rgb(239,68,68)' },
-                  { value: 'missed',   label: `เกินกำหนด (ปิดแล้ว)`, icon: 'circle-xmark',iconColor: 'rgb(124,58,237)' },
-                ]}
-              />
-            </div>
-              {/* Hide Completed Switch */}
-              <div className="filter-group" style={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                background: 'var(--bg-main)',
-                padding: '12px 14px',
-                borderRadius: 10,
-                border: '1px solid var(--border-light)',
-                marginTop: 4
-              }}>
-                <span style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-primary)' }}>ซ่อนเคสที่สำเร็จ / ปิดแล้ว / ยกเลิก</span>
-                <label className="switch" style={{ position: 'relative', display: 'inline-block', width: 44, height: 24, margin: 0 }}>
-                  <input
-                    type="checkbox"
-                    checked={pendingHideCompleted}
-                    onChange={e => setPendingHideCompleted(e.target.checked)}
-                    style={{ opacity: 0, width: 0, height: 0 }}
-                  />
-                  <span style={{
-                    position: 'absolute',
-                    cursor: 'pointer',
-                    top: 0, left: 0, right: 0, bottom: 0,
-                    background: pendingHideCompleted ? 'var(--primary)' : '#cbd5e1',
-                    transition: 'background 0.25s cubic-bezier(0.4, 0, 0.2, 1)',
-                    borderRadius: 24,
-                  }}>
+                  justifyContent: 'space-between',
+                  background: 'var(--bg-main)',
+                  padding: '12px 14px',
+                  borderRadius: 10,
+                  border: '1px solid var(--border-light)',
+                  marginTop: 4
+                }}>
+                  <span style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-primary)' }}>ซ่อนเคสที่สำเร็จ / ปิดแล้ว / ยกเลิก</span>
+                  <label className="switch" style={{ position: 'relative', display: 'inline-block', width: 44, height: 24, margin: 0 }}>
+                    <input
+                      type="checkbox"
+                      checked={pendingHideCompleted}
+                      onChange={e => setPendingHideCompleted(e.target.checked)}
+                      style={{ opacity: 0, width: 0, height: 0 }}
+                    />
                     <span style={{
                       position: 'absolute',
-                      height: 18, width: 18,
-                      left: pendingHideCompleted ? 23 : 3,
-                      top: 3,
-                      background: 'white',
-                      transition: 'left 0.25s cubic-bezier(0.4, 0, 0.2, 1)',
-                      borderRadius: '50%',
-                      boxShadow: '0 1px 3px rgba(0,0,0,0.15)'
-                    }} />
-                  </span>
-                </label>
+                      cursor: 'pointer',
+                      top: 0, left: 0, right: 0, bottom: 0,
+                      background: pendingHideCompleted ? 'var(--primary)' : '#cbd5e1',
+                      transition: 'background 0.25s cubic-bezier(0.4, 0, 0.2, 1)',
+                      borderRadius: 24,
+                    }}>
+                      <span style={{
+                        position: 'absolute',
+                        height: 18, width: 18,
+                        left: pendingHideCompleted ? 23 : 3,
+                        top: 3,
+                        background: 'white',
+                        transition: 'left 0.25s cubic-bezier(0.4, 0, 0.2, 1)',
+                        borderRadius: '50%',
+                        boxShadow: '0 1px 3px rgba(0,0,0,0.15)'
+                      }} />
+                    </span>
+                  </label>
+                </div>
               </div>
-            </div>
 
             {/* Footer Buttons */}
             <div className="bottom-sheet-footer" style={{
@@ -1825,7 +1829,9 @@ export default function SLAView() {
               </button>
           </div>
         </div>
-      </>
+      </>,
+      document.body
+    )}
 
 
     </div>

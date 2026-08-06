@@ -3946,9 +3946,11 @@ button:active,
   }
 
   /* Text & Pill Truncation */
-  .detail-subject, .topbar-logo-text, .badge, .tag, .pill {
-    max-width: 100% !important;
-    word-break: break-word;
+  /* Help Modal Rigid Height Constraints on Mobile */
+  .help-modal-fixed-container {
+    height: 85dvh !important;
+    min-height: 85dvh !important;
+    max-height: 85dvh !important;
   }
 }
 

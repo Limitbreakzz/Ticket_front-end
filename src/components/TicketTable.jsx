@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
+import { createPortal } from 'react-dom';
 import { useApp } from '../context/AppContext';
 import { CATEGORIES, STATUS_LABEL } from '../data/mockData';
 import { SLABadge } from './SLAComponents';
@@ -1686,314 +1687,318 @@ export default function TicketTable({ tickets, title = 'รายการ Ticke
         )}
 
         {/* Slide-Up Bottom Sheet Modal */}
-        <>
-          <div 
-            className="bottom-sheet-backdrop" 
-            onClick={() => setShowMobileFilterModal(false)}
-            style={{
-              position: 'fixed',
-              inset: 0,
-              background: 'rgba(15, 23, 42, 0.4)',
-              backdropFilter: 'blur(2px)',
-              zIndex: 2500,
-              opacity: showMobileFilterModal ? 1 : 0,
-              pointerEvents: showMobileFilterModal ? 'auto' : 'none',
-              transition: 'opacity 0.25s ease'
-            }}
-          />
-          <div 
-            className="bottom-sheet-content"
-            style={{
-              position: 'fixed',
-              bottom: 0,
-              left: 0,
-              right: 0,
-              background: 'var(--bg-card)',
-              borderTopLeftRadius: 24,
-              borderTopRightRadius: 24,
-              borderTop: '1px solid var(--border-light)',
-              zIndex: 2501,
-              padding: '20px 16px 32px 16px',
-              display: 'flex',
-              flexDirection: 'column',
-              gap: 16,
-              maxHeight: '85vh',
-              overflowY: 'auto',
-              boxShadow: '0 -8px 32px rgba(15, 23, 42, 0.15)',
-              transform: showMobileFilterModal ? 'translateY(0)' : 'translateY(100%)',
-              opacity: showMobileFilterModal ? 1 : 0,
-              transition: 'transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.25s ease',
-              pointerEvents: showMobileFilterModal ? 'auto' : 'none'
-            }}
-          >
-            <div className="bottom-sheet-header" style={{
-              display: 'flex',
-              justifyContent: 'space-between',
-              alignItems: 'center',
-              borderBottom: '1px solid var(--border-light)',
-              paddingBottom: 12
-            }}>
-              <h3 style={{ margin: 0, fontSize: 16, fontWeight: 800, color: 'var(--text-primary)' }}>ตัวกรองข้อมูล</h3>
-              <button 
-                type="button" 
-                className="close-btn" 
-                onClick={() => setShowMobileFilterModal(false)}
-                style={{
-                  background: 'var(--bg-main)',
-                  border: '1px solid var(--border-light)',
-                  width: 32,
-                  height: 32,
-                  borderRadius: '50%',
-                  cursor: 'pointer',
+        {createPortal(
+          <>
+            <div 
+              className="bottom-sheet-backdrop" 
+              onClick={() => setShowMobileFilterModal(false)}
+              style={{
+                position: 'fixed',
+                inset: 0,
+                background: 'rgba(15, 23, 42, 0.45)',
+                backdropFilter: 'blur(3px)',
+                WebkitBackdropFilter: 'blur(3px)',
+                zIndex: 10000,
+                opacity: showMobileFilterModal ? 1 : 0,
+                pointerEvents: showMobileFilterModal ? 'auto' : 'none',
+                transition: 'opacity 0.25s ease'
+              }}
+            />
+            <div 
+              className="bottom-sheet-content"
+              style={{
+                position: 'fixed',
+                bottom: 0,
+                left: 0,
+                right: 0,
+                background: 'var(--bg-card)',
+                borderTopLeftRadius: 24,
+                borderTopRightRadius: 24,
+                borderTop: '1px solid var(--border-light)',
+                zIndex: 10001,
+                padding: '20px 16px 32px 16px',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: 16,
+                maxHeight: '85vh',
+                overflowY: 'auto',
+                boxShadow: '0 -8px 32px rgba(15, 23, 42, 0.2)',
+                transform: showMobileFilterModal ? 'translateY(0)' : 'translateY(100%)',
+                opacity: showMobileFilterModal ? 1 : 0,
+                transition: 'transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.25s ease',
+                pointerEvents: showMobileFilterModal ? 'auto' : 'none'
+              }}
+            >
+              <div className="bottom-sheet-header" style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                borderBottom: '1px solid var(--border-light)',
+                paddingBottom: 12
+              }}>
+                <h3 style={{ margin: 0, fontSize: 16, fontWeight: 800, color: 'var(--text-primary)' }}>ตัวกรองข้อมูล</h3>
+                <button 
+                  type="button" 
+                  className="close-btn" 
+                  onClick={() => setShowMobileFilterModal(false)}
+                  style={{
+                    background: 'var(--bg-main)',
+                    border: '1px solid var(--border-light)',
+                    width: 32,
+                    height: 32,
+                    borderRadius: '50%',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    color: 'var(--text-secondary)'
+                  }}
+                >
+                  <i className="fa-solid fa-xmark" />
+                </button>
+              </div>
+              <div className="bottom-sheet-body" style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+                {/* Status Filter */}
+                <div className="filter-group" style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                  <label style={{ fontSize: 12, fontWeight: 700, color: 'var(--text-muted)' }}>สถานะ</label>
+                  <MobileCustomSelect
+                    value={statusFilter}
+                    onChange={v => { setStatusFilter(v); setCurrentPage(1); }}
+                    placeholder="ทุกสถานะ"
+                    icon="circle-dot"
+                    options={Object.entries(STATUS_LABEL).map(([k, v]) => {
+                      const statusColors = {
+                        pending: 'rgb(71, 85, 105)',
+                        progress: 'rgb(37, 99, 235)',
+                        'wait-approve': 'rgb(245, 158, 11)',
+                        approved: 'rgb(16, 185, 129)',
+                        rejected: 'rgb(239, 68, 68)',
+                        forwarded: 'rgb(124, 58, 237)',
+                        'wait-parts': 'rgb(180, 83, 9)',
+                        resolved: 'rgb(16, 185, 129)',
+                        cancelled: 'rgb(239, 68, 68)'
+                      };
+                      return {
+                        value: k,
+                        label: v.label,
+                        dot: statusColors[k] || 'var(--text-muted)',
+                        icon: v.icon,
+                        iconColor: statusColors[k] || 'var(--text-muted)'
+                      };
+                    })}
+                  />
+                </div>
+                
+                {/* Urgency Filter */}
+                {activeNav !== 'escalated' && (
+                  <div className="filter-group" style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                    <label style={{ fontSize: 12, fontWeight: 700, color: 'var(--text-muted)' }}>ระดับความเร่งด่วน</label>
+                    <MobileCustomSelect
+                      value={urgencyFilter}
+                      onChange={v => { setUrgencyFilter(v); setCurrentPage(1); }}
+                      placeholder="ทุกระดับ"
+                      icon="circle-exclamation"
+                      options={[
+                        { value: 'low', label: 'ต่ำ', dot: 'rgb(16,185,129)', icon: 'circle-check', iconColor: 'rgb(16,185,129)' },
+                        { value: 'medium', label: 'ปานกลาง', dot: 'rgb(245,158,11)', icon: 'circle-minus', iconColor: 'rgb(245,158,11)' },
+                        { value: 'high', label: 'สูง', dot: 'rgb(239,68,68)', icon: 'circle-exclamation', iconColor: 'rgb(239,68,68)' },
+                        { value: 'critical', label: 'วิกฤต', dot: 'rgb(124,58,237)', icon: 'triangle-exclamation', iconColor: 'rgb(124,58,237)' }
+                      ]}
+                    />
+                  </div>
+                )}
+
+                {/* Category Filter */}
+                <div className="filter-group" style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                  <label style={{ fontSize: 12, fontWeight: 700, color: 'var(--text-muted)' }}>หมวดหมู่หลัก</label>
+                  <MobileCustomSelect
+                    value={catFilter}
+                    onChange={v => { setCatFilter(v); setCurrentPage(1); }}
+                    placeholder="ทุกหมวดหมู่"
+                    icon="layer-group"
+                    options={Object.entries(CATEGORIES).map(([k, v]) => {
+                      const catColors = {
+                        hardware: '#e67e22',
+                        software: '#3498db',
+                        network: '#eab308',
+                        access: '#9b59b6',
+                        other: '#95a5a6',
+                      };
+                      return {
+                        value: k,
+                        label: v.label,
+                        dot: catColors[k] || 'var(--text-muted)',
+                        icon: v.icon || 'folder',
+                        iconColor: catColors[k] || 'var(--text-muted)'
+                      };
+                    })}
+                  />
+                </div>
+
+                {/* Hide Completed Switch */}
+                <div className="filter-group" style={{
                   display: 'flex',
                   alignItems: 'center',
-                  justifyContent: 'center',
-                  color: 'var(--text-secondary)'
-                }}
-              >
-                <i className="fa-solid fa-xmark" />
-              </button>
-            </div>
-            <div className="bottom-sheet-body" style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
-              {/* Status Filter */}
-              <div className="filter-group" style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-                <label style={{ fontSize: 12, fontWeight: 700, color: 'var(--text-muted)' }}>สถานะ</label>
-                <MobileCustomSelect
-                  value={statusFilter}
-                  onChange={v => { setStatusFilter(v); setCurrentPage(1); }}
-                  placeholder="ทุกสถานะ"
-                  icon="circle-dot"
-                  options={Object.entries(STATUS_LABEL).map(([k, v]) => {
-                    const statusColors = {
-                      pending: 'rgb(71, 85, 105)',
-                      progress: 'rgb(37, 99, 235)',
-                      'wait-approve': 'rgb(245, 158, 11)',
-                      approved: 'rgb(16, 185, 129)',
-                      rejected: 'rgb(239, 68, 68)',
-                      forwarded: 'rgb(124, 58, 237)',
-                      'wait-parts': 'rgb(180, 83, 9)',
-                      resolved: 'rgb(16, 185, 129)',
-                      cancelled: 'rgb(239, 68, 68)'
-                    };
-                    return {
-                      value: k,
-                      label: v.label,
-                      dot: statusColors[k] || 'var(--text-muted)',
-                      icon: v.icon,
-                      iconColor: statusColors[k] || 'var(--text-muted)'
-                    };
-                  })}
-                />
-              </div>
-              
-              {/* Urgency Filter */}
-              {activeNav !== 'escalated' && (
-                <div className="filter-group" style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-                  <label style={{ fontSize: 12, fontWeight: 700, color: 'var(--text-muted)' }}>ระดับความเร่งด่วน</label>
-                  <MobileCustomSelect
-                    value={urgencyFilter}
-                    onChange={v => { setUrgencyFilter(v); setCurrentPage(1); }}
-                    placeholder="ทุกระดับ"
-                    icon="circle-exclamation"
-                    options={[
-                      { value: 'low', label: 'ต่ำ', dot: 'rgb(16,185,129)', icon: 'circle-check', iconColor: 'rgb(16,185,129)' },
-                      { value: 'medium', label: 'ปานกลาง', dot: 'rgb(245,158,11)', icon: 'circle-minus', iconColor: 'rgb(245,158,11)' },
-                      { value: 'high', label: 'สูง', dot: 'rgb(239,68,68)', icon: 'circle-exclamation', iconColor: 'rgb(239,68,68)' },
-                      { value: 'critical', label: 'วิกฤต', dot: 'rgb(124,58,237)', icon: 'triangle-exclamation', iconColor: 'rgb(124,58,237)' }
-                    ]}
-                  />
-                </div>
-              )}
-
-              {/* Category Filter */}
-              <div className="filter-group" style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-                <label style={{ fontSize: 12, fontWeight: 700, color: 'var(--text-muted)' }}>หมวดหมู่หลัก</label>
-                <MobileCustomSelect
-                  value={catFilter}
-                  onChange={v => { setCatFilter(v); setCurrentPage(1); }}
-                  placeholder="ทุกหมวดหมู่"
-                  icon="layer-group"
-                  options={Object.entries(CATEGORIES).map(([k, v]) => {
-                    const catColors = {
-                      hardware: '#e67e22',
-                      software: '#3498db',
-                      network: '#eab308',
-                      access: '#9b59b6',
-                      other: '#95a5a6',
-                    };
-                    return {
-                      value: k,
-                      label: v.label,
-                      dot: catColors[k] || 'var(--text-muted)',
-                      icon: v.icon || 'folder',
-                      iconColor: catColors[k] || 'var(--text-muted)'
-                    };
-                  })}
-                />
-              </div>
-
-              {/* Hide Completed Switch */}
-              <div className="filter-group" style={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                background: 'var(--bg-main)',
-                padding: '12px 14px',
-                borderRadius: 10,
-                border: '1px solid var(--border-light)',
-                marginTop: 4
-              }}>
-                <span style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-primary)' }}>ซ่อนเคสที่สำเร็จ / ปิดแล้ว / ยกเลิก</span>
-                <label className="switch" style={{ position: 'relative', display: 'inline-block', width: 44, height: 24, margin: 0 }}>
-                  <input
-                    type="checkbox"
-                    checked={hideCompleted}
-                    onChange={e => { setHideCompleted(e.target.checked); setCurrentPage(1); }}
-                    style={{ opacity: 0, width: 0, height: 0 }}
-                  />
-                  <span style={{
-                    position: 'absolute',
-                    cursor: 'pointer',
-                    top: 0, left: 0, right: 0, bottom: 0,
-                    background: hideCompleted ? 'var(--primary)' : '#cbd5e1',
-                    transition: 'background 0.25s cubic-bezier(0.4, 0, 0.2, 1)',
-                    borderRadius: 24,
-                  }}>
+                  justifyContent: 'space-between',
+                  background: 'var(--bg-main)',
+                  padding: '12px 14px',
+                  borderRadius: 10,
+                  border: '1px solid var(--border-light)',
+                  marginTop: 4
+                }}>
+                  <span style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-primary)' }}>ซ่อนเคสที่สำเร็จ / ปิดแล้ว / ยกเลิก</span>
+                  <label className="switch" style={{ position: 'relative', display: 'inline-block', width: 44, height: 24, margin: 0 }}>
+                    <input
+                      type="checkbox"
+                      checked={hideCompleted}
+                      onChange={e => { setHideCompleted(e.target.checked); setCurrentPage(1); }}
+                      style={{ opacity: 0, width: 0, height: 0 }}
+                    />
                     <span style={{
                       position: 'absolute',
-                      height: 18, width: 18,
-                      left: hideCompleted ? 23 : 3,
-                      top: 3,
-                      background: 'white',
-                      transition: 'left 0.25s cubic-bezier(0.4, 0, 0.2, 1)',
-                      borderRadius: '50%',
-                      boxShadow: '0 1px 3px rgba(0,0,0,0.15)'
-                    }} />
-                  </span>
-                </label>
-              </div>
-              {/* Personal Ticket Filter Button (Mobile - matches Desktop styling) */}
-              {showPersonalToggle && (
-                <div className="filter-group" style={{ display: 'flex', flexDirection: 'column', gap: 6, marginTop: 4 }}>
-                  <label style={{ fontSize: 12, fontWeight: 700, color: 'var(--text-muted)' }}>ประเภทตั๋วพิเศษ</label>
-                  <button
-                    type="button"
-                    onClick={() => { setPersonalFilter(!personalFilter); setCurrentPage(1); }}
-                    style={{
-                      background: personalFilter 
-                        ? 'rgba(225, 29, 72, 0.05)' 
-                        : 'var(--bg-card)',
-                      border: personalFilter 
-                        ? '1.5px solid #e11d48' 
-                        : '1.5px dashed var(--border-strong)',
-                      padding: '12px 16px',
-                      borderRadius: '10px',
                       cursor: 'pointer',
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: 8,
-                      fontSize: 13,
-                      fontWeight: 700,
-                      color: personalFilter ? '#e11d48' : 'var(--text-secondary)',
-                      transition: 'all 0.2s ease-in-out',
-                      outline: 'none',
-                      userSelect: 'none',
-                      height: '44px',
-                      position: 'relative',
-                      width: '100%',
-                      textAlign: 'left',
-                      justifyContent: 'flex-start'
-                    }}
-                  >
-                    {/* Left Accent line on active */}
-                    {personalFilter && (
+                      top: 0, left: 0, right: 0, bottom: 0,
+                      background: hideCompleted ? 'var(--primary)' : '#cbd5e1',
+                      transition: 'background 0.25s cubic-bezier(0.4, 0, 0.2, 1)',
+                      borderRadius: 24,
+                    }}>
                       <span style={{
                         position: 'absolute',
-                        left: 0,
-                        top: '20%',
-                        bottom: '20%',
-                        width: '3.5px',
-                        background: '#e11d48',
-                        borderRadius: '0 4px 4px 0'
+                        height: 18, width: 18,
+                        left: hideCompleted ? 23 : 3,
+                        top: 3,
+                        background: 'white',
+                        transition: 'left 0.25s cubic-bezier(0.4, 0, 0.2, 1)',
+                        borderRadius: '50%',
+                        boxShadow: '0 1px 3px rgba(0,0,0,0.15)'
                       }} />
-                    )}
-                    <i 
-                      className={personalFilter ? "fa-solid fa-lock" : "fa-solid fa-lock-open"} 
-                      style={{ 
-                        fontSize: 12, 
-                        color: personalFilter ? '#e11d48' : 'var(--text-muted)',
-                        transition: 'all 0.2s'
-                      }} 
-                    />
-                    <span style={{ flex: 1 }}>แสดงเฉพาะ Ticket ส่วนตัว</span>
-                    <span style={{
-                      background: personalFilter ? '#e11d48' : 'var(--bg-main)',
-                      color: personalFilter ? '#ffffff' : 'var(--text-secondary)',
-                      fontSize: 11,
-                      fontWeight: 800,
-                      padding: '2px 7px',
-                      borderRadius: '6px',
-                      display: 'inline-flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      minWidth: '20px',
-                      height: '18px',
-                      border: personalFilter ? 'none' : '1px solid var(--border-light)',
-                      transition: 'all 0.2s'
-                    }}>
-                      {personalTicketsCount}
                     </span>
-                  </button>
+                  </label>
                 </div>
-              )}
+                {/* Personal Ticket Filter Button (Mobile - matches Desktop styling) */}
+                {showPersonalToggle && (
+                  <div className="filter-group" style={{ display: 'flex', flexDirection: 'column', gap: 6, marginTop: 4 }}>
+                    <label style={{ fontSize: 12, fontWeight: 700, color: 'var(--text-muted)' }}>ประเภทตั๋วพิเศษ</label>
+                    <button
+                      type="button"
+                      onClick={() => { setPersonalFilter(!personalFilter); setCurrentPage(1); }}
+                      style={{
+                        background: personalFilter 
+                          ? 'rgba(225, 29, 72, 0.05)' 
+                          : 'var(--bg-card)',
+                        border: personalFilter 
+                          ? '1.5px solid #e11d48' 
+                          : '1.5px dashed var(--border-strong)',
+                        padding: '12px 16px',
+                        borderRadius: '10px',
+                        cursor: 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 8,
+                        fontSize: 13,
+                        fontWeight: 700,
+                        color: personalFilter ? '#e11d48' : 'var(--text-secondary)',
+                        transition: 'all 0.2s ease-in-out',
+                        outline: 'none',
+                        userSelect: 'none',
+                        height: '44px',
+                        position: 'relative',
+                        width: '100%',
+                        textAlign: 'left',
+                        justifyContent: 'flex-start'
+                      }}
+                    >
+                      {/* Left Accent line on active */}
+                      {personalFilter && (
+                        <span style={{
+                          position: 'absolute',
+                          left: 0,
+                          top: '20%',
+                          bottom: '20%',
+                          width: '3.5px',
+                          background: '#e11d48',
+                          borderRadius: '0 4px 4px 0'
+                        }} />
+                      )}
+                      <i 
+                        className={personalFilter ? "fa-solid fa-lock" : "fa-solid fa-lock-open"} 
+                        style={{ 
+                          fontSize: 12, 
+                          color: personalFilter ? '#e11d48' : 'var(--text-muted)',
+                          transition: 'all 0.2s'
+                        }} 
+                      />
+                      <span style={{ flex: 1 }}>แสดงเฉพาะ Ticket ส่วนตัว</span>
+                      <span style={{
+                        background: personalFilter ? '#e11d48' : 'var(--bg-main)',
+                        color: personalFilter ? '#ffffff' : 'var(--text-secondary)',
+                        fontSize: 11,
+                        fontWeight: 800,
+                        padding: '2px 7px',
+                        borderRadius: '6px',
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        minWidth: '20px',
+                        height: '18px',
+                        border: personalFilter ? 'none' : '1px solid var(--border-light)',
+                        transition: 'all 0.2s'
+                      }}>
+                        {personalTicketsCount}
+                      </span>
+                    </button>
+                  </div>
+                )}
+              </div>
+              <div className="bottom-sheet-footer" style={{
+                display: 'flex',
+                gap: 12,
+                marginTop: 8,
+                borderTop: '1px solid var(--border-light)',
+                paddingTop: 16
+              }}>
+                <button 
+                  type="button" 
+                  className="btn-clear" 
+                  onClick={() => { setStatusFilter(''); setUrgencyFilter(''); setCatFilter(''); setHideCompleted(true); setPersonalFilter(false); setCurrentPage(1); setShowMobileFilterModal(false); }}
+                  style={{
+                    flex: 1,
+                    height: 44,
+                    borderRadius: 10,
+                    background: 'var(--bg-main)',
+                    border: '1px solid var(--border-light)',
+                    color: 'var(--text-secondary)',
+                    fontWeight: 700,
+                    fontSize: 13,
+                    cursor: 'pointer'
+                  }}
+                >
+                  ล้างตัวกรอง
+                </button>
+                <button 
+                  type="button" 
+                  className="btn-apply" 
+                  onClick={() => setShowMobileFilterModal(false)}
+                  style={{
+                    flex: 1,
+                    height: 44,
+                    borderRadius: 10,
+                    background: 'var(--primary)',
+                    border: 'none',
+                    color: 'white',
+                    fontWeight: 700,
+                    fontSize: 13,
+                    cursor: 'pointer',
+                    boxShadow: '0 2px 8px rgba(37, 99, 235, 0.25)'
+                  }}
+                >
+                  ใช้ตัวกรอง
+                </button>
+              </div>
             </div>
-            <div className="bottom-sheet-footer" style={{
-              display: 'flex',
-              gap: 12,
-              marginTop: 8,
-              borderTop: '1px solid var(--border-light)',
-              paddingTop: 16
-            }}>
-              <button 
-                type="button" 
-                className="btn-clear" 
-                onClick={() => { setStatusFilter(''); setUrgencyFilter(''); setCatFilter(''); setHideCompleted(true); setPersonalFilter(false); setCurrentPage(1); setShowMobileFilterModal(false); }}
-                style={{
-                  flex: 1,
-                  height: 44,
-                  borderRadius: 10,
-                  background: 'var(--bg-main)',
-                  border: '1px solid var(--border-light)',
-                  color: 'var(--text-secondary)',
-                  fontWeight: 700,
-                  fontSize: 13,
-                  cursor: 'pointer'
-                }}
-              >
-                ล้างตัวกรอง
-              </button>
-              <button 
-                type="button" 
-                className="btn-apply" 
-                onClick={() => setShowMobileFilterModal(false)}
-                style={{
-                  flex: 1,
-                  height: 44,
-                  borderRadius: 10,
-                  background: 'var(--primary)',
-                  border: 'none',
-                  color: 'white',
-                  fontWeight: 700,
-                  fontSize: 13,
-                  cursor: 'pointer',
-                  boxShadow: '0 2px 8px rgba(37, 99, 235, 0.25)'
-                }}
-              >
-                ใช้ตัวกรอง
-              </button>
-            </div>
-          </div>
-        </>
+          </>,
+          document.body
+        )}
       </div>
     </div>
   );
