@@ -445,7 +445,7 @@ export default function SettingsView({ defaultActiveTab }) {
       display: 'flex',
       flexDirection: 'column',
       gap: 24,
-      padding: isMobile ? '12px' : '24px',
+      padding: isMobile ? '12px 12px 36px 12px' : '24px',
       width: '100%',
       boxSizing: 'border-box'
     }}>

@@ -134,7 +134,7 @@ export default function MyTicketsView({ filterOverride, titleOverride, defaultTa
   const resolvedCount = displayTickets.filter(t => t.status === 'resolved' || t.status === 'closed').length;
 
   return (
-    <div className="view-container" style={{ maxWidth: 1200, margin: '0 auto', display: 'flex', flexDirection: 'column', gap: 24 }}>
+    <div className="view-container" style={{ maxWidth: 1200, margin: '0 auto', display: 'flex', flexDirection: 'column', gap: 24, paddingBottom: isMobile ? '0px' : undefined }}>
 
       {/* Mobile Tab Switcher */}
       {getTabOptions().length > 1 && (

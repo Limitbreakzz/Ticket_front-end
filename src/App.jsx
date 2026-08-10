@@ -76,6 +76,17 @@ function PlaceholderView({ title, icon }) {
 function Topbar({ onCreateTicket }) {
   const { role, activeNav, setActiveNav, notifications, clearAllNotifications, markNotifAsRead, openTicketDetail, currentUser, setShowMobileSidebar, theme, setTheme, logoutUser, setShowHelp } = useApp();
   const info = ROLE_INFO[role];
+  const userDeptName = 
+    currentUser?.department?.name || 
+    currentUser?.departmentName || 
+    (typeof currentUser?.department === 'string' ? currentUser.department : null) || 
+    currentUser?.dept?.name ||
+    (typeof currentUser?.dept === 'string' ? currentUser.dept : null) ||
+    currentUser?.departmentCode ||
+    currentUser?.deptName ||
+    (currentUser?.name?.toUpperCase().includes('IT') || currentUser?.username?.toUpperCase().includes('IT') ? 'แผนก IT' :
+     currentUser?.name?.toUpperCase().includes('HR') || currentUser?.username?.toUpperCase().includes('HR') ? 'ฝ่ายบุคคล' :
+     info?.department || 'ส่วนกลาง');
   const [showNotif, setShowNotif] = useState(false);
 
   const unreadCount = notifications.filter(n => n.read === false || n.isRead === false).length;
@@ -370,7 +381,7 @@ function Topbar({ onCreateTicket }) {
               }}>
                 {info.label}
               </span>
-              {currentUser?.department?.name && (
+              {userDeptName && (
                 <span className="topbar-profile-dept-badge" style={{
                   background: 'rgba(148, 163, 184, 0.12)',
                   color: 'var(--text-muted)',
@@ -381,7 +392,7 @@ function Topbar({ onCreateTicket }) {
                   fontWeight: 500,
                   lineHeight: 1.4
                 }}>
-                  {currentUser.department.name}
+                  {userDeptName}
                 </span>
               )}
             </div>

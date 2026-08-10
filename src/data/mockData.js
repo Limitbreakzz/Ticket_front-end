@@ -12,6 +12,7 @@ export const ROLE_INFO = {
     initials: 'สช',
     color: '#2563eb',
     desc: 'พนักงานทั่วไป',
+    department: 'ฝ่ายผลิต 1',
   },
   manager: {
     label: 'หัวหน้างาน',
@@ -19,6 +20,7 @@ export const ROLE_INFO = {
     initials: 'วภ',
     color: '#10b981',
     desc: 'หัวหน้างาน',
+    department: 'ฝ่ายซ่อมบำรุง',
   },
   admin: {
     label: 'ผู้ดูแลระบบ',
@@ -26,6 +28,7 @@ export const ROLE_INFO = {
     initials: 'ธน',
     color: '#7c3aed',
     desc: 'ผู้ดูแลระบบ',
+    department: 'ส่วนกลาง',
   },
 };
 

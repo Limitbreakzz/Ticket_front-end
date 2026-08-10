@@ -87,7 +87,7 @@ html, body {
   overflow-x: hidden;
   height: 100%;
   font-family: 'Plus Jakarta Sans', 'IBM Plex Sans Thai', 'Inter', system-ui, sans-serif;
-  background-color: #020617;
+  background-color: var(--bg-main, #f1f5f9);
   color: var(--text-primary);
   font-size: 14px;
   line-height: 1.6;
@@ -2325,7 +2325,7 @@ tbody td {
 
 @media (max-width: 768px) {
   .view-container {
-    padding: 12px;
+    padding: 12px 12px 36px 12px;
   }
   
   .hero-section {
@@ -2948,7 +2948,7 @@ tbody td {
     padding: 4px 8px !important;
     gap: 5px !important;
     flex-shrink: 1 !important;
-    max-width: 175px !important;
+    max-width: 240px !important;
     overflow: hidden !important;
   }
   .topbar-profile-avatar-container {
@@ -2965,7 +2965,7 @@ tbody td {
   }
   .topbar-profile-name {
     font-size: 11px !important;
-    max-width: 75px !important;
+    max-width: 100px !important;
     white-space: nowrap !important;
     overflow: hidden !important;
     text-overflow: ellipsis !important;
@@ -2973,17 +2973,17 @@ tbody td {
   .topbar-profile-badges {
     display: flex !important;
     gap: 2px !important;
+    flex-wrap: nowrap !important;
   }
-  .topbar-profile-role-badge {
+  .topbar-profile-role-badge,
+  .topbar-profile-dept-badge {
     font-size: 8px !important;
     padding: 0.5px 4px !important;
-    max-width: 60px !important;
+    max-width: 75px !important;
     white-space: nowrap !important;
     overflow: hidden !important;
     text-overflow: ellipsis !important;
-  }
-  .topbar-profile-dept-badge {
-    display: none !important;
+    display: inline-block !important;
   }
   .icon-btn {
     width: 32px !important;
@@ -3111,7 +3111,7 @@ tbody td {
   .detail-body-container {
     padding: 16px 12px !important;
     gap: 24px !important;
-    padding-bottom: 96px !important; /* Prevent bottom nav overlapping and add breathing room */
+    padding-bottom: 36px !important; /* Prevent bottom nav overlapping and add breathing room */
     width: 100% !important;
     max-width: 100% !important;
     box-sizing: border-box !important;
@@ -3553,7 +3553,7 @@ tbody td {
   .detail-body-container {
     height: auto !important;
     overflow: visible !important;
-    padding: 16px 12px 120px 12px !important;
+    padding: 16px 12px 36px 12px !important;
     width: 100% !important;
     max-width: 100% !important;
     box-sizing: border-box !important;
@@ -4294,6 +4294,20 @@ html.dark .badge-open { background: rgba(59, 130, 246, 0.15) !important; color: 
 html.dark .badge-in-progress { background: rgba(245, 158, 11, 0.15) !important; color: #fbbf24 !important; }
 html.dark .badge-pending { background: rgba(139, 92, 246, 0.15) !important; color: #c084fc !important; }
 html.dark .badge-closed { background: rgba(148, 163, 184, 0.12) !important; color: #94a3b8 !important; border: 1px solid rgba(148, 163, 184, 0.2) !important; }
+
+/* Mobile Bottom Spacer to ensure consistent bottom spacing on mobile */
+.mobile-bottom-spacer {
+  display: none;
+}
+@media (max-width: 768px) {
+  .mobile-bottom-spacer {
+    display: block;
+    height: 24px;
+    width: 100%;
+    clear: both;
+    flex-shrink: 0;
+  }
+}
 
 
 

@@ -181,13 +181,25 @@ export default function ProfileView() {
     }
   };
 
-  const displayDept = currentUser?.department?.name || 'ไม่มีแผนก';
+  const displayDept = 
+    currentUser?.department?.name || 
+    currentUser?.departmentName || 
+    (typeof currentUser?.department === 'string' ? currentUser.department : null) || 
+    currentUser?.dept?.name ||
+    (typeof currentUser?.dept === 'string' ? currentUser.dept : null) ||
+    currentUser?.departmentCode ||
+    currentUser?.deptName ||
+    (role === ROLES.ADMIN ? 'ส่วนกลาง' : (
+      currentUser?.name?.toUpperCase().includes('_IT') || currentUser?.username?.toUpperCase().includes('_IT') ? 'ไอที' :
+      currentUser?.name?.toUpperCase().includes('_HR') || currentUser?.username?.toUpperCase().includes('_HR') ? 'ทรัพยากรบุคคล (HR)' :
+      'ไม่มีแผนก'
+    ));
 
   return (
     <div className="view-container" style={{
       maxWidth: '620px',
       margin: '0 auto',
-      padding: '20px 8px 80px 8px',
+      padding: '20px 8px 36px 8px',
       display: 'flex',
       flexDirection: 'column',
       gap: '20px',

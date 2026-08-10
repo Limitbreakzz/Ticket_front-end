@@ -1545,7 +1545,7 @@ export default function TicketTable({ tickets, title = 'รายการ Ticke
             background: 'var(--bg-card)',
             border: '1px solid var(--border-light)',
             borderRadius: '16px',
-            margin: '12px 12px 24px 12px',
+            margin: '12px 12px 36px 12px',
             display: 'flex',
             flexDirection: 'column',
             gap: 12,

@@ -734,7 +734,15 @@ export default function ApprovalView({ isEmbedded = false }) {
           </div>
         </div>
       ) : (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginBottom: 24 }}>
+        <div style={{ 
+          display: 'flex', 
+          flexDirection: 'column', 
+          gap: 10, 
+          marginBottom: 24, 
+          maxHeight: '450px', 
+          overflowY: 'auto', 
+          paddingRight: 6 
+        }}>
           {filteredPending.map(t => {
             const catInfo = CATEGORIES[t.category];
             const urgLabels = { low: 'ต่ำ', medium: 'ปานกลาง', high: 'สูง', critical: 'วิกฤต' };
@@ -824,7 +832,7 @@ export default function ApprovalView({ isEmbedded = false }) {
             </div>
           </div>
         ) : isMobile ? (
-          <div className="mobile-only-cards" style={{ display: 'flex', flexDirection: 'column', gap: 12, padding: '0 0 12px 0' }}>
+          <div className="mobile-only-cards" style={{ display: 'flex', flexDirection: 'column', gap: 12, padding: '0 0 12px 0', maxHeight: '500px', overflowY: 'auto', paddingRight: 4 }}>
             {paginatedHistory.map(t => {
               const catInfo = CATEGORIES[t.category];
               const statusInfo = STATUS_LABEL[t.status] || { label: t.status, cls: 'status-pending' };
@@ -878,7 +886,7 @@ export default function ApprovalView({ isEmbedded = false }) {
             })}
           </div>
         ) : (
-          <div className="table-wrapper">
+          <div className="table-wrapper" style={{ maxHeight: '500px', overflowY: 'auto' }}>
             <table className="responsive-table">
               <thead>
                 <tr>

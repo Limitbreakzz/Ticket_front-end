@@ -2324,7 +2324,8 @@ export default function TicketDetailModal({ ticket, onClose }) {
                               display: 'inline-flex',
                               alignItems: 'center',
                               gap: 6,
-                              whiteSpace: 'nowrap'
+                              whiteSpace: 'nowrap',
+                              marginTop: 14
                             }}
                             onMouseEnter={e => { if (statusUpdating === null) e.currentTarget.style.background = 'var(--primary-light)'; }}
                             onMouseLeave={e => { if (statusUpdating === null) e.currentTarget.style.background = 'var(--primary)'; }}
@@ -2341,7 +2342,7 @@ export default function TicketDetailModal({ ticket, onClose }) {
                         )
                       ) : (
                         <>
-                          <div className="detail-control-assignee-buttons" style={{ display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap', justifyContent: 'flex-end' }}>
+                          <div className="detail-control-assignee-buttons" style={{ display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap', justifyContent: 'flex-end', marginTop: 14 }}>
                             {(detailTicket.assignedTo === currentUser?.name || role === ROLES.ADMIN || role === ROLES.MANAGER) && (
                               <button
                                 onClick={async () => {

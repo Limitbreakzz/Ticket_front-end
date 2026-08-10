@@ -82,7 +82,14 @@ export default function DashboardView() {
   const pendingApprovalsCount = tickets.filter(t => t.status === 'wait-approve' && t.assignedTo && t.assignedTo !== 'รอมอบหมาย').length;
 
   return (
-    <div className="view-container" style={{ maxWidth: 1200, margin: '0 auto', display: 'flex', flexDirection: 'column', gap: 24 }}>
+    <div className="view-container" style={{
+      maxWidth: 1200,
+      margin: '0 auto',
+      display: 'flex',
+      flexDirection: 'column',
+      gap: 24,
+      padding: isMobile ? '12px 12px 36px 12px' : '24px'
+    }}>
 
       {/* ── Hero / Greeting ── */}
       <div className="hero-section" style={{ position: 'relative', overflow: 'hidden' }}>
