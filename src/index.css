@@ -984,7 +984,7 @@ tbody td {
   border-radius: var(--radius-md);
   font-size: 13px;
   color: var(--text-primary);
-  background: var(--bg-main);
+  background: var(--bg-card);
   font-family: inherit;
   transition: var(--transition);
   outline: none;
@@ -995,6 +995,20 @@ tbody td {
   border-color: var(--primary);
   background: var(--bg-card);
   box-shadow: 0 0 0 3px rgba(37,99,235,0.1);
+}
+html.dark .form-input,
+html.dark .form-select,
+html.dark .form-textarea {
+  background-color: #0d1527 !important;
+  border-color: rgba(255, 255, 255, 0.08) !important;
+  color: var(--text-primary) !important;
+}
+html.dark .form-input:focus,
+html.dark .form-select:focus,
+html.dark .form-textarea:focus {
+  background-color: #0d1527 !important;
+  border-color: var(--primary) !important;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.25) !important;
 }
 .form-input::placeholder,
 .form-textarea::placeholder { color: var(--text-muted); }

@@ -197,6 +197,7 @@ export default function TicketFormModal({ onClose }) {
                   value={form.subject}
                   onChange={e => set('subject', e.target.value)}
                   maxLength={100}
+                  style={{ background: isDark ? '#0d1527' : undefined, border: isDark ? '1.5px solid rgba(255, 255, 255, 0.1)' : undefined }}
                 />
                 {errors.subject && (
                   <span className="form-error">
@@ -217,9 +218,10 @@ export default function TicketFormModal({ onClose }) {
                     display: 'grid',
                     gridTemplateColumns: '1fr 1fr',
                     gap: 8,
-                    background: 'var(--bg-main)',
+                    background: isDark ? '#0d1527' : 'var(--bg-main)',
                     padding: 4,
                     borderRadius: 'var(--radius-md)',
+                    border: `1.5px solid ${isDark ? 'rgba(255, 255, 255, 0.1)' : 'var(--border)'}`
                   }}>
                     <button
                       type="button"
@@ -281,7 +283,8 @@ export default function TicketFormModal({ onClose }) {
                         alignItems: 'center', 
                         justifyContent: 'space-between', 
                         cursor: 'pointer',
-                        background: 'var(--bg-main)',
+                        background: isDark ? '#0d1527' : 'var(--bg-main)',
+                        border: isDark ? '1.5px solid rgba(255, 255, 255, 0.1)' : undefined,
                         padding: '9px 12px',
                         minHeight: '38px',
                         userSelect: 'none',
@@ -429,7 +432,8 @@ export default function TicketFormModal({ onClose }) {
                         alignItems: 'center', 
                         justifyContent: 'space-between', 
                         cursor: 'pointer',
-                        background: 'var(--bg-main)',
+                        background: isDark ? '#0d1527' : 'var(--bg-main)',
+                        border: isDark ? '1.5px solid rgba(255, 255, 255, 0.1)' : undefined,
                         padding: '9px 12px',
                         minHeight: '38px',
                         userSelect: 'none',
@@ -584,8 +588,8 @@ export default function TicketFormModal({ onClose }) {
                           gap: 8,
                           padding: '14px 8px',
                           borderRadius: 'var(--radius-lg)',
-                          border: `2px solid ${isActive ? theme.active : (isDark ? 'rgba(255, 255, 255, 0.08)' : theme.border)}`,
-                          background: isActive ? theme.active : (isDark ? '#1e293b' : theme.bg),
+                          border: `2px solid ${isActive ? theme.active : (isDark ? 'rgba(255, 255, 255, 0.1)' : theme.border)}`,
+                          background: isActive ? theme.active : (isDark ? '#172136' : theme.bg),
                           cursor: 'pointer',
                           transition: 'all 0.18s cubic-bezier(0.4,0,0.2,1)',
                           fontFamily: 'inherit',
@@ -603,13 +607,13 @@ export default function TicketFormModal({ onClose }) {
                         }}>
                           <i className={`fa-solid fa-${cat.icon}`} style={{
                               fontSize: 18,
-                              color: isActive ? '#fff' : (isDark ? '#94a3b8' : theme.iconColor),
+                              color: isActive ? '#fff' : (isDark ? theme.iconColor : theme.iconColor),
                             }} aria-hidden="true"></i>
                         </div>
                         <span style={{
                           fontSize: 11,
                           fontWeight: 700,
-                          color: isActive ? '#fff' : (isDark ? 'var(--text-secondary)' : 'var(--text-primary)'),
+                          color: isActive ? '#fff' : 'var(--text-primary)',
                           textAlign: 'center',
                           lineHeight: 1.3,
                         }}>
@@ -686,6 +690,7 @@ export default function TicketFormModal({ onClose }) {
                   value={form.description}
                   onChange={e => set('description', e.target.value)}
                   rows={4}
+                  style={{ background: isDark ? '#0d1527' : undefined, border: isDark ? '1.5px solid rgba(255, 255, 255, 0.1)' : undefined }}
                 />
                 <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: 4 }}>
                   <span style={{ 
@@ -726,8 +731,8 @@ export default function TicketFormModal({ onClose }) {
                           gap: 6,
                           padding: '12px 8px',
                           borderRadius: 'var(--radius-lg)',
-                          border: `2px solid ${isActive ? u.color : 'var(--border)'}`,
-                          background: isActive ? u.color : 'var(--bg-card)',
+                          border: `2px solid ${isActive ? u.color : (isDark ? 'rgba(255, 255, 255, 0.1)' : 'var(--border)')}`,
+                          background: isActive ? u.color : (isDark ? '#172136' : 'var(--bg-card)'),
                           cursor: 'pointer',
                           fontFamily: 'inherit',
                           transition: 'all 0.18s ease',
@@ -754,20 +759,32 @@ export default function TicketFormModal({ onClose }) {
                 )}
               </div>
 
-              {/* ── File Upload (Multi-image up to 5) ── */}
+              {/* ── File Upload (Multi-image grid layout) ── */}
               <div className="form-group">
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
                   <label className="form-label" style={{ margin: 0 }}>
                     <i className="fa-solid fa-paperclip" style={{ marginRight: 6, color: 'var(--primary)' }} aria-hidden="true"></i>
                     แนบรูปภาพประกอบ (ไม่บังคับ)
                   </label>
-                  <span style={{ fontSize: 11.5, fontWeight: 600, color: files.length >= 5 ? 'var(--danger)' : 'var(--text-muted)' }}>
+                  <span style={{ fontSize: 12, fontWeight: 600, color: files.length >= 5 ? 'var(--danger)' : 'var(--text-muted)' }}>
                     {files.length}/5 รูป
                   </span>
                 </div>
 
-                {/* Dropzone */}
-                {files.length < 5 && (
+                {/* Hidden File Input */}
+                <input
+                  ref={fileRef}
+                  type="file"
+                  accept="image/*"
+                  multiple
+                  style={{ display: 'none' }}
+                  onChange={e => handleFiles(e.target.files)}
+                  id="file-input"
+                />
+
+                {/* Conditional rendering for File Attachment */}
+                {files.length === 0 ? (
+                  /* Large Dropzone Area when no files attached yet */
                   <div
                     className={`upload-area${drag ? ' drag-over' : ''}`}
                     onClick={() => fileRef.current?.click()}
@@ -776,13 +793,14 @@ export default function TicketFormModal({ onClose }) {
                     onDrop={e => { e.preventDefault(); setDrag(false); handleFiles(e.dataTransfer.files); }}
                     id="upload-area"
                     style={{
-                      border: `2px dashed ${drag ? 'var(--primary)' : 'var(--border)'}`,
-                      borderRadius: 'var(--radius-lg)',
+                      border: `2px dashed ${drag ? 'var(--primary)' : (isDark ? 'rgba(255, 255, 255, 0.15)' : 'var(--border-strong, #cbd5e1)')}`,
+                      borderRadius: 'var(--radius-lg, 12px)',
                       padding: '24px 16px',
                       textAlign: 'center',
-                      background: drag ? 'var(--primary-pale)' : 'var(--bg-main)',
+                      background: drag ? 'var(--primary-pale)' : (isDark ? '#172136' : '#f8fafc'),
                       cursor: 'pointer',
                       transition: 'all 0.2s ease',
+                      userSelect: 'none',
                     }}
                   >
                     <div className="upload-icon" style={{ marginBottom: 8 }}>
@@ -794,82 +812,142 @@ export default function TicketFormModal({ onClose }) {
                     <div className="upload-hint" style={{ fontSize: 11.5, color: 'var(--text-muted)', marginTop: 4 }}>
                       รองรับเฉพาะไฟล์รูปภาพ (JPG, PNG, GIF, WEBP) สูงสุด 5 รูป (ไม่เกิน 10MB/รูป)
                     </div>
-                    <input
-                      ref={fileRef}
-                      type="file"
-                      accept="image/*"
-                      multiple
-                      style={{ display: 'none' }}
-                      onChange={e => handleFiles(e.target.files)}
-                      id="file-input"
-                    />
                   </div>
-                )}
-
-                {fileErr && (
-                  <span className="form-error" style={{ marginTop: 6 }}>
-                    <i className="fa-solid fa-triangle-exclamation" style={{ marginRight: 4 }} aria-hidden="true"></i>
-                    {fileErr}
-                  </span>
-                )}
-
-                {/* Uploaded files grid list */}
-                {files.length > 0 && (
-                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(100px, 1fr))', gap: 10, marginTop: 12 }}>
-                    {files.map((f, idx) => {
-                      const imgUrl = URL.createObjectURL(f);
-                      return (
-                        <div
-                          key={idx}
-                          style={{
-                            position: 'relative',
-                            borderRadius: 'var(--radius-md)',
-                            overflow: 'hidden',
-                            border: '1px solid var(--border-light)',
-                            aspectRatio: '1',
-                            background: 'var(--bg-main)',
-                            boxShadow: 'var(--shadow-sm)'
-                          }}
-                        >
-                          <img
-                            src={imgUrl}
-                            alt={`preview-${idx}`}
-                            style={{ width: '100%', height: '100%', objectFit: 'cover', cursor: 'pointer' }}
-                            onClick={() => setViewImage(imgUrl)}
-                          />
-                          {/* Remove button */}
-                          <button
-                            type="button"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              removeFile(idx);
-                            }}
-                            title="ลบรูปภาพ"
+                ) : (
+                  /* Grid List Layout once 1 or more files are attached */
+                  <>
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 10 }}>
+                      {files.map((f, idx) => {
+                        const imgUrl = URL.createObjectURL(f);
+                        return (
+                          <div
+                            key={idx}
                             style={{
-                              position: 'absolute', top: 4, right: 4,
-                              background: 'rgba(239, 68, 68, 0.85)', color: '#fff',
-                              border: 'none', borderRadius: '50%',
-                              width: 22, height: 22,
-                              display: 'flex', alignItems: 'center', justifyContent: 'center',
-                              cursor: 'pointer',
-                              zIndex: 10,
-                              fontSize: 10,
-                              boxShadow: '0 2px 4px rgba(0,0,0,0.2)'
+                              position: 'relative',
+                              borderRadius: 'var(--radius-lg, 12px)',
+                              overflow: 'hidden',
+                              border: `1.5px solid ${isDark ? 'rgba(255, 255, 255, 0.12)' : 'var(--border)'}`,
+                              aspectRatio: '1',
+                              background: isDark ? '#172136' : '#f8fafc',
+                              boxShadow: 'var(--shadow-sm)',
                             }}
                           >
-                            <i className="fa-solid fa-xmark" aria-hidden="true"></i>
-                          </button>
+                            <img
+                              src={imgUrl}
+                              alt={`preview-${idx}`}
+                              style={{ width: '100%', height: '100%', objectFit: 'cover', cursor: 'pointer', display: 'block' }}
+                              onClick={() => setViewImage(imgUrl)}
+                            />
+
+                            {/* First image Cover Badge "ปก" */}
+                            {idx === 0 && (
+                              <span style={{
+                                position: 'absolute',
+                                bottom: 6,
+                                left: 6,
+                                background: 'rgba(15, 23, 42, 0.8)',
+                                color: '#ffffff',
+                                fontSize: 10,
+                                fontWeight: 700,
+                                padding: '2px 7px',
+                                borderRadius: '6px',
+                                backdropFilter: 'blur(4px)',
+                                userSelect: 'none',
+                                letterSpacing: '0.3px',
+                                boxShadow: '0 2px 4px rgba(0,0,0,0.25)',
+                              }}>
+                                ปก
+                              </span>
+                            )}
+
+                            {/* Delete Button (Red Circle Badge) */}
+                            <button
+                              type="button"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                removeFile(idx);
+                              }}
+                              title="ลบรูปภาพ"
+                              style={{
+                                position: 'absolute',
+                                top: 6,
+                                right: 6,
+                                background: '#ef4444',
+                                color: '#ffffff',
+                                border: 'none',
+                                borderRadius: '50%',
+                                width: 22,
+                                height: 22,
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                cursor: 'pointer',
+                                zIndex: 10,
+                                fontSize: 10,
+                                boxShadow: '0 2px 6px rgba(0,0,0,0.3)',
+                                transition: 'transform 0.12s ease',
+                              }}
+                              onMouseEnter={e => e.currentTarget.style.transform = 'scale(1.15)'}
+                              onMouseLeave={e => e.currentTarget.style.transform = 'scale(1)'}
+                            >
+                              <i className="fa-solid fa-xmark" aria-hidden="true"></i>
+                            </button>
+                          </div>
+                        );
+                      })}
+
+                      {/* Dashed "+ เพิ่มรูป" Tile */}
+                      {files.length < 5 && (
+                        <div
+                          onClick={() => fileRef.current?.click()}
+                          onDragOver={e => { e.preventDefault(); setDrag(true); }}
+                          onDragLeave={() => setDrag(false)}
+                          onDrop={e => { e.preventDefault(); setDrag(false); handleFiles(e.dataTransfer.files); }}
+                          id="upload-area"
+                          style={{
+                            aspectRatio: '1',
+                            border: `2px dashed ${drag ? 'var(--primary)' : (isDark ? 'rgba(255, 255, 255, 0.18)' : 'var(--border-strong, #cbd5e1)')}`,
+                            borderRadius: 'var(--radius-lg, 12px)',
+                            display: 'flex',
+                            flexDirection: 'column',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            gap: 4,
+                            background: drag ? 'var(--primary-pale)' : (isDark ? '#172136' : '#f8fafc'),
+                            cursor: 'pointer',
+                            transition: 'all 0.18s ease',
+                            userSelect: 'none',
+                          }}
+                          onMouseEnter={e => {
+                            if (!drag) {
+                              e.currentTarget.style.borderColor = 'var(--primary)';
+                              e.currentTarget.style.background = isDark ? '#1e293b' : '#eff6ff';
+                            }
+                          }}
+                          onMouseLeave={e => {
+                            if (!drag) {
+                              e.currentTarget.style.borderColor = isDark ? 'rgba(255, 255, 255, 0.18)' : 'var(--border-strong, #cbd5e1)';
+                              e.currentTarget.style.background = isDark ? '#172136' : '#f8fafc';
+                            }
+                          }}
+                        >
+                          <i className="fa-solid fa-plus" style={{ fontSize: 20, color: 'var(--text-muted)' }} aria-hidden="true"></i>
+                          <span style={{ fontSize: 12, fontWeight: 600, color: 'var(--text-muted)' }}>เพิ่มรูป</span>
                         </div>
-                      );
-                    })}
-                  </div>
+                      )}
+                    </div>
+
+                    <div style={{ fontSize: 11.5, color: 'var(--text-muted)', marginTop: 8 }}>
+                      รองรับ JPG, PNG, GIF, WEBP สูงสุด 5 รูป (ไม่เกิน 10MB/รูป)
+                    </div>
+                  </>
                 )}
               </div>
 
               {/* Creator info */}
               <div style={{
-                background: 'var(--primary-bg)',
-                border: '1px solid var(--border-light)',
+                background: isDark ? '#172136' : 'var(--primary-bg)',
+                border: `1px solid ${isDark ? 'rgba(255, 255, 255, 0.1)' : 'var(--border-light)'}`,
                 borderRadius: 'var(--radius-md)',
                 padding: '10px 14px',
                 display: 'flex',
