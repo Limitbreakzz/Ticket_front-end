@@ -34,7 +34,6 @@ import PageTransition from './components/PageTransition';
 import { renderTextWithIcons } from './utils/render';
 
 import ToastNotification from './components/ToastNotification';
-import PullToRefresh from './components/PullToRefresh';
 import './index.css';
 
 
@@ -527,14 +526,12 @@ function MainContent() {
     <>
       <Topbar onCreateTicket={() => setShowCreateModal(true)} />
       <main className="page-content">
-        <PullToRefresh>
           <AnimatePresence mode="wait">
             <PageTransition key={activeNav}>
               {renderView()}
             </PageTransition>
           </AnimatePresence>
           {activeTicketId && <TicketDetailModal ticket={{ id: activeTicketId }} onClose={closeTicketDetail} />}
-        </PullToRefresh>
       </main>
       {showCreateModal && <TicketFormModal onClose={() => setShowCreateModal(false)} />}
     </>

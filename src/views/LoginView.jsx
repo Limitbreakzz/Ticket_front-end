@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useApp } from '../context/AppContext';
+import { motion, AnimatePresence } from 'framer-motion';
 
 export default function LoginView() {
   const { loginUser } = useApp();
@@ -384,20 +385,34 @@ export default function LoginView() {
                     onFocus={e => { e.target.style.borderColor = 'var(--primary, #3b82f6)'; e.target.style.boxShadow = '0 0 0 3px rgba(59,130,246,0.12)'; }}
                     onBlur={e => { e.target.style.borderColor = 'var(--border-light, #cbd5e1)'; e.target.style.boxShadow = 'none'; }}
                   />
-                  <button
-                    type="button"
+                  <div
+                    role="button"
                     onClick={() => setShowPw(p => !p)}
                     style={{
                       position: 'absolute', right: 12, top: '50%', transform: 'translateY(-50%)',
                       background: 'none', border: 'none', cursor: 'pointer',
                       color: 'var(--text-muted, #94a3b8)', fontSize: 13, padding: 4, zIndex: 10,
                       display: 'flex', alignItems: 'center', justifyContent: 'center',
-                      transition: 'color 0.15s'
+                      transition: 'color 0.15s',
+                      userSelect: 'none',
                     }}
                     aria-label={showPw ? 'ซ่อนรหัสผ่าน' : 'แสดงรหัสผ่าน'}
                   >
-                    <i className={`fa-solid fa-eye${showPw ? '-slash' : ''}`} />
-                  </button>
+                    <AnimatePresence mode="wait" initial={false}>
+                      <motion.span
+                        key={showPw ? 'visible' : 'hidden'}
+                        initial={{ opacity: 0, scale: 0.6 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        exit={{ opacity: 0, scale: 0.6 }}
+                        whileHover={{ scale: 1.15 }}
+                        whileTap={{ scale: 0.9 }}
+                        transition={{ duration: 0.12 }}
+                        style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}
+                      >
+                        <i className={`fa-solid fa-eye${showPw ? '-slash' : ''}`} />
+                      </motion.span>
+                    </AnimatePresence>
+                  </div>
                 </div>
               </div>
 
