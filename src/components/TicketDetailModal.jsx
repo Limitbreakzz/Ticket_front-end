@@ -4,6 +4,7 @@ import { useApp } from '../context/AppContext';
 import { CATEGORIES, ROLES } from '../data/mockData';
 import { SLADetail } from './SLAComponents';
 import * as api from '../utils/api';
+import { getSocket } from '../utils/socket';
 import { renderTextWithIcons } from '../utils/render';
 
 const URGENCY_INFO = {
@@ -560,23 +561,95 @@ export default function TicketDetailModal({ ticket, onClose }) {
     /* eslint-disable-next-line react-hooks/exhaustive-deps */
   }, [ticket.id]);
 
-  // Background polling for ticket detail updates (refresh chat/comments every 5 seconds)
+  // Real-time WebSocket listener & background polling for ticket detail updates
   useEffect(() => {
     let active = true;
-    const interval = setInterval(() => {
+
+    const fetchLatestDetails = () => {
       if (active && document.visibilityState === 'visible') {
-        api.getTicketDetail(ticket.id)
+        api.getTicketDetail(ticket.id, true)
           .then(details => {
             if (active) {
               setDetailTicket(details);
             }
           })
-          .catch(err => console.error("Error polling ticket details:", err));
+          .catch(err => console.error("Error fetching ticket details on WS event:", err));
       }
+    };
+
+    let cleanupWs = null;
+
+    // Listen to WebSocket events for real-time instant chat updates
+    const socket = getSocket();
+    if (socket) {
+      // Emit join room for real-time ticket events
+      socket.emit('joinRoom', `ticket:${ticket.id}`);
+
+      const handleCommentEvent = (data) => {
+        const payload = data?.payload || data;
+        
+        // If event specifies ticketId, verify it matches
+        const eventTicketId = payload?.ticketId || payload?.ticket?.id || data?.ticketId;
+        if (!eventTicketId || String(eventTicketId) === String(ticket.id)) {
+          // If payload contains the new comment directly, append immediately to avoid API network latency delay
+          if (payload && payload.id && payload.message) {
+            setDetailTicket((prev) => {
+              if (!prev) return prev;
+              const existingComments = prev.comments || [];
+              if (existingComments.some(c => c.id === payload.id)) return prev;
+              
+              const newCommentObj = {
+                id: payload.id,
+                message: payload.message,
+                user: payload.user || { name: payload.userName || 'Unknown' },
+                createdAt: payload.createdAt || new Date().toISOString(),
+                attachmentUrl: payload.attachmentUrl || null,
+              };
+
+              const updatedComments = [...existingComments, newCommentObj];
+              return {
+                ...prev,
+                comments: updatedComments,
+                timeline: [...(prev.timeline || []), {
+                  id: payload.id,
+                  event: payload.message,
+                  actor: payload.user?.name || 'Unknown',
+                  time: 'เมื่อสักครู่',
+                  icon: 'comment',
+                  attachmentUrl: payload.attachmentUrl || null
+                }]
+              };
+            });
+          }
+          // Fetch complete ticket details in background to sync all fields (status, SLA, etc.)
+          fetchLatestDetails();
+        }
+      };
+
+      socket.on('comment:created', handleCommentEvent);
+      socket.on('comment:updated', handleCommentEvent);
+      socket.on('comment:deleted', handleCommentEvent);
+      socket.on('ticket:updated', handleCommentEvent);
+
+      // Cleanup WS listeners on unmount
+      cleanupWs = () => {
+        socket.emit('leaveRoom', `ticket:${ticket.id}`);
+        socket.off('comment:created', handleCommentEvent);
+        socket.off('comment:updated', handleCommentEvent);
+        socket.off('comment:deleted', handleCommentEvent);
+        socket.off('ticket:updated', handleCommentEvent);
+      };
+    }
+
+    // Fallback background polling (refresh every 5 seconds)
+    const interval = setInterval(() => {
+      fetchLatestDetails();
     }, 5000);
+
     return () => {
       active = false;
       clearInterval(interval);
+      if (cleanupWs) cleanupWs();
     };
   }, [ticket.id]);
 

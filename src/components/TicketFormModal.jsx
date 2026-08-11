@@ -55,17 +55,10 @@ export default function TicketFormModal({ onClose }) {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  const userDeptName = 
-    currentUser?.department?.name || 
-    currentUser?.departmentName || 
-    (typeof currentUser?.department === 'string' ? currentUser.department : null) || 
-    currentUser?.dept?.name ||
-    (typeof currentUser?.dept === 'string' ? currentUser.dept : null) ||
-    currentUser?.departmentCode ||
-    currentUser?.deptName || null;
+  const userDeptName = currentUser?.department?.name || currentUser?.departmentName || (typeof currentUser?.department === 'string' ? currentUser.department : null) || currentUser?.departmentCode;
 
   const filteredDepts = (depts || [])
-    .filter(dept => !userDeptName || dept.trim().toLowerCase() !== userDeptName.trim().toLowerCase())
+    .filter(dept => !userDeptName || dept.toLowerCase() !== userDeptName.toLowerCase())
     .filter(dept => dept.toLowerCase().includes(deptSearch.toLowerCase()));
 
   const selectDepartment = (dept) => {
@@ -101,9 +94,10 @@ export default function TicketFormModal({ onClose }) {
     if (!form.category)           e.category  = 'กรุณาเลือกหมวดหมู่';
     if (!form.urgency)            e.urgency   = 'กรุณาเลือกระดับความเร่งด่วน';
     if (form.sendType === 'dept') {
-      if (!form.department)       e.department = 'กรุณาเลือกแผนก / ฝ่าย';
-      else if (userDeptName && form.department.trim().toLowerCase() === userDeptName.trim().toLowerCase()) {
-        e.department = 'ไม่สามารถแจ้ง Ticket ไปยังแผนกของตนเองได้';
+      if (!form.department) {
+        e.department = 'กรุณาเลือกแผนก / ฝ่าย';
+      } else if (userDeptName && form.department.toLowerCase() === userDeptName.toLowerCase()) {
+        e.department = 'ไม่สามารถส่ง Ticket แจ้งปัญหาไปยังแผนกของตนเองได้';
       }
     } else {
       if (!form.receiverManagerId) e.receiverManagerId = 'กรุณาเลือกหัวหน้างาน / Manager';
