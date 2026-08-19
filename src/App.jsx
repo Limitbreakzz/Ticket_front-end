@@ -157,17 +157,6 @@ function Topbar({ onCreateTicket }) {
       </div>
 
       <div className="topbar-actions">
-        {/* Create Ticket btn */}
-        {(role === ROLES.EMPLOYEE || role === ROLES.MANAGER || role === ROLES.ADMIN) && (
-          <button
-            className="btn btn-primary topbar-create-btn"
-            onClick={onCreateTicket}
-            id="topbar-create-btn"
-          >
-            <i className="fa-solid fa-ticket" style={{marginRight: 6}}></i> สร้าง Ticket
-          </button>
-        )}
-
         {/* Notifications */}
         <div style={{ position: 'relative' }}>
           <button 
