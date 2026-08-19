@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { useApp } from '../context/AppContext';
 import { ROLE_INFO, ROLES } from '../data/mockData';
 import * as api from '../utils/api';
@@ -490,18 +491,9 @@ export default function ProfileView() {
       </form>
 
       {/* ── Image Cropping Modal (Drag & Zoom) ── */}
-      {cropSrc && (
-        <div style={{
-          position: 'fixed',
-          inset: 0,
-          background: 'rgba(15, 23, 42, 0.75)',
-          backdropFilter: 'blur(8px)',
-          WebkitBackdropFilter: 'blur(8px)',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
+      {cropSrc && createPortal(
+        <div className="modal-overlay" style={{
           zIndex: 11000,
-          padding: '16px',
           fontFamily: "inherit"
         }}>
           <div style={{
@@ -655,7 +647,8 @@ export default function ProfileView() {
               </button>
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </div>
   );
