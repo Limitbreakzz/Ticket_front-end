@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
+import { createPortal } from 'react-dom';
 import { useApp } from '../context/AppContext';
 import { DEPARTMENTS } from '../data/mockData';
 import * as api from '../utils/api';
@@ -822,7 +823,7 @@ export default function SettingsView({ defaultActiveTab }) {
             </div>
 
             {/* Edit Webhook form Modal */}
-            {editingWebhook && (
+            {editingWebhook && createPortal(
               <div className="modal-overlay" onClick={e => e.target === e.currentTarget && setEditingWebhook(null)} style={{ zIndex: 2100 }}>
                 <div className="modal" role="dialog" aria-modal="true" style={{ maxWidth: 480, display: 'flex', flexDirection: 'column', overflow: isMobile ? 'hidden' : 'visible' }}>
                   <div className="modal-header">
@@ -948,11 +949,12 @@ export default function SettingsView({ defaultActiveTab }) {
                     </div>
                   </form>
                 </div>
-              </div>
+              </div>,
+              document.body
             )}
 
             {/* Add Webhook form Modal */}
-            {showAddForm && (
+            {showAddForm && createPortal(
               <div className="modal-overlay" onClick={e => e.target === e.currentTarget && setShowAddForm(false)} style={{ zIndex: 2100 }}>
                 <div className="modal" role="dialog" aria-modal="true" style={{ maxWidth: 480, display: 'flex', flexDirection: 'column', overflow: isMobile ? 'hidden' : 'visible' }}>
                   <div className="modal-header">
@@ -1078,7 +1080,8 @@ export default function SettingsView({ defaultActiveTab }) {
                     </div>
                   </form>
                 </div>
-              </div>
+              </div>,
+              document.body
             )}
 
             </div>
