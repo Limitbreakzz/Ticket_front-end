@@ -12,8 +12,15 @@ export const getToken = () => localStorage.getItem('jwt_token');
 export const setToken = (token) => localStorage.setItem('jwt_token', token);
 export const removeToken = () => localStorage.removeItem('jwt_token');
 
+export function resolveAvatarUrl(url) {
+  if (!url) return '/profile.jpg';
+  if (url === '/profile.jpg') return '/profile.jpg';
+  return resolveImageUrl(url) || '/profile.jpg';
+}
+
 export function resolveImageUrl(url) {
   if (!url) return null;
+  if (url === '/profile.jpg') return '/profile.jpg';
   if (typeof url === 'string' && url.includes(',')) {
     return url.split(',').map(s => resolveImageUrl(s.trim())).filter(Boolean);
   }
@@ -201,8 +208,8 @@ export async function login(username, password) {
   if (res.data && res.data.token) {
     setToken(res.data.token);
   }
-  if (res.data && res.data.avatarUrl) {
-    res.data.avatarUrl = resolveImageUrl(res.data.avatarUrl);
+  if (res.data) {
+    res.data.avatarUrl = resolveAvatarUrl(res.data.avatarUrl);
   }
   return res.data;
 }
@@ -216,8 +223,8 @@ export async function logout() {
 
 export async function getMe() {
   const res = await apiFetch('/auth/me');
-  if (res.data && res.data.avatarUrl) {
-    res.data.avatarUrl = resolveImageUrl(res.data.avatarUrl);
+  if (res.data) {
+    res.data.avatarUrl = resolveAvatarUrl(res.data.avatarUrl);
   }
   return res.data;
 }
@@ -287,7 +294,7 @@ export function mapTicketBEtoFE(tk, comments) {
       id: c.id,
       event: c.message,
       actor: isSystem ? 'System' : (c.user ? c.user.name : 'Unknown'),
-      actorAvatar: isSystem ? null : (c.user ? resolveImageUrl(c.user.avatarUrl) : null),
+      actorAvatar: isSystem ? null : resolveAvatarUrl(c.user?.avatarUrl),
       time: formatThaiDateTime(c.createdAt),
       icon,
       attachmentUrl: resolveImageUrl(c.attachmentUrl),
@@ -306,9 +313,9 @@ export function mapTicketBEtoFE(tk, comments) {
     urgency: URGENCY_BE_TO_FE[tk.priority] || 'medium',
     status: STATUS_BE_TO_FE[tk.status] || 'pending',
     assignedTo: tk.agent ? tk.agent.name : 'รอมอบหมาย',
-    agentAvatar: tk.agent ? resolveImageUrl(tk.agent.avatarUrl) : null,
+    agentAvatar: tk.agent ? resolveAvatarUrl(tk.agent.avatarUrl) : null,
     createdBy: tk.user ? tk.user.name : 'ไม่ระบุ',
-    creatorAvatar: tk.user ? resolveImageUrl(tk.user.avatarUrl) : null,
+    creatorAvatar: tk.user ? resolveAvatarUrl(tk.user.avatarUrl) : '/profile.jpg',
     department: tk.sourceDepartment ? tk.sourceDepartment.name : 'ไม่ระบุ',
     createdAt: formatThaiDateTime(tk.createdAt),
     updatedAt: formatThaiDateTime(tk.updatedAt),
@@ -327,7 +334,7 @@ export function mapTicketBEtoFE(tk, comments) {
       id: tk.receiverManager.id,
       name: tk.receiverManager.name,
       email: tk.receiverManager.email,
-      avatarUrl: resolveImageUrl(tk.receiverManager.avatarUrl),
+      avatarUrl: resolveAvatarUrl(tk.receiverManager.avatarUrl),
     } : null,
   };
 }
@@ -419,7 +426,7 @@ export async function getTicketChatUpdates(id) {
       id: c.id,
       event: c.message,
       actor: isSystem ? 'System' : (c.user ? c.user.name : 'Unknown'),
-      actorAvatar: isSystem ? null : (c.user ? resolveImageUrl(c.user.avatarUrl) : null),
+      actorAvatar: isSystem ? null : resolveAvatarUrl(c.user?.avatarUrl),
       time: formatThaiDateTime(c.createdAt),
       icon,
       attachmentUrl: resolveImageUrl(c.attachmentUrl),
@@ -436,7 +443,7 @@ export async function getTicketChatUpdates(id) {
   return {
     status: STATUS_BE_TO_FE[status] || 'pending',
     assignedTo: agent ? agent.name : 'รอมอบหมาย',
-    agentAvatar: agent ? resolveImageUrl(agent.avatarUrl) : null,
+    agentAvatar: agent ? resolveAvatarUrl(agent.avatarUrl) : null,
     targetDepartment: targetDepartment ? targetDepartment.name : '',
     managerApproval,
     comments: commentsArray,
@@ -658,8 +665,8 @@ export async function updateMe(payload) {
     method: 'PATCH',
     body: payload,
   });
-  if (res.data && res.data.avatarUrl) {
-    res.data.avatarUrl = resolveImageUrl(res.data.avatarUrl);
+  if (res.data) {
+    res.data.avatarUrl = resolveAvatarUrl(res.data.avatarUrl);
   }
   return res.data;
 }

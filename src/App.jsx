@@ -348,12 +348,21 @@ function Topbar({ onCreateTicket }) {
         <CommandMenu
           title={currentUser?.name || info.name}
           avatar={
-            <div className="topbar-profile-avatar-container" style={{ background: currentUser?.avatarUrl ? 'transparent' : info.color, margin: '2px' }}>
-              {currentUser?.avatarUrl ? (
-                <img src={currentUser.avatarUrl} alt="avatar" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-              ) : (
-                currentUser?.name ? currentUser.name.trim().charAt(0).toUpperCase() : info.initials
-              )}
+            <div className="topbar-profile-avatar-container" style={{ margin: '2px', background: 'transparent' }}>
+              <img 
+                src={currentUser?.avatarUrl || '/profile.jpg'} 
+                alt="avatar" 
+                style={{ width: '100%', height: '100%', objectFit: 'cover' }} 
+                onError={(e) => {
+                  e.currentTarget.style.display = 'none';
+                  if (e.currentTarget.nextSibling) {
+                    e.currentTarget.nextSibling.style.display = 'flex';
+                  }
+                }}
+              />
+              <span style={{ display: 'none', width: '100%', height: '100%', alignItems: 'center', justifyContent: 'center', background: info.color, color: '#fff' }}>
+                {currentUser?.name ? currentUser.name.trim().charAt(0).toUpperCase() : info.initials}
+              </span>
             </div>
           }
           badges={

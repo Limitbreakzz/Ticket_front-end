@@ -23,6 +23,7 @@ function CommentAvatar({ actor, actorAvatar, isMe }) {
   }, [actorAvatar]);
 
   const initials = actor ? actor.trim().charAt(0).toUpperCase() : 'U';
+  const avatarSrc = actorAvatar || '/profile.jpg';
 
   return (
     <div style={{
@@ -35,9 +36,9 @@ function CommentAvatar({ actor, actorAvatar, isMe }) {
       boxShadow: isMe ? 'var(--shadow-sm)' : 'none',
       overflow: 'hidden'
     }}>
-      {actorAvatar && !imageError ? (
+      {!imageError ? (
         <img 
-          src={actorAvatar} 
+          src={avatarSrc} 
           alt="avatar" 
           style={{ width: '100%', height: '100%', objectFit: 'cover' }} 
           onError={() => setImageError(true)}
@@ -58,30 +59,30 @@ function UserAvatar({ name, avatarUrl, size = 32, defaultBg = 'var(--primary)' }
   }, [avatarUrl]);
 
   const initials = name ? name.trim().charAt(0).toUpperCase() : 'U';
+  const isUnassigned = !name || name === 'รอมอบหมาย';
+  const avatarSrc = avatarUrl || '/profile.jpg';
 
   return (
     <div style={{
       width: size, height: size, borderRadius: '50%',
-      background: (!name || name === 'รอมอบหมาย') ? 'var(--bg-main)' : defaultBg,
-      color: (!name || name === 'รอมอบหมาย') ? 'var(--text-muted)' : '#fff',
+      background: isUnassigned ? 'var(--bg-main)' : defaultBg,
+      color: isUnassigned ? 'var(--text-muted)' : '#fff',
       display: 'flex', alignItems: 'center', justifyContent: 'center',
       fontWeight: 800, fontSize: size * 0.375, border: '1px solid var(--border-light)',
       overflow: 'hidden',
       flexShrink: 0
     }}>
-      {name && name !== 'รอมอบหมาย' && avatarUrl && !imageError ? (
+      {!isUnassigned && !imageError ? (
         <img 
-          src={avatarUrl} 
+          src={avatarSrc} 
           alt="avatar" 
           style={{ width: '100%', height: '100%', objectFit: 'cover' }} 
           onError={() => setImageError(true)}
         />
+      ) : isUnassigned ? (
+        <i className="fa-solid fa-hourglass-half" style={{ fontSize: size * 0.34 }}></i>
       ) : (
-        (!name || name === 'รอมอบหมาย') ? (
-          <i className="fa-solid fa-hourglass-half" style={{ fontSize: size * 0.34 }}></i>
-        ) : (
-          initials
-        )
+        initials
       )}
     </div>
   );

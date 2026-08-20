@@ -31,8 +31,8 @@ export default function ProfileView() {
     if (currentUser) {
       Promise.resolve().then(() => {
         setName(currentUser.name || '');
-        setAvatarUrl(currentUser.avatarUrl || '');
-        setAvatarPreview(currentUser.avatarUrl || '');
+        setAvatarUrl(currentUser.avatarUrl || '/profile.jpg');
+        setAvatarPreview(currentUser.avatarUrl || '/profile.jpg');
       });
     }
   }, [currentUser]);
@@ -245,21 +245,12 @@ export default function ProfileView() {
           }}
           title="คลิกเพื่อเปลี่ยนรูปภาพ"
         >
-          {avatarPreview ? (
-            <img 
-              src={avatarPreview} 
-              alt="Avatar" 
-              style={{ width: '100%', height: '100%', objectFit: 'cover' }} 
-            />
-          ) : (
-            <div style={{
-              fontSize: '32px',
-              fontWeight: 800,
-              color: info?.color || 'var(--primary)'
-            }}>
-              {currentUser?.name ? currentUser.name.charAt(0).toUpperCase() : 'U'}
-            </div>
-          )}
+          <img 
+            src={avatarPreview || '/profile.jpg'} 
+            alt="Avatar" 
+            style={{ width: '100%', height: '100%', objectFit: 'cover' }} 
+            onError={(e) => { e.currentTarget.src = '/profile.jpg'; }}
+          />
 
           {/* Hover Overlay Camera Icon */}
           <div style={{

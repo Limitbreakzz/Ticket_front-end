@@ -11,13 +11,14 @@ function DashboardAvatar({ name, avatarUrl }) {
   }, [avatarUrl]);
 
   const initials = name ? name.trim().charAt(0).toUpperCase() : 'U';
+  const avatarSrc = avatarUrl || '/profile.jpg';
 
   return (
     <div style={{
       width: 18,
       height: 18,
       borderRadius: '50%',
-      background: (avatarUrl && !imageError) ? 'transparent' : 'var(--primary)',
+      background: !imageError ? 'transparent' : 'var(--primary)',
       color: '#fff',
       display: 'flex',
       alignItems: 'center',
@@ -27,9 +28,9 @@ function DashboardAvatar({ name, avatarUrl }) {
       overflow: 'hidden',
       flexShrink: 0
     }}>
-      {avatarUrl && !imageError ? (
+      {!imageError ? (
         <img 
-          src={avatarUrl} 
+          src={avatarSrc} 
           alt="avatar" 
           style={{ width: '100%', height: '100%', objectFit: 'cover' }} 
           onError={() => setImageError(true)}

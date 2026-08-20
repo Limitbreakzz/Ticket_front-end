@@ -79,36 +79,36 @@ function TableAvatar({ name, avatarUrl }) {
   }, [avatarUrl]);
 
   const initials = name ? name.trim().charAt(0).toUpperCase() : 'U';
+  const isUnassigned = !name || name === 'รอมอบหมาย';
+  const avatarSrc = avatarUrl || '/profile.jpg';
 
   return (
     <div style={{
       width: 26,
       height: 26,
       borderRadius: '50%',
-      background: (!name || name === 'รอมอบหมาย') ? 'var(--bg-main)' : 'var(--primary)',
-      color: (!name || name === 'รอมอบหมาย') ? 'var(--text-muted)' : '#fff',
+      background: isUnassigned ? 'var(--bg-main)' : 'var(--primary)',
+      color: isUnassigned ? 'var(--text-muted)' : '#fff',
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'center',
-      fontSize: (!name || name === 'รอมอบหมาย') ? 11 : 10,
+      fontSize: isUnassigned ? 11 : 10,
       fontWeight: 800,
       border: '1px solid var(--border-light)',
       flexShrink: 0,
       overflow: 'hidden'
     }}>
-      {name && name !== 'รอมอบหมาย' && avatarUrl && !imageError ? (
+      {!isUnassigned && !imageError ? (
         <img 
-          src={avatarUrl} 
+          src={avatarSrc} 
           alt="avatar" 
           style={{ width: '100%', height: '100%', objectFit: 'cover' }} 
           onError={() => setImageError(true)}
         />
+      ) : isUnassigned ? (
+        <i className="fa-solid fa-hourglass-half" aria-hidden="true"></i>
       ) : (
-        (!name || name === 'รอมอบหมาย') ? (
-          <i className="fa-solid fa-hourglass-half" aria-hidden="true"></i>
-        ) : (
-          initials
-        )
+        initials
       )}
     </div>
   );

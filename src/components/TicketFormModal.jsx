@@ -964,28 +964,27 @@ export default function TicketFormModal({ onClose }) {
                 <div style={{
                   width: 34, height: 34,
                   borderRadius: '50%',
-                  background: currentUser?.avatarUrl ? 'transparent' : 'var(--primary)',
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
                   overflow: 'hidden',
                   flexShrink: 0,
                   fontSize: 13,
                   fontWeight: 700,
                   color: '#fff',
+                  border: '1px solid var(--border-light)'
                 }}>
-                  {currentUser?.avatarUrl ? (
-                    <img
-                      src={currentUser.avatarUrl}
-                      alt="avatar"
-                      style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                      onError={e => { e.currentTarget.style.display = 'none'; e.currentTarget.nextSibling.style.display = 'flex'; }}
-                    />
-                  ) : null}
+                  <img
+                    src={currentUser?.avatarUrl || '/profile.jpg'}
+                    alt="avatar"
+                    style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                    onError={e => { e.currentTarget.style.display = 'none'; e.currentTarget.nextSibling.style.display = 'flex'; }}
+                  />
                   <span style={{
-                    display: currentUser?.avatarUrl ? 'none' : 'flex',
+                    display: 'none',
                     alignItems: 'center',
                     justifyContent: 'center',
                     width: '100%',
                     height: '100%',
+                    background: 'var(--primary)',
                   }}>
                     {currentUser?.name ? currentUser.name.trim().charAt(0).toUpperCase() : <i className="fa-solid fa-user" style={{ fontSize: 14 }} aria-hidden="true"></i>}
                   </span>
