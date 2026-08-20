@@ -716,18 +716,8 @@ export default function TicketDetailModal({ ticket, onClose }) {
   const canControl = 
     !['rejected', 'cancelled', 'resolved', 'closed'].includes(detailTicket.status?.toLowerCase()) &&
     (role !== ROLES.EMPLOYEE || isTargetDeptStaff) && 
-    (!isOwner || role === ROLES.ADMIN) && (
-      role === ROLES.ADMIN || 
-      isMyCase ||
-      (role === ROLES.MANAGER && (
-        !detailTicket.targetDepartment || 
-        isTargetDeptStaff
-      )) ||
-      (!isAssigned && (
-        role === ROLES.ADMIN ||
-        isTargetDeptStaff
-      ))
-    );
+    (!isOwner || role === ROLES.ADMIN) && 
+    isMyCase;
 
   const canClaim = 
     !['rejected', 'cancelled', 'resolved', 'closed'].includes(detailTicket.status?.toLowerCase()) &&
@@ -1152,7 +1142,9 @@ export default function TicketDetailModal({ ticket, onClose }) {
               <i className="fa-solid fa-xmark"></i>
             </button>
           </div>
-        </div>        {/* 2. Middle Section Grid: Info vs Chat */}
+        </div>
+
+        {/* 2. Middle Section Grid: Info vs Chat */}
         {initialLoading || reloading || statusUpdating ? (
           <DetailSkeleton />
         ) : (
@@ -2194,143 +2186,145 @@ export default function TicketDetailModal({ ticket, onClose }) {
                     gap: 16,
                     alignItems: 'stretch'
                   }}>
-                    {/* Top Section: Action Buttons */}
-                    <div className="detail-control-buttons-wrapper" style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-                      <span style={{ fontSize: 11, color: 'var(--text-muted)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                        จัดการสถานะ {!canControl ? `(เฝ้าดูอย่างเดียว — เคสนี้${detailTicket.assignedTo && detailTicket.assignedTo !== 'รอมอบหมาย' ? `เป็นของ${detailTicket.assignedTo}` : 'ยังไม่มีผู้รับผิดชอบ'})` : `(สำหรับคุณ — ${currentUser?.name})`}
-                      </span>
-                      
-                      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
-                        {((!detailTicket.assignedTo || detailTicket.assignedTo === 'รอมอบหมาย') && canClaim) ? (
-                          <span style={{ fontSize: 13, color: 'var(--danger)', fontStyle: 'italic', fontWeight: 600, display: 'flex', alignItems: 'center', gap: 6 }}>
-                            <i className="fa-solid fa-circle-exclamation"></i> กรุณากดปุ่ม "รับผิดชอบงานนี้" ก่อนเพื่อจัดการสถานะตั๋ว
-                          </span>
-                        ) : (
-                          <>
-                            {[
-                              { statusVal: 'progress', label: 'เริ่มดำเนินการ', icon: 'fa-play', color: '#2563eb', bg: 'rgba(37,99,235,0.06)' },
-                              { statusVal: 'wait-approve', label: 'ขออนุมัติ', icon: 'fa-hourglass-half', color: '#8b5cf6', bg: 'rgba(139,92,246,0.06)' },
-                              { statusVal: 'wait-parts', label: 'รออะไหล่', icon: 'fa-wrench', color: '#b45309', bg: 'rgba(245,158,11,0.06)' },
-                              { statusVal: 'resolved', label: 'แก้ไขแล้ว', icon: 'fa-circle-check', color: '#10b981', bg: 'rgba(16,185,129,0.06)' },
-                            ].filter(btn => {
-                              // Managers and Admins do not need to request approval (wait-approve)
-                              if (btn.statusVal === 'wait-approve' && (role === ROLES.MANAGER || role === ROLES.ADMIN)) {
-                                return false;
-                              }
-                              return true;
-                            }).map((btn) => {
-                              const isCurrent = detailTicket.status === btn.statusVal;
-                              const isUpdating = statusUpdating === btn.statusVal;
-                              const isDisabled = !canControl || isCurrent || ['resolved', 'closed'].includes(detailTicket.status) || statusUpdating !== null;
+                    {/* Top Section: Action Buttons - only shown if unassigned (shows notice) or assigned to ME */}
+                    {(!isAssigned || isMyCase) && (
+                      <div className="detail-control-buttons-wrapper" style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                        <span style={{ fontSize: 11, color: 'var(--text-muted)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                          จัดการสถานะ (สำหรับคุณ — {currentUser?.name})
+                        </span>
+                        
+                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+                          {(!isAssigned && canClaim) ? (
+                            <span style={{ fontSize: 13, color: 'var(--danger)', fontStyle: 'italic', fontWeight: 600, display: 'flex', alignItems: 'center', gap: 6 }}>
+                              <i className="fa-solid fa-circle-exclamation"></i> กรุณากดปุ่ม "รับผิดชอบงานนี้" ก่อนเพื่อจัดการสถานะตั๋ว
+                            </span>
+                          ) : (
+                            <>
+                              {[
+                                { statusVal: 'progress', label: 'เริ่มดำเนินการ', icon: 'fa-play', color: '#2563eb', bg: 'rgba(37,99,235,0.06)' },
+                                { statusVal: 'wait-approve', label: 'ขออนุมัติ', icon: 'fa-hourglass-half', color: '#8b5cf6', bg: 'rgba(139,92,246,0.06)' },
+                                { statusVal: 'wait-parts', label: 'รออะไหล่', icon: 'fa-wrench', color: '#b45309', bg: 'rgba(245,158,11,0.06)' },
+                                { statusVal: 'resolved', label: 'แก้ไขแล้ว', icon: 'fa-circle-check', color: '#10b981', bg: 'rgba(16,185,129,0.06)' },
+                              ].filter(btn => {
+                                // Managers and Admins do not need to request approval (wait-approve)
+                                if (btn.statusVal === 'wait-approve' && (role === ROLES.MANAGER || role === ROLES.ADMIN)) {
+                                  return false;
+                                }
+                                return true;
+                              }).map((btn) => {
+                                const isCurrent = detailTicket.status === btn.statusVal;
+                                const isUpdating = statusUpdating === btn.statusVal;
+                                const isDisabled = !canControl || isCurrent || ['resolved', 'closed'].includes(detailTicket.status) || statusUpdating !== null;
 
-                              let btnBg = 'transparent';
-                              let btnColor = isDisabled ? 'var(--text-muted)' : 'var(--text-secondary)';
-                              let btnBorder = `1.5px solid ${isDisabled ? 'var(--border-light)' : 'var(--border-strong)'}`;
-                              let btnShadow = 'none';
-                              let btnOpacity = isDisabled ? 0.4 : 1;
+                                let btnBg = 'transparent';
+                                let btnColor = isDisabled ? 'var(--text-muted)' : 'var(--text-secondary)';
+                                let btnBorder = `1.5px solid ${isDisabled ? 'var(--border-light)' : 'var(--border-strong)'}`;
+                                let btnShadow = 'none';
+                                let btnOpacity = isDisabled ? 0.4 : 1;
 
-                              if (isCurrent) {
-                                btnBg = btn.color;
-                                btnColor = '#ffffff';
-                                btnBorder = `1.5px solid ${btn.color}`;
-                                btnShadow = `0 4px 12px ${btn.color}40`;
-                                btnOpacity = 1;
-                              } else if (isUpdating) {
-                                btnBg = btn.bg;
-                                btnColor = btn.color;
-                                btnBorder = `1.5px solid ${btn.color}`;
-                                btnOpacity = 1;
-                              }
+                                if (isCurrent) {
+                                  btnBg = btn.color;
+                                  btnColor = '#ffffff';
+                                  btnBorder = `1.5px solid ${btn.color}`;
+                                  btnShadow = `0 4px 12px ${btn.color}40`;
+                                  btnOpacity = 1;
+                                } else if (isUpdating) {
+                                  btnBg = btn.bg;
+                                  btnColor = btn.color;
+                                  btnBorder = `1.5px solid ${btn.color}`;
+                                  btnOpacity = 1;
+                                }
 
-                              return (
-                                <button
-                                  key={btn.statusVal}
-                                  onClick={async () => {
-                                    if (isDisabled) return;
-                                    const confirmed = await showCustomConfirm({
-                                      title: 'ยืนยันการเปลี่ยนสถานะ',
-                                      message: `คุณต้องการเปลี่ยนสถานะของ Ticket เป็น "${btn.label}" ใช่หรือไม่?`
-                                    });
-                                    if (!confirmed) return;
-                                    
-                                    setStatusUpdating(btn.statusVal);
-                                    try {
-                                      await updateTicketStatus(detailTicket.id, btn.statusVal);
-                                      await loadData(true, true);
-                                      if (reloadTickets) {
-                                        await reloadTickets();
+                                return (
+                                  <button
+                                    key={btn.statusVal}
+                                    onClick={async () => {
+                                      if (isDisabled) return;
+                                      const confirmed = await showCustomConfirm({
+                                        title: 'ยืนยันการเปลี่ยนสถานะ',
+                                        message: `คุณต้องการเปลี่ยนสถานะของ Ticket เป็น "${btn.label}" ใช่หรือไม่?`
+                                      });
+                                      if (!confirmed) return;
+                                      
+                                      setStatusUpdating(btn.statusVal);
+                                      try {
+                                        await updateTicketStatus(detailTicket.id, btn.statusVal);
+                                        await loadData(true, true);
+                                        if (reloadTickets) {
+                                          await reloadTickets();
+                                        }
+                                        addToast(`เปลี่ยนสถานะเป็น "${btn.label}" เรียบร้อยแล้ว`, 'success');
+                                      } catch (err) {
+                                        console.error(err);
+                                        addToast(`เปลี่ยนสถานะล้มเหลว: ${err.message || err}`, 'error');
+                                      } finally {
+                                        setStatusUpdating(null);
                                       }
-                                      addToast(`เปลี่ยนสถานะเป็น "${btn.label}" เรียบร้อยแล้ว`, 'success');
-                                    } catch (err) {
-                                      console.error(err);
-                                      addToast(`เปลี่ยนสถานะล้มเหลว: ${err.message || err}`, 'error');
-                                    } finally {
-                                      setStatusUpdating(null);
-                                    }
-                                  }}
-                                  disabled={isDisabled}
-                                  style={{
-                                    display: 'inline-flex', alignItems: 'center', gap: 8,
-                                    background: btnBg,
-                                    color: btnColor,
-                                    border: btnBorder,
-                                    boxShadow: btnShadow,
-                                    padding: '8px 14px', borderRadius: 8, fontSize: 12, fontWeight: 800,
-                                    opacity: btnOpacity,
-                                    cursor: isDisabled ? 'not-allowed' : 'pointer',
-                                    transition: 'all 0.18s',
-                                    whiteSpace: 'nowrap'
-                                  }}
-                                  onMouseEnter={e => {
-                                    if (!isDisabled && !isCurrent && !isUpdating) {
-                                      e.currentTarget.style.background = btn.bg;
-                                      e.currentTarget.style.color = btn.color;
-                                      e.currentTarget.style.borderColor = btn.color;
-                                      e.currentTarget.style.boxShadow = `0 4px 10px ${btn.color}15`;
-                                    }
-                                  }}
-                                  onMouseLeave={e => {
-                                    if (!isDisabled && !isCurrent && !isUpdating) {
-                                      e.currentTarget.style.background = 'transparent';
-                                      e.currentTarget.style.color = 'var(--text-secondary)';
-                                      e.currentTarget.style.borderColor = 'var(--border-strong)';
-                                      e.currentTarget.style.boxShadow = 'none';
-                                    }
-                                  }}
-                                >
-                                  {isUpdating ? (
-                                    <i className="fa-solid fa-spinner fa-spin"></i>
-                                  ) : (
-                                    <>
-                                      {isCurrent && <i className="fa-solid fa-check" style={{ marginRight: -2 }}></i>}
-                                      <i className={`fa-solid ${btn.icon}`}></i>
-                                    </>
-                                  )}
-                                  <span>{btn.label}{isCurrent ? ' (ปัจจุบัน)' : ''}</span>
-                                </button>
-                              );
-                            })}
+                                    }}
+                                    disabled={isDisabled}
+                                    style={{
+                                      display: 'inline-flex', alignItems: 'center', gap: 8,
+                                      background: btnBg,
+                                      color: btnColor,
+                                      border: btnBorder,
+                                      boxShadow: btnShadow,
+                                      padding: '8px 14px', borderRadius: 8, fontSize: 12, fontWeight: 800,
+                                      opacity: btnOpacity,
+                                      cursor: isDisabled ? 'not-allowed' : 'pointer',
+                                      transition: 'all 0.18s',
+                                      whiteSpace: 'nowrap'
+                                    }}
+                                    onMouseEnter={e => {
+                                      if (!isDisabled && !isCurrent && !isUpdating) {
+                                        e.currentTarget.style.background = btn.bg;
+                                        e.currentTarget.style.color = btn.color;
+                                        e.currentTarget.style.borderColor = btn.color;
+                                        e.currentTarget.style.boxShadow = `0 4px 10px ${btn.color}15`;
+                                      }
+                                    }}
+                                    onMouseLeave={e => {
+                                      if (!isDisabled && !isCurrent && !isUpdating) {
+                                        e.currentTarget.style.background = 'transparent';
+                                        e.currentTarget.style.color = 'var(--text-secondary)';
+                                        e.currentTarget.style.borderColor = 'var(--border-strong)';
+                                        e.currentTarget.style.boxShadow = 'none';
+                                      }
+                                    }}
+                                  >
+                                    {isUpdating ? (
+                                      <i className="fa-solid fa-spinner fa-spin"></i>
+                                    ) : (
+                                      <>
+                                        {isCurrent && <i className="fa-solid fa-check" style={{ marginRight: -2 }}></i>}
+                                        <i className={`fa-solid ${btn.icon}`}></i>
+                                      </>
+                                    )}
+                                    <span>{btn.label}{isCurrent ? ' (ปัจจุบัน)' : ''}</span>
+                                  </button>
+                                );
+                              })}
 
-                            <button
-                              onClick={() => setShowTransferForm(true)}
-                              disabled={!canTransfer || statusUpdating !== null}
-                              style={{
-                                display: 'inline-flex', alignItems: 'center', gap: 6,
-                                background: 'var(--bg-main)',
-                                border: '1px solid var(--border-light)',
-                                color: (!canTransfer || statusUpdating !== null) ? 'var(--text-muted)' : 'var(--text-secondary)',
-                                padding: '8px 14px', borderRadius: 8, fontSize: 12, fontWeight: 800,
-                                opacity: (!canTransfer || statusUpdating !== null) ? 0.4 : 1,
-                                cursor: (!canTransfer || statusUpdating !== null) ? 'not-allowed' : 'pointer',
-                                whiteSpace: 'nowrap'
-                              }}
-                            >
-                              <i className="fa-solid fa-circle-arrow-right"></i> ส่งต่อไปแผนกอื่น
-                            </button>
-                          </>
-                        )}
+                              <button
+                                onClick={() => setShowTransferForm(true)}
+                                disabled={!canTransfer || statusUpdating !== null}
+                                style={{
+                                  display: 'inline-flex', alignItems: 'center', gap: 6,
+                                  background: 'var(--bg-main)',
+                                  border: '1px solid var(--border-light)',
+                                  color: (!canTransfer || statusUpdating !== null) ? 'var(--text-muted)' : 'var(--text-secondary)',
+                                  padding: '8px 14px', borderRadius: 8, fontSize: 12, fontWeight: 800,
+                                  opacity: (!canTransfer || statusUpdating !== null) ? 0.4 : 1,
+                                  cursor: (!canTransfer || statusUpdating !== null) ? 'not-allowed' : 'pointer',
+                                  whiteSpace: 'nowrap'
+                                }}
+                              >
+                                <i className="fa-solid fa-circle-arrow-right"></i> ส่งต่อไปแผนกอื่น
+                              </button>
+                            </>
+                          )}
+                        </div>
                       </div>
-                    </div>
+                    )}
 
                     {/* Bottom Section: Agent Claim/Release */}
                     <div className="detail-control-assignee-wrapper" style={{
@@ -2338,8 +2332,8 @@ export default function TicketDetailModal({ ticket, onClose }) {
                       alignItems: 'flex-start',
                       justifyContent: 'space-between',
                       gap: 12,
-                      borderTop: '1px solid var(--border-light)',
-                      paddingTop: 14,
+                      borderTop: (!isAssigned || isMyCase) ? '1px solid var(--border-light)' : 'none',
+                      paddingTop: (!isAssigned || isMyCase) ? 14 : 0,
                       flexWrap: 'wrap',
                     }}>
                       {/* Agent Profile display */}
@@ -2416,7 +2410,7 @@ export default function TicketDetailModal({ ticket, onClose }) {
                       ) : (
                         <>
                           <div className="detail-control-assignee-buttons" style={{ display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap', justifyContent: 'flex-end', marginTop: 14 }}>
-                            {(detailTicket.assignedTo === currentUser?.name || role === ROLES.ADMIN || role === ROLES.MANAGER) && (
+                            {isMyCase && (
                               <button
                                 onClick={async () => {
                                   if (statusUpdating !== null) return;
