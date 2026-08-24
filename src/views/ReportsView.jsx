@@ -392,7 +392,8 @@ export default function ReportsView() {
                   <YAxis stroke="var(--text-muted)" tickLine={false} />
                   <Tooltip 
                     contentStyle={{ background: '#1e293b', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '12px' }}
-                    itemStyle={{ color: '#fff' }}
+                    labelStyle={{ color: '#fff', fontWeight: 'bold' }}
+                    itemStyle={{ color: '#60a5fa' }}
                   />
                   <Bar dataKey="value" fill="#3b82f6" radius={[8, 8, 0, 0]}>
                     {formattedStatusData.map((entry, index) => (
@@ -422,7 +423,8 @@ export default function ReportsView() {
                   <YAxis stroke="var(--text-muted)" tickLine={false} />
                   <Tooltip 
                     contentStyle={{ background: '#1e293b', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '12px' }}
-                    itemStyle={{ color: '#fff' }}
+                    labelStyle={{ color: '#fff', fontWeight: 'bold' }}
+                    itemStyle={{ color: '#60a5fa' }}
                   />
                   <Bar dataKey="value" fill="#3b82f6" radius={[8, 8, 0, 0]}>
                     {formattedPriorityData.map((entry, index) => (
@@ -462,7 +464,8 @@ export default function ReportsView() {
                   </Pie>
                   <Tooltip 
                     contentStyle={{ background: '#1e293b', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '12px' }}
-                    itemStyle={{ color: '#fff' }}
+                    labelStyle={{ color: '#fff', fontWeight: 'bold' }}
+                    itemStyle={{ color: '#60a5fa' }}
                     formatter={(value) => [`${value} เคส`, 'จำนวน']}
                   />
                   <Legend 
