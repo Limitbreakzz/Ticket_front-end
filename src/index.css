@@ -3704,34 +3704,64 @@ button:active,
   color: var(--text-primary);
 }
 
+/* Invisible click-away overlay when message menu is open (No blur, no dark background) */
+.chat-blur-overlay {
+  position: fixed;
+  inset: 0;
+  background: transparent;
+  z-index: 500;
+  cursor: default;
+}
+
+/* Active bubble effect when long-pressed or menu open */
+.chat-bubble-active-menu {
+  transform: scale(0.97) !important;
+  filter: brightness(0.92) contrast(1.05) !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12) !important;
+  z-index: 503 !important;
+  transition: transform 0.15s ease, filter 0.15s ease, box-shadow 0.15s ease !important;
+}
+
 @media (max-width: 768px) {
   .comment-menu-trigger-btn {
     display: none !important;
   }
+
+  .bubble-wrapper-me .comment-menu-dropdown {
+    right: 0;
+    left: auto;
+  }
+
+  .bubble-wrapper-other .comment-menu-dropdown {
+    left: 0;
+    right: auto;
+  }
 }
 
-/* Dropdown popover container */
+/* Dropdown popover container - Frosted Glass Dark Aesthetic */
 .comment-menu-dropdown {
   position: absolute;
-  bottom: calc(100% + 4px);
+  bottom: calc(100% + 8px);
   right: 0;
-  background: var(--bg-card);
-  border: 1px solid var(--border-light);
-  border-radius: 12px;
-  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3), 0 8px 10px -6px rgba(0, 0, 0, 0.3);
+  background: rgba(30, 41, 59, 0.95);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 14px;
+  box-shadow: 0 20px 40px -8px rgba(0, 0, 0, 0.5), 0 8px 16px -4px rgba(0, 0, 0, 0.3);
   padding: 6px;
   display: flex;
   flex-direction: column;
-  gap: 2px;
-  min-width: 140px;
-  z-index: 50;
+  gap: 3px;
+  min-width: 155px;
+  z-index: 505;
   animation: popoverShow 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
 @keyframes popoverShow {
   from {
     opacity: 0;
-    transform: scale(0.9) translateY(8px);
+    transform: scale(0.85) translateY(10px);
   }
   to {
     opacity: 1;
@@ -3744,29 +3774,30 @@ button:active,
   background: transparent;
   width: 100%;
   text-align: left;
-  padding: 8px 12px;
-  border-radius: 8px;
-  font-size: 12px;
+  padding: 9px 12px;
+  border-radius: 10px;
+  font-size: 13px;
   font-weight: 600;
-  color: var(--text-secondary);
+  color: #f1f5f9;
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
   cursor: pointer;
   transition: all 0.15s ease;
 }
 
 .comment-menu-dropdown button:hover {
-  background: var(--bg-main);
-  color: var(--text-primary);
+  background: rgba(255, 255, 255, 0.12);
+  color: #ffffff;
 }
 
 .comment-menu-dropdown button.delete-action {
-  color: var(--danger) !important;
+  color: #f87171 !important;
 }
 
 .comment-menu-dropdown button.delete-action:hover {
-  background: rgba(239, 68, 68, 0.08) !important;
+  background: rgba(239, 68, 68, 0.18) !important;
+  color: #fca5a5 !important;
 }
 
 /* Premium Inline Editor */

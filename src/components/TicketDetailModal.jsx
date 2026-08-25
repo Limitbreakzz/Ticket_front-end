@@ -441,19 +441,71 @@ export default function TicketDetailModal({ ticket, onClose }) {
   const [editingCommentId, setEditingCommentId] = useState(null);
   const [openMenuCommentId, setOpenMenuCommentId] = useState(null);
   const [menuDirection, setMenuDirection] = useState('up');
-  const [showBottomSheet, setShowBottomSheet] = useState(false);
-  const [menuCommentId, setMenuCommentId] = useState(null);
-  const [menuCommentText, setMenuCommentText] = useState('');
-  
-  const longPressTimers = useRef({});
-  const chatInputRef = useRef(null);
+        
+    const chatInputRef = useRef(null);
   const lastUploadedFileRef = useRef(null);
+
+  const longPressTimerRef = useRef(null);
+  const touchStartPosRef = useRef({ x: 0, y: 0 });
 
   useEffect(() => {
     const closeMenu = () => setOpenMenuCommentId(null);
     document.addEventListener('click', closeMenu);
     return () => document.removeEventListener('click', closeMenu);
   }, []);
+
+  const handleOpenCommentMenu = (item, targetEl) => {
+    if (!item || !item.id) return;
+    const container = chatContainerRef.current;
+    if (targetEl && container) {
+      const rect = targetEl.getBoundingClientRect();
+      const containerRect = container.getBoundingClientRect();
+      const distanceToTop = rect.top - containerRect.top;
+      if (distanceToTop < 110) {
+        setMenuDirection('down');
+      } else {
+        setMenuDirection('up');
+      }
+    } else {
+      setMenuDirection('up');
+    }
+    setOpenMenuCommentId(openMenuCommentId === item.id ? null : item.id);
+  };
+
+  const handleBubbleTouchStart = (item, isCommentDeletable, e) => {
+    if (!isCommentDeletable) return;
+    if (e.touches && e.touches[0]) {
+      touchStartPosRef.current = { x: e.touches[0].clientX, y: e.touches[0].clientY };
+    }
+    const currentTarget = e.currentTarget;
+    if (longPressTimerRef.current) clearTimeout(longPressTimerRef.current);
+    longPressTimerRef.current = setTimeout(() => {
+      handleOpenCommentMenu(item, currentTarget);
+      if (navigator.vibrate) {
+        try { navigator.vibrate(40); } catch (_) {}
+      }
+    }, 380);
+  };
+
+  const handleBubbleTouchMove = (e) => {
+    if (e.touches && e.touches[0] && touchStartPosRef.current) {
+      const moveX = Math.abs(e.touches[0].clientX - touchStartPosRef.current.x);
+      const moveY = Math.abs(e.touches[0].clientY - touchStartPosRef.current.y);
+      if (moveX > 10 || moveY > 10) {
+        if (longPressTimerRef.current) {
+          clearTimeout(longPressTimerRef.current);
+          longPressTimerRef.current = null;
+        }
+      }
+    }
+  };
+
+  const handleBubbleTouchEnd = () => {
+    if (longPressTimerRef.current) {
+      clearTimeout(longPressTimerRef.current);
+      longPressTimerRef.current = null;
+    }
+  };
 
   useEffect(() => {
     if (!commentFile) {
@@ -464,16 +516,7 @@ export default function TicketDetailModal({ ticket, onClose }) {
     setCommentFilePreview(objectUrl);
     return () => URL.revokeObjectURL(objectUrl);
   }, [commentFile]);
-  useEffect(() => {
-    if (showBottomSheet) {
-      document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = '';
-    }
-    return () => {
-      document.body.style.overflow = '';
-    };
-  }, [showBottomSheet]);
+  
   
   
   // Filter for Timeline
@@ -850,27 +893,6 @@ export default function TicketDetailModal({ ticket, onClose }) {
     } catch (err) {
       console.error("Failed to delete comment:", err);
       addToast(`ยกเลิกการส่งข้อความล้มเหลว: ${err.message}`, 'error');
-    }
-  };
-
-  const handleLongPressStart = (commentId, itemText) => (e) => {
-    // Only trigger for own, editable comments
-    const timer = setTimeout(() => {
-      // Trigger long-press vibration feedback if supported
-      if (navigator.vibrate) {
-        navigator.vibrate(50);
-      }
-      setMenuCommentId(commentId);
-      setMenuCommentText(itemText);
-      setShowBottomSheet(true);
-    }, 600); // 600ms threshold
-    longPressTimers.current[commentId] = timer;
-  };
-
-  const handleLongPressEnd = (commentId) => () => {
-    if (longPressTimers.current[commentId]) {
-      clearTimeout(longPressTimers.current[commentId]);
-      delete longPressTimers.current[commentId];
     }
   };
 
@@ -1827,7 +1849,7 @@ export default function TicketDetailModal({ ticket, onClose }) {
                               {(() => {
                                 const isUnsent = item.event === "ยกเลิกการส่งข้อความแล้ว";
                                 return (
-                                  <div className="chat-bubble" style={{
+                                  <div  style={{
                                       background: isUnsent ? 'rgba(0,0,0,0.02)' : ((item.event === "ส่งรูปภาพประกอบ" && item.attachmentUrl) ? 'transparent' : (isMe ? 'linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%)' : 'var(--bg-main)')),
                                       border: isUnsent ? '1px dashed var(--border)' : ((item.event === "ส่งรูปภาพประกอบ" && item.attachmentUrl) ? 'none' : (isMe ? 'none' : '1px solid var(--border-light)')),
                                       borderRadius: isMe ? '12px 0 12px 12px' : '0 12px 12px 12px',
@@ -1844,9 +1866,18 @@ export default function TicketDetailModal({ ticket, onClose }) {
                                       WebkitUserSelect: 'none',
                                       WebkitTouchCallout: 'none'
                                     }}
-                                    onTouchStart={isCommentDeletable ? handleLongPressStart(item.id, item.event) : undefined}
-                                    onTouchEnd={isCommentDeletable ? handleLongPressEnd(item.id) : undefined}
-                                    onTouchMove={isCommentDeletable ? handleLongPressEnd(item.id) : undefined}
+                                    className={`chat-bubble ${openMenuCommentId === item.id ? 'chat-bubble-active-menu' : ''}`}
+                                    onTouchStart={(e) => handleBubbleTouchStart(item, isCommentDeletable, e)}
+                                    onTouchMove={handleBubbleTouchMove}
+                                    onTouchEnd={handleBubbleTouchEnd}
+                                    onTouchCancel={handleBubbleTouchEnd}
+                                    onContextMenu={(e) => {
+                                      if (isCommentDeletable) {
+                                        e.preventDefault();
+                                        e.stopPropagation();
+                                        handleOpenCommentMenu(item, e.currentTarget);
+                                      }
+                                    }}
                                   >
                                     {isUnsent ? (
                                       <span>{isMe ? "คุณได้ยกเลิกการส่งข้อความนี้" : `${item.actor} ได้ยกเลิกการส่งข้อความนี้`}</span>
@@ -3350,160 +3381,7 @@ export default function TicketDetailModal({ ticket, onClose }) {
 
       
 
-      {/* Message Actions Instagram-style Context Overlay for Mobile Long-press */}
-      {showBottomSheet && createPortal(
-        <div 
-          onClick={() => setShowBottomSheet(false)}
-          style={{
-            position: 'fixed',
-            top: 0, left: 0, right: 0, bottom: 0,
-            background: 'rgba(15, 23, 42, 0.45)',
-            backdropFilter: 'blur(16px)',
-            WebkitBackdropFilter: 'blur(16px)',
-            zIndex: 10000,
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            justifyContent: 'center',
-            padding: 20,
-            animation: 'fadeIn 0.25s ease-out'
-          }}
-          className="bottom-sheet-backdrop"
-        >
-          <div 
-            onClick={e => e.stopPropagation()}
-            style={{
-              width: '100%',
-              maxWidth: 300,
-              display: 'flex',
-              flexDirection: 'column',
-              gap: 12,
-              animation: 'scaleUpUp 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)'
-            }}
-          >
-
-            {/* Standout Bubble Preview */}
-            {(() => {
-              const selectedComment = filteredTimeline.find(c => c.id === menuCommentId);
-              const previewAttachmentUrl = selectedComment ? selectedComment.attachmentUrl : null;
-              
-              if (menuCommentText === "ส่งรูปภาพประกอบ" && previewAttachmentUrl) {
-                return (
-                  <div style={{
-                    alignSelf: 'flex-end',
-                    background: 'transparent',
-                    borderRadius: '12px',
-                    padding: '0',
-                    boxShadow: '0 10px 25px rgba(0,0,0,0.15)',
-                    maxWidth: '85%',
-                    overflow: 'hidden'
-                  }}>
-                    <img 
-                      src={previewAttachmentUrl} 
-                      alt="ตัวอย่างรูปภาพ" 
-                      style={{ maxWidth: 180, maxHeight: 150, borderRadius: 12, display: 'block', objectFit: 'cover' }} 
-                    />
-                  </div>
-                );
-              }
-              
-              return menuCommentText !== "ส่งรูปภาพประกอบ" ? (
-                <div style={{
-                  alignSelf: 'flex-end',
-                  background: 'linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%)',
-                  borderRadius: '16px 0px 16px 16px',
-                  padding: '10px 14px',
-                  color: '#ffffff',
-                  fontSize: 13,
-                  fontWeight: 500,
-                  boxShadow: '0 10px 25px rgba(37,99,235,0.25)',
-                  wordBreak: 'break-word',
-                  maxWidth: '85%'
-                }}>
-                  {menuCommentText}
-                </div>
-              ) : null;
-            })()}
-
-            {/* Premium Instagram Menu Container */}
-            <div style={{
-              background: 'var(--bg-card)',
-              border: '1px solid var(--border-light)',
-              borderRadius: 24,
-              padding: '8px 6px',
-              boxShadow: '0 20px 40px -10px rgba(0,0,0,0.3)',
-              display: 'flex',
-              flexDirection: 'column',
-              gap: 2
-            }}>
-              {/* Header Date */}
-              <div style={{
-                padding: '8px 14px 6px 14px',
-                fontSize: 11,
-                color: 'var(--text-muted)',
-                fontWeight: 600,
-                borderBottom: '1px solid var(--border-light)',
-                marginBottom: 4
-              }}>
-                {(() => {
-                  const item = filteredTimeline.find(c => c.id === menuCommentId);
-                  return item ? item.time : 'วันที่แชท';
-                })()}
-              </div>
-
-
-
-              {/* Edit Option */}
-              {menuCommentText !== "ส่งรูปภาพประกอบ" && (
-                <button
-                  type="button"
-                  onClick={() => {
-                    setEditingCommentId(menuCommentId);
-                    setCommentText(menuCommentText);
-                    setShowBottomSheet(false);
-                    setTimeout(() => {
-                      if (chatInputRef.current) {
-                        chatInputRef.current.focus();
-                      }
-                    }, 50);
-                  }}
-                  style={{
-                    display: 'flex', alignItems: 'center', gap: 12, width: '100%', padding: '10px 14px',
-                    borderRadius: 14, border: 'none', background: 'transparent', color: 'var(--text-primary)',
-                    fontSize: 13, fontWeight: 600, cursor: 'pointer', textAlign: 'left', transition: 'background 0.2s'
-                  }}
-                  onMouseEnter={e => e.currentTarget.style.background = 'var(--bg-main)'}
-                  onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
-                >
-                  <i className="fa-solid fa-arrow-rotate-left" style={{ fontSize: 15, width: 20 }} />
-                  <span>แก้ไขข้อความ</span>
-                </button>
-              )}
-
-              {/* Delete Option */}
-              <button
-                type="button"
-                onClick={() => {
-                  setShowBottomSheet(false);
-                  handleDeleteCommentAction(menuCommentId);
-                }}
-                style={{
-                  display: 'flex', alignItems: 'center', gap: 12, width: '100%', padding: '10px 14px',
-                  borderRadius: 14, border: 'none', background: 'transparent', color: 'var(--danger)',
-                  fontSize: 13, fontWeight: 600, cursor: 'pointer', textAlign: 'left', transition: 'background 0.2s'
-                }}
-                onMouseEnter={e => e.currentTarget.style.background = 'var(--bg-main)'}
-                onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
-              >
-                <i className="fa-regular fa-trash-can" style={{ fontSize: 15, width: 20 }} />
-                <span>ยกเลิกการส่ง (ลบข้อความ)</span>
-              </button>
-            </div>
-          </div>
-        </div>,
-        document.body
-      )}
-
+      
     </div>
   );
 }
