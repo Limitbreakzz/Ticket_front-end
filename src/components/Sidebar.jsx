@@ -4,7 +4,6 @@ import { useApp } from '../context/AppContext';
 import { ROLES, ROLE_INFO, NAV_CONFIG } from '../data/mockData';
 import HelpModal from './HelpModal';
 
-
 export default function Sidebar() {
   const { role, activeNav, setActiveNav, logoutUser, currentUser, tickets, showMobileSidebar, setShowMobileSidebar, showHelp, setShowHelp } = useApp();
   const [showRoleDropdown, setShowRoleDropdown] = useState(false);
@@ -42,8 +41,6 @@ export default function Sidebar() {
             <span className="sidebar-logo-title">Ticket Hub</span>
           </div>
         </div>
-
-
 
       {/* Nav */}
       <nav className="sidebar-nav">

@@ -116,7 +116,7 @@ export default function LoginView() {
         }
       `}</style>
 
-      {/* ── Left Column: Dark Navy Wavy Showcase Panel (Desktop Only) ── */}
+      {/* Left Column: Dark Navy Wavy Showcase Panel (Desktop Only) */}
       <div 
         className="auth-showcase-panel"
         style={{
@@ -193,7 +193,7 @@ export default function LoginView() {
         </div>
       </div>
 
-      {/* ── Right Column: Off-White App Background Form Panel ── */}
+      {/* Right Column: OffWhite App Background Form Panel */}
       <div 
         className="auth-form-container"
         style={{

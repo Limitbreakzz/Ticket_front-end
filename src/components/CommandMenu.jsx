@@ -31,7 +31,7 @@ export default function CommandMenu({
 	const selectedRef = useRef(selected);
 	selectedRef.current = selected;
 
-	/** Geometry of the highlight that slides between items */
+	// * Geometry of the highlight that slides between items
 	const [highlight, setHighlight] = useState();
 	const [highlightMoves, setHighlightMoves] = useState(false);
 	const itemRefs = useRef([]);

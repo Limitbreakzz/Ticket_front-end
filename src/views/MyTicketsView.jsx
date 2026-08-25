@@ -66,7 +66,7 @@ export default function MyTicketsView({ filterOverride, titleOverride, defaultTa
     }
   };
 
-  // ── หาชื่อแผนกของ user ปัจจุบัน ──
+  // หาชื่อแผนกของ user ปัจจุบัน
   // backend อาจส่งมาเป็น: department.name | departmentName | department (string)
   const ourDept =
     currentUser?.department?.name ||
@@ -93,7 +93,7 @@ export default function MyTicketsView({ filterOverride, titleOverride, defaultTa
   );
 
   // 3) Ticket ที่แผนกเราส่งออก (sourceDept = ourDept)
-  //    ADMIN เห็นทุก ticket (ไม่มีแผนกเฉพาะ)
+  // ADMIN เห็นทุก ticket (ไม่มีแผนกเฉพาะ)
   const outboundTickets = isAdmin
     ? baseTickets
     : ourDept
@@ -101,7 +101,7 @@ export default function MyTicketsView({ filterOverride, titleOverride, defaultTa
       : [];
 
   // 4) Ticket ทั้งหมดของแผนก (targetDept = ourDept)
-  //    ADMIN เห็นทุก ticket
+  // ADMIN เห็นทุก ticket
   const inboundTickets = isAdmin
     ? baseTickets
     : ourDept
@@ -175,7 +175,6 @@ export default function MyTicketsView({ filterOverride, titleOverride, defaultTa
           })}
         </div>
       )}
-
 
       <AnimatePresence mode="wait">
         {deptTab === 'wait-approve' ? (

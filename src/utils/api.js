@@ -7,7 +7,7 @@ const getApiBaseUrl = () => {
 };
 const API_BASE_URL = getApiBaseUrl();
 
-// ── JWT TOKEN HELPERS ──
+// JWT TOKEN HELPERS
 export const getToken = () => localStorage.getItem('jwt_token');
 export const setToken = (token) => localStorage.setItem('jwt_token', token);
 export const removeToken = () => localStorage.removeItem('jwt_token');
@@ -44,8 +44,7 @@ export function resolveImageUrl(url) {
   return url;
 }
 
-// ── BIDIRECTIONAL MAPPINGS ──
-
+// BIDIRECTIONAL MAPPINGS
 // Categories
 const CATEGORY_FE_TO_BE = {
   hardware: 'HARDWARE',
@@ -144,8 +143,7 @@ const STATUS_BE_TO_FE = {
   CANCELLED: 'cancelled',
 };
 
-// ── UTILITIES ──
-
+// UTILITIES
 export async function apiFetch(endpoint, options = {}) {
   const url = `${API_BASE_URL}${endpoint}`;
 
@@ -185,8 +183,7 @@ export async function apiFetch(endpoint, options = {}) {
   return res.json();
 }
 
-// ── FILE UPLOAD ──
-
+// FILE UPLOAD
 export async function uploadFile(file) {
   const formData = new FormData();
   formData.append('file', file);
@@ -198,8 +195,7 @@ export async function uploadFile(file) {
   return res.data.url;
 }
 
-// ── AUTHENTICATION ──
-
+// AUTHENTICATION
 export async function login(username, password) {
   const res = await apiFetch('/auth/login', {
     method: 'POST',
@@ -218,7 +214,9 @@ export async function logout() {
   removeToken();
   try {
     await apiFetch('/auth/logout', { method: 'POST' });
-  } catch { /* ignore */ }
+  } catch {
+    // ignore
+  }
 }
 
 export async function getMe() {
@@ -229,10 +227,7 @@ export async function getMe() {
   return res.data;
 }
 
-
-
-// ── DEPARTMENTS ──
-
+// DEPARTMENTS
 export async function getDepartments(force = false) {
   const cached = sessionStorage.getItem('cached_api_departments');
   const cachedTime = sessionStorage.getItem('cached_api_departments_time');
@@ -251,8 +246,7 @@ export async function getManagers() {
   return (res.data || []).filter(u => u.role === 'MANAGER');
 }
 
-// ── TICKETS ──
-
+// TICKETS
 export function formatThaiDateTime(dateString) {
   if (!dateString) return '—';
   return new Date(dateString).toLocaleString('th-TH', {
@@ -530,8 +524,7 @@ export async function fetchUsers() {
   return res.data || [];
 }
 
-// ── NOTIFICATIONS ──
-
+// NOTIFICATIONS
 export async function fetchNotifications() {
   const res = await apiFetch('/notifications');
   return (res.data || []).map(n => {
@@ -563,7 +556,7 @@ export async function markNotificationAsRead(id = null) {
   });
 }
 
-// ── ADMIN USER MANAGEMENT ──
+// ADMIN USER MANAGEMENT
 export async function adminFetchUsers() {
   const res = await apiFetch('/admin/users');
   return res.data || [];
@@ -591,7 +584,7 @@ export async function adminDeleteUser(id) {
   });
 }
 
-// ── ADMIN DEPARTMENT MANAGEMENT ──
+// ADMIN DEPARTMENT MANAGEMENT
 export async function adminFetchDepartments() {
   const res = await apiFetch('/admin/departments');
   return res.data || [];
@@ -619,14 +612,13 @@ export async function adminDeleteDepartment(id) {
   });
 }
 
-// ── ADMIN ANALYTICS ──
+// ADMIN ANALYTICS
 export async function fetchAnalytics() {
   const res = await apiFetch('/admin/analytics');
   return res.data;
 }
 
-
-// ── WEBHOOK MANAGEMENT ──
+// WEBHOOK MANAGEMENT
 export async function fetchWebhooks() {
   const res = await apiFetch('/webhooks');
   return res.data || [];

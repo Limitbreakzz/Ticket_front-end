@@ -6,8 +6,6 @@ import { initSocket, disconnectSocket, parsePayload } from '../utils/socket';
 
 const AppContext = createContext(null);
 
-
-
 export function AppProvider({ children }) {
   const [role, setRole]             = useState(ROLES.EMPLOYEE);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -208,14 +206,46 @@ export function AppProvider({ children }) {
     });
   }, []);
 
+  // Helper to decode JWT payload safely
+  const decodeJwtPayload = (token) => {
+    try {
+      const parts = token.split('.');
+      if (parts.length !== 3) return null;
+      const base64 = parts[1].replace(/-/g, '+').replace(/_/g, '/');
+      const jsonPayload = decodeURIComponent(
+        atob(base64)
+          .split('')
+          .map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
+          .join('')
+      );
+      return JSON.parse(jsonPayload);
+    } catch {
+      return null;
+    }
+  };
+
   // Check existing session on mount (no auto-login)
   useEffect(() => {
     async function initSession() {
+      const token = getToken();
       // No JWT token in localStorage = not logged in, skip all
-      if (!getToken()) {
+      if (!token) {
         setAuthLoading(false);
         return;
       }
+
+      const decoded = decodeJwtPayload(token);
+      // If token is malformed or expired, clear and return
+      if (!decoded || (decoded.exp && decoded.exp * 1000 < Date.now())) {
+        removeToken();
+        sessionStorage.clear();
+        setIsLoggedIn(false);
+        setAuthLoading(false);
+        return;
+      }
+
+      const roleMap = { USER: ROLES.EMPLOYEE, MANAGER: ROLES.MANAGER, ADMIN: ROLES.ADMIN };
+      const verifiedTokenRole = roleMap[decoded.role] || ROLES.EMPLOYEE;
 
       try {
         // Check cache first to avoid server loading on rapid F5 refreshes
@@ -228,22 +258,25 @@ export function AppProvider({ children }) {
         const cachedTime = sessionStorage.getItem('cached_time');
 
         const now = Date.now();
-        // If cache exists and is less than 10 seconds old
-        const isCacheValid = cachedUser && cachedRole && cachedTime && (now - Number(cachedTime) < 10_000);
+        // If cache exists, role matches verified JWT token, and is less than 10 seconds old
+        const isCacheValid = cachedUser && cachedRole === verifiedTokenRole && cachedTime && (now - Number(cachedTime) < 10_000);
 
         if (isCacheValid) {
-          setCurrentUser(JSON.parse(cachedUser));
-          setRole(cachedRole);
-          setIsLoggedIn(true);
-          
-          if (cachedTickets) setTickets(JSON.parse(cachedTickets));
-          if (cachedNotifs) setNotifications(JSON.parse(cachedNotifs));
-          if (cachedDepts) setDepts(JSON.parse(cachedDepts));
-          if (cachedManagers) setManagers(JSON.parse(cachedManagers));
-          
-          lastFetchRef.current = Number(cachedTime);
-          setAuthLoading(false);
-          return; // Skip API calls
+          const parsedUser = JSON.parse(cachedUser);
+          if (parsedUser && (parsedUser.id === decoded.id || parsedUser.username === decoded.username)) {
+            setCurrentUser(parsedUser);
+            setRole(verifiedTokenRole);
+            setIsLoggedIn(true);
+            
+            if (cachedTickets) setTickets(JSON.parse(cachedTickets));
+            if (cachedNotifs) setNotifications(JSON.parse(cachedNotifs));
+            if (cachedDepts) setDepts(JSON.parse(cachedDepts));
+            if (cachedManagers) setManagers(JSON.parse(cachedManagers));
+            
+            lastFetchRef.current = Number(cachedTime);
+            setAuthLoading(false);
+            return; // Skip API calls
+          }
         }
       } catch (e) {
         console.error('Failed to parse session storage cache', e);
@@ -252,8 +285,7 @@ export function AppProvider({ children }) {
       try {
         const me = await api.getMe();
         setCurrentUser(me);
-        const roleMap = { USER: ROLES.EMPLOYEE, MANAGER: ROLES.MANAGER, ADMIN: ROLES.ADMIN };
-        const userRole = roleMap[me.role] || ROLES.EMPLOYEE;
+        const userRole = roleMap[me.role] || verifiedTokenRole || ROLES.EMPLOYEE;
         setRole(userRole);
         setIsLoggedIn(true);
         
@@ -283,10 +315,6 @@ export function AppProvider({ children }) {
       });
 
       if (socket) {
-        if (socket.connected) {
-          setUseWs(true);
-        }
-
         socket.on('connect', () => {
           setUseWs(true);
         });
@@ -338,7 +366,7 @@ export function AppProvider({ children }) {
           }
         });
 
-        socket.on('comment:created', (data) => {
+        socket.on('comment:created', () => {
           loadData(false, true); // Reload dashboard in real-time
         });
 
@@ -508,7 +536,7 @@ export function AppProvider({ children }) {
 
   // Login
   const loginUser = useCallback(async (username, password) => {
-    const data = await api.login(username, password);
+    await api.login(username, password);
     const me = await api.getMe();
     setCurrentUser(me);
     const roleMap = { USER: ROLES.EMPLOYEE, MANAGER: ROLES.MANAGER, ADMIN: ROLES.ADMIN };
@@ -531,7 +559,11 @@ export function AppProvider({ children }) {
   // Logout
   const logoutUser = useCallback(async () => {
     removeToken(); // Remove JWT from localStorage first
-    try { await api.logout(); } catch { /* ignore */ }
+    try {
+      await api.logout();
+    } catch {
+      // ignore
+    }
     disconnectSocket(); // Disconnect real-time sockets
     setIsLoggedIn(false);
     setCurrentUser(null);
@@ -609,12 +641,8 @@ export function AppProvider({ children }) {
   }, [addToast, loadData]);
 
   const updateTicketStatus = useCallback(async (id, status, note = '') => {
-    try {
-      await api.updateTicketStatus(id, status, note);
-      await loadData(false, true); // Force-refresh after mutation
-    } catch (err) {
-      throw err; // Rethrow to let the caller (Modal) display the specific error/success toasts
-    }
+    await api.updateTicketStatus(id, status, note);
+    await loadData(false, true); // Force-refresh after mutation
   }, [loadData]);
 
   const approveTicket = useCallback(async (id, approved, note = '') => {

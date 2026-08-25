@@ -6,8 +6,7 @@ import { SLABadge } from './SLAComponents';
 import PageSizeDropdown from './PageSizeDropdown';
 import { smoothScrollToTop } from '../utils/scroll';
 
-
-/* ─── Custom Dropdown ────────────────────────────────── */
+// Custom Dropdown
 function CustomDropdown({ id, icon, label, value, onChange, options, placeholder }) {
   const [open, setOpen] = useState(false);
   const ref = useRef(null);
@@ -175,10 +174,8 @@ function CustomDropdown({ id, icon, label, value, onChange, options, placeholder
     </div>
   );
 }
-/* ──────────────────────────────────────────────────── */
 
-
-/* ─── Mobile Custom Choice Selector (Dropdown replacement) ─────────────────── */
+// Mobile Custom Choice Selector (Dropdown replacement)
 function MobileCustomSelect({ value, onChange, options, placeholder, icon }) {
   const [open, setOpen] = useState(false);
   const ref = useRef(null);
@@ -320,7 +317,6 @@ function MobileCustomSelect({ value, onChange, options, placeholder, icon }) {
     </div>
   );
 }
-/* ──────────────────────────────────────────────────── */
 
 // Helper component for rendering agent avatars in the table
 function TableAvatar({ name, avatarUrl }) {
@@ -383,10 +379,6 @@ export default function TicketTable({ tickets, title = 'รายการ Ticke
   const dataSectionRef = useRef(null);
   const isMounted = useRef(false);
 
-
-
-
-
   useEffect(() => {
     if (pageInput !== String(currentPage)) {
       Promise.resolve().then(() => {
@@ -448,8 +440,6 @@ export default function TicketTable({ tickets, title = 'รายการ Ticke
     const matchCompleted = !hideCompleted || !['resolved', 'closed', 'cancelled'].includes(t.status) || statusFilter === t.status;
     return matchSearch && matchStatus && matchUrgency && matchCat && matchCompleted && t.receiverManager != null;
   }).length;
-
-
 
   const handleSearchChange = (e) => {
     setSearch(e.target.value);
@@ -542,11 +532,9 @@ export default function TicketTable({ tickets, title = 'รายการ Ticke
     );
   };
 
-
-
   return (
     <div ref={dataSectionRef}>
-      {/* ─── DESKTOP ONLY LAYOUT ─── */}
+      {/* DESKTOP ONLY LAYOUT */}
       <div className="desktop-only-layout">
         <div className="table-card" style={{ border: '1px solid var(--border-light)', boxShadow: 'var(--shadow-sm)' }}>
           {/* Redesigned Premium Toolbar */}

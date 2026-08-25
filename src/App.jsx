@@ -36,8 +36,7 @@ import { renderTextWithIcons } from './utils/render';
 import ToastNotification from './components/ToastNotification';
 import './index.css';
 
-
-// ── Toast notifications ──
+// Toast notifications
 function ToastContainer() {
   const { toasts, removeToast } = useApp();
   
@@ -61,7 +60,7 @@ function ToastContainer() {
   );
 }
 
-// ── Placeholder for pages not yet built ──
+// Placeholder for pages not yet built
 function PlaceholderView({ title, icon }) {
   return (
     <div className="view-placeholder">
@@ -72,7 +71,7 @@ function PlaceholderView({ title, icon }) {
   );
 }
 
-// ── Topbar ──
+// Topbar
 function Topbar({ onCreateTicket }) {
   const { role, activeNav, setActiveNav, notifications, clearAllNotifications, markNotifAsRead, openTicketDetail, currentUser, setShowMobileSidebar, theme, setTheme, logoutUser, setShowHelp } = useApp();
   const info = ROLE_INFO[role];
@@ -116,8 +115,6 @@ function Topbar({ onCreateTicket }) {
 
   return (
     <header className="topbar">
-
-
 
       <div className="topbar-brand" onClick={() => setActiveNav('dashboard')} style={{ cursor: 'pointer' }}>
         <div className="topbar-logo-icon">
@@ -412,7 +409,7 @@ function Topbar({ onCreateTicket }) {
   );
 }
 
-// ── Helper: when user clicks "แจ้งเรื่อง" nav item, open the modal ──
+// Helper: when user clicks "แจ้งเรื่อง" nav item, open the modal
 function CreateTicketRedirect({ onOpen, onRedirect }) {
   useEffect(() => {
     onOpen();
@@ -421,7 +418,7 @@ function CreateTicketRedirect({ onOpen, onRedirect }) {
   return null;
 }
 
-// ── Main router ──
+// Main router
 function MainContent() {
   const { activeNav, setActiveNav, activeTicketId, closeTicketDetail, showCreateModal, setShowCreateModal, ticketsLoading } = useApp();
   const { tickets } = useApp();
@@ -463,7 +460,6 @@ function MainContent() {
         return <MyTicketsView defaultTab="outbound" titleOverride="Ticket ที่แผนกเราส่งไป" />;
       case 'all-dept-tickets':
         return <MyTicketsView defaultTab="inbound" titleOverride="Ticket ทั้งหมดของแผนก" />;
-
 
       case 'create-ticket': {
         // Open the modal and redirect to my-tickets (track)
@@ -547,8 +543,7 @@ function MainContent() {
   );
 }
 
-
-// ── Root ──
+// Root
 function AppShell() {
   const { isLoggedIn, authLoading, activeNav } = useApp();
 

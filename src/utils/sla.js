@@ -1,12 +1,5 @@
-/**
- * SLA Utility — HelpdeskPro
- * ─────────────────────────
- * SLA deadline (business hours) per urgency level.
- * "Business hours" = 08:00–17:00, Mon–Fri.
- *
- * For the demo we treat all time as calendar hours (simpler, still meaningful).
- */
-
+// SLA Utility — HelpdeskPro
+// SLA deadline per urgency level
 export const SLA_POLICY = {
   critical: { hours: 4,   label: '4 ชั่วโมง',    desc: 'วิกฤต! ต้องแก้ไขภายใน 4 ชม.' },
   high:     { hours: 8,   label: '8 ชั่วโมง',    desc: 'เร่งด่วน! ต้องแก้ไขภายใน 8 ชม.' },
@@ -24,10 +17,7 @@ export const SLA_RESPONSE_POLICY = {
 // Ticket statuses that are "closed" (SLA no longer counts)
 export const CLOSED_STATUSES = new Set(['resolved', 'closed', 'rejected']);
 
-/**
- * Parse a Thai date string like "28 พ.ค. 2567, 08:30"
- * into a JS Date (Buddhist year → Gregorian year).
- */
+// Parse a Thai date string into a JS Date
 const THAI_MONTHS = {
   'ม.ค.': 0, 'ก.พ.': 1, 'มี.ค.': 2, 'เม.ย.': 3,
   'พ.ค.': 4, 'มิ.ย.': 5, 'ก.ค.': 6, 'ส.ค.': 7,
@@ -46,9 +36,7 @@ export function parseThaiDate(str) {
   return new Date(year, month, parseInt(day), parseInt(hour), parseInt(min));
 }
 
-/**
- * Format a duration in hours to a human-readable string.
- */
+// Format a duration in hours to a humanreadable string.
 export function formatDuration(hours) {
   if (hours < 1)       return `${Math.round(hours * 60)} นาที`;
   if (hours < 24)      return `${hours.toFixed(1)} ชั่วโมง`;
@@ -57,13 +45,7 @@ export function formatDuration(hours) {
   return `${(days / 30).toFixed(1)} วัน`;
 }
 
-/**
- * Core SLA calculator.
- *
- * @param {object} ticket  — ticket object with `urgency`, `createdAt`, `updatedAt`, `status`
- * @param {Date}   now     — current time (injectable for testing)
- * @returns {object} SLA info
- */
+// Core SLA calculator
 export function calcSLA(ticket, now = new Date()) {
   const createdDate = ticket.rawCreatedAt 
     ? new Date(ticket.rawCreatedAt) 
@@ -181,7 +163,7 @@ export function calcResponseSLA(ticket, now = new Date()) {
   };
 }
 
-/** Display config per slaStatus */
+// * Display config per slaStatus
 export const SLA_STATUS_CONFIG = {
   'not-started': { label: 'รอรับงาน (ยังไม่นับ)', color: '#6366f1', bg: 'rgba(99, 102, 241, 0.08)', icon: 'clock' },
   'on-track': { label: 'ยังอยู่ในเกณฑ์', color: '#2563eb', bg: 'rgba(37, 99, 235, 0.12)', icon: 'check' },
@@ -191,9 +173,7 @@ export const SLA_STATUS_CONFIG = {
   'missed':   { label: 'เสร็จเกินกำหนด', color: '#64748b', bg: 'rgba(100, 116, 139, 0.12)', icon: 'circle-xmark' },
 };
 
-/**
- * Format the deadline date to a readable Thai-style string.
- */
+// Format the deadline date to a readable Thaistyle string.
 export function formatDeadline(date) {
   if (!date) return '—';
   return date.toLocaleString('th-TH', {
@@ -202,7 +182,7 @@ export function formatDeadline(date) {
   });
 }
 
-/** Aggregate SLA stats from a list of tickets */
+// * Aggregate SLA stats from a list of tickets
 export function aggregateSLAStats(tickets) {
   const active   = tickets.filter(t => !CLOSED_STATUSES.has(t.status));
   const closed   = tickets.filter(t => CLOSED_STATUSES.has(t.status));

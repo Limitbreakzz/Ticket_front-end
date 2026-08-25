@@ -1,4 +1,4 @@
-// ── ROLES ──
+// ROLES
 export const ROLES = {
   EMPLOYEE: 'employee',
   MANAGER: 'manager',
@@ -32,7 +32,7 @@ export const ROLE_INFO = {
   },
 };
 
-// ── NAV_CONFIG ──
+// NAVCONFIG
 export const NAV_CONFIG = {
   [ROLES.EMPLOYEE]: [
     {
@@ -108,7 +108,7 @@ export const NAV_CONFIG = {
   ],
 };
 
-// ── CATEGORIES ──
+// CATEGORIES
 export const CATEGORIES = {
   hardware: {
     label: 'ฮาร์ดแวร์ / อุปกรณ์',
@@ -137,7 +137,7 @@ export const CATEGORIES = {
   },
 };
 
-// ── URGENCY ──
+// URGENCY
 export const URGENCY_LEVELS = [
   { value: 'low',      label: 'ต่ำ',     icon: 'circle-check',        color: '#16a34a' },
   { value: 'medium',   label: 'ปานกลาง', icon: 'circle-minus',        color: '#d97706' },
@@ -145,7 +145,7 @@ export const URGENCY_LEVELS = [
   { value: 'critical', label: 'วิกฤต',  icon: 'triangle-exclamation', color: '#7c3aed' },
 ];
 
-// ── STATUSES (Factory Context) ──
+// STATUSES (Factory Context)
 export const STATUS_LABEL = {
   pending:      { label: 'รอดำเนินการ',    cls: 'status-pending',      icon: 'clock' },
   progress:     { label: 'กำลังแก้ไข',     cls: 'status-progress',     icon: 'spinner' },
@@ -158,7 +158,7 @@ export const STATUS_LABEL = {
   cancelled:    { label: 'ยกเลิก',          cls: 'status-cancelled',   icon: 'ban' },
 };
 
-// ── DEPARTMENTS ──
+// DEPARTMENTS
 export const DEPARTMENTS = [
   'ฝ่ายผลิต 1',
   'ฝ่ายบรรจุภัณฑ์',
@@ -172,7 +172,7 @@ export const DEPARTMENTS = [
   'ฝ่ายซ่อมบำรุง',
 ];
 
-// ── MOCK TICKETS ──
+// MOCK TICKETS
 let idCounter = 9;
 export const generateId = () => {
   idCounter++;

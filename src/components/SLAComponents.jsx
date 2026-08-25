@@ -18,9 +18,7 @@ const RESOLUTION_SLA_LABELS = {
   'missed': 'เสร็จเกินกำหนด',
 };
 
-/**
- * Compact inline SLA badge — used in ticket tables.
- */
+// Compact inline SLA badge — used in ticket tables.
 export function SLABadge({ ticket }) {
   // A ticket is considered acknowledged if it has an agent assigned or status is not pending/new
   const isAcknowledged = (ticket.assignedTo && ticket.assignedTo !== 'รอมอบหมาย') || !['pending', 'new', 'wait-approve'].includes(ticket.status);
@@ -74,9 +72,7 @@ export function SLABadge({ ticket }) {
   }
 }
 
-/**
- * Progress bar strip — shows % of SLA consumed.
- */
+// Progress bar strip — shows % of SLA consumed.
 export function SLABar({ ticket, showLabel = true, showBottomLabel = true, stackLabel = false }) {
   // A ticket is considered acknowledged if it has an agent assigned or status is not pending/new
   const isAcknowledged = (ticket.assignedTo && ticket.assignedTo !== 'รอมอบหมาย') || !['pending', 'new', 'wait-approve'].includes(ticket.status);
@@ -141,9 +137,7 @@ export function SLABar({ ticket, showLabel = true, showBottomLabel = true, stack
   );
 }
 
-/**
- * Full SLA detail block — used in ticket detail modal.
- */
+// Full SLA detail block — used in ticket detail modal.
 export function SLADetail({ ticket }) {
   const slaRes = calcSLA(ticket);
   const slaResp = calcResponseSLA(ticket);

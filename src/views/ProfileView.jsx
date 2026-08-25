@@ -208,7 +208,7 @@ export default function ProfileView() {
       color: 'var(--text-primary)'
     }}>
       
-      {/* ── Top Header Avatar Card ── */}
+      {/* Top Header Avatar Card */}
       <div style={{
         background: 'var(--bg-card)',
         border: '1px solid var(--border-light)',
@@ -311,7 +311,7 @@ export default function ProfileView() {
         </div>
       </div>
 
-      {/* ── Form Section ── */}
+      {/* Form Section */}
       <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
         
         {/* 1. Personal Information Card */}
@@ -358,8 +358,6 @@ export default function ProfileView() {
               }}></i>
             </div>
           </div>
-
-
 
           {/* Email (Disabled) */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
@@ -481,7 +479,7 @@ export default function ProfileView() {
 
       </form>
 
-      {/* ── Image Cropping Modal (Drag & Zoom) ── */}
+      {/* Image Cropping Modal (Drag & Zoom) */}
       {cropSrc && createPortal(
         <div className="modal-overlay" style={{
           zIndex: 11000,

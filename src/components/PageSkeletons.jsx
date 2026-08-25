@@ -1,4 +1,4 @@
-// ─── 1. Dashboard Skeleton ───
+// 1. Dashboard Skeleton
 export function DashboardSkeleton() {
   return (
     <div className="view-container" style={{ maxWidth: 1200, margin: '0 auto', display: 'flex', flexDirection: 'column', gap: 24 }}>
@@ -130,7 +130,7 @@ export function DashboardSkeleton() {
   );
 }
 
-// ─── 2. Tickets List Skeleton ───
+// 2. Tickets List Skeleton
 export function TicketsSkeleton() {
   return (
     <div className="view-container" style={{ maxWidth: 1200, margin: '0 auto', display: 'flex', flexDirection: 'column', gap: 24 }}>
@@ -239,7 +239,7 @@ export function TicketsSkeleton() {
   );
 }
 
-// ─── 3. Approval View Skeleton ───
+// 3. Approval View Skeleton
 export function ApprovalSkeleton() {
   return (
     <div className="view-container" style={{ maxWidth: 1200, margin: '0 auto', display: 'flex', flexDirection: 'column', gap: 24 }}>
@@ -284,7 +284,7 @@ export function ApprovalSkeleton() {
   );
 }
 
-// ─── 4. SLA View Skeleton ───
+// 4. SLA View Skeleton
 export function SLASkeleton() {
   return (
     <div className="view-container" style={{ maxWidth: 1200, margin: '0 auto', display: 'flex', flexDirection: 'column', gap: 24 }}>
@@ -346,7 +346,7 @@ export function SLASkeleton() {
   );
 }
 
-// ─── 5. Profile View Skeleton ───
+// 5. Profile View Skeleton
 export function ProfileSkeleton() {
   return (
     <div className="view-container" style={{ maxWidth: 800, margin: '0 auto', display: 'flex', flexDirection: 'column', gap: 24 }}>
@@ -375,7 +375,7 @@ export function ProfileSkeleton() {
   );
 }
 
-// ─── 6. Reports View Skeleton ───
+// 6. Reports View Skeleton
 export function ReportsSkeleton() {
   const isMobile = typeof window !== 'undefined' ? window.innerWidth <= 768 : false;
 
@@ -498,7 +498,7 @@ export function ReportsSkeleton() {
   );
 }
 
-// ─── 7. Table Skeleton ───
+// 7. Table Skeleton
 export function TableSkeleton({ cols = 5, rows = 5 }) {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', width: '100%' }}>

@@ -92,7 +92,7 @@ export default function DashboardView() {
       padding: isMobile ? '12px 12px 36px 12px' : '24px'
     }}>
 
-      {/* ── Hero / Greeting ── */}
+      {/* Hero / Greeting */}
       <div className="hero-section" style={{ position: 'relative', overflow: 'hidden' }}>
         
         {/* Background SVG — gradient + subtle grid only */}
@@ -213,7 +213,7 @@ export default function DashboardView() {
         </div>
       </div>
 
-      {/* ── KPI Cards ── */}
+      {/* KPI Cards */}
       <div className="dashboard-summary-grid">
 
         {/* KPI 1: Ticket ทั้งหมด */}
@@ -320,8 +320,7 @@ export default function DashboardView() {
 
       </div>
 
-
-      {/* ── Main Split Layout Section ── */}
+      {/* Main Split Layout Section */}
       <div className="dashboard-main-grid" style={{ gap: 24, alignItems: 'stretch' }}>
         
         {/* Left Side: งานของแผนก (Primary Action Panel) */}
@@ -502,7 +501,6 @@ export default function DashboardView() {
         </div>
 
       </div>
-
 
     </div>
   );

@@ -182,8 +182,6 @@ export default function ReportsView() {
     .map(name => ({ name, value: agentMap[name] }))
     .sort((a, b) => b.value - a.value);
 
-
-
   return (
     <div style={{ position: 'relative', minHeight: '450px', paddingBottom: '24px', paddingLeft: isMobile ? '8px' : 0, paddingRight: isMobile ? '8px' : 0 }}>
       {/* Title */}

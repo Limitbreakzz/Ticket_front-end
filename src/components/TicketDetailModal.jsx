@@ -546,7 +546,6 @@ export default function TicketDetailModal({ ticket, onClose }) {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-
   const [statusUpdating, setStatusUpdating] = useState(null);
   
   // Department list for transfers
@@ -602,7 +601,7 @@ export default function TicketDetailModal({ ticket, onClose }) {
     return () => {
       active = false;
     };
-    /* eslint-disable-next-line react-hooks/exhaustive-deps */
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [ticket.id]);
 
   // Real-time WebSocket listener & background polling for ticket detail updates
@@ -1001,7 +1000,7 @@ export default function TicketDetailModal({ ticket, onClose }) {
     }} className="full-screen-detail-view">
 
       
-      {/* ── Main Body Container ── */}
+      {/* Main Body Container */}
       <div className="detail-body-container" style={{ padding: '24px', display: 'flex', flexDirection: 'column', gap: 24, width: '100%', flex: 1 }}>
         
         {/* 1. Workflow Progress Steps */}
@@ -2187,7 +2186,6 @@ export default function TicketDetailModal({ ticket, onClose }) {
                       <i className="fa-solid fa-paper-plane" style={{ fontSize: 11 }}></i>
                     </button>
 
-
                   </div>
 
                 </form>
@@ -2792,7 +2790,6 @@ export default function TicketDetailModal({ ticket, onClose }) {
           )
         )}
 
-
       </div>
 
       {showTransferForm && createPortal(
@@ -3377,7 +3374,6 @@ export default function TicketDetailModal({ ticket, onClose }) {
         </div>,
         document.body
       )}
-
 
       
 

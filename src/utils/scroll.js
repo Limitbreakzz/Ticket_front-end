@@ -1,8 +1,4 @@
-/**
- * Smoothly scrolls an element to the top over a custom duration (in ms).
- * @param {HTMLElement} element - The scroll container element
- * @param {number} duration - Animation duration in milliseconds
- */
+// Smoothly scrolls an element to the top over a custom duration (in ms)
 export function smoothScrollToTop(element, duration = 250) {
   if (!element) return;
   const start = element.scrollTop;

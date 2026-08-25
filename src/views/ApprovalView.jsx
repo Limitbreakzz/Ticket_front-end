@@ -559,7 +559,7 @@ export default function ApprovalView({ isEmbedded = false }) {
           </div>
         </div>
       ) : (
-        /* Mobile search card header — matching SLA and ticket list */
+        // Mobile search card header — matching SLA and ticket list
         <div className="mobile-header-search-card" style={{
           background: 'var(--bg-card)',
           border: '1px solid var(--border-light)',
@@ -1180,8 +1180,6 @@ export default function ApprovalView({ isEmbedded = false }) {
           )
         )}
       </div>
-
-
 
       {actionTicket && (
         <div style={{

@@ -168,7 +168,7 @@ export default function TicketFormModal({ onClose }) {
       <form onSubmit={handleSubmit} className="modal" role="dialog" aria-modal="true" aria-labelledby="form-modal-title"
         style={{ maxWidth: 620, display: 'flex', flexDirection: 'column' }}>
 
-        {/* ── Header ── */}
+        {/* Header */}
         <div className="modal-header">
           <div className="modal-title-wrap">
             <div className="modal-icon-title">
@@ -186,7 +186,7 @@ export default function TicketFormModal({ onClose }) {
           </button>
         </div>
 
-        {/* ── Body ── */}
+        {/* Body */}
         <div className="modal-body">
             <div className="form-grid">
 
@@ -271,7 +271,7 @@ export default function TicketFormModal({ onClose }) {
 
               {/* Conditional Department or Manager selection */}
               {form.sendType === 'dept' ? (
-                /* Department Dropdown */
+                // Department Dropdown
                 <div className="form-group" style={{ position: 'relative' }} ref={deptDropdownRef}>
                   <label className="form-label">
                     <i className="fa-solid fa-building" style={{ marginRight: 6, color: 'var(--primary)' }} aria-hidden="true"></i>
@@ -420,7 +420,7 @@ export default function TicketFormModal({ onClose }) {
                   )}
                 </div>
               ) : (
-                /* Manager Dropdown */
+                // Manager Dropdown
                 <div className="form-group" style={{ position: 'relative' }} ref={managerDropdownRef}>
                   <label className="form-label">
                     <i className="fa-solid fa-user-tie" style={{ marginRight: 6, color: 'var(--primary)' }} aria-hidden="true"></i>
@@ -565,8 +565,7 @@ export default function TicketFormModal({ onClose }) {
                 </div>
               )}
 
-
-              {/* ── Category Card Grid ── */}
+              {/* Category Card Grid */}
               <div className="form-group">
                 <label className="form-label">
                   <i className="fa-solid fa-tags" style={{ marginRight: 6, color: 'var(--primary)' }} aria-hidden="true"></i>
@@ -638,7 +637,7 @@ export default function TicketFormModal({ onClose }) {
                 )}
               </div>
 
-              {/* ── Subcategory Pill Buttons ── */}
+              {/* Subcategory Pill Buttons */}
               {form.category && subOptions.length > 0 && (
                 <div className="form-group">
                   <label className="form-label">
@@ -715,7 +714,7 @@ export default function TicketFormModal({ onClose }) {
                 )}
               </div>
 
-              {/* ── Urgency ── */}
+              {/* Urgency */}
               <div className="form-group">
                 <label className="form-label">
                   <i className="fa-solid fa-gauge-high" style={{ marginRight: 6, color: 'var(--primary)' }} aria-hidden="true"></i>
@@ -765,7 +764,7 @@ export default function TicketFormModal({ onClose }) {
                 )}
               </div>
 
-              {/* ── File Upload (Multi-image grid layout) ── */}
+              {/* File Upload (Multiimage grid layout) */}
               <div className="form-group">
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
                   <label className="form-label" style={{ margin: 0 }}>
@@ -790,7 +789,7 @@ export default function TicketFormModal({ onClose }) {
 
                 {/* Conditional rendering for File Attachment */}
                 {files.length === 0 ? (
-                  /* Large Dropzone Area when no files attached yet */
+                  // Large Dropzone Area when no files attached yet
                   <div
                     className={`upload-area${drag ? ' drag-over' : ''}`}
                     onClick={() => fileRef.current?.click()}
@@ -820,7 +819,7 @@ export default function TicketFormModal({ onClose }) {
                     </div>
                   </div>
                 ) : (
-                  /* Grid List Layout once 1 or more files are attached */
+                  // Grid List Layout once 1 or more files are attached
                   <>
                     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 10 }}>
                       {files.map((f, idx) => {
@@ -1002,7 +1001,7 @@ export default function TicketFormModal({ onClose }) {
             </div>
           </div>
 
-          {/* ── Footer ── */}
+          {/* Footer */}
           <div className="modal-footer">
             <button type="button" className="btn btn-ghost" onClick={onClose}>
               <i className="fa-solid fa-xmark" style={{ marginRight: 6 }} aria-hidden="true"></i>

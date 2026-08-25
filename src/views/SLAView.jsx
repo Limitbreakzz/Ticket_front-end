@@ -27,7 +27,7 @@ const URGENCY_TH = { low: 'ต่ำ', medium: 'ปานกลาง', high: '�
 const URGENCY_COLOR = { low: '#16a34a', medium: '#d97706', high: '#ef4444', critical: '#7c3aed' };
 const STATUS_TH = { new: 'ใหม่', open: 'เปิด', 'in-progress': 'กำลังดำเนินการ', pending: 'รออนุมัติ', resolved: 'แก้ไขแล้ว', closed: 'ปิด', rejected: 'ปฏิเสธ' };
 
-// ── Circular gauge for SLA compliance rate ──
+// Circular gauge for SLA compliance rate
 function SLAGauge({ value }) {
   const r = 44, cx = 54, cy = 54, sw = 10;
   const circ = 2 * Math.PI * r;
@@ -48,7 +48,7 @@ function SLAGauge({ value }) {
   );
 }
 
-// ── Small stat pill ──
+// Small stat pill
 function SLAStat({ icon, label, value, color, bg, border }) {
   return (
     <div className="stat-card" style={{
@@ -371,7 +371,6 @@ export default function SLAView() {
   const [pendingCatFilter, setPendingCatFilter] = useState('');
   const [pendingHideCompleted, setPendingHideCompleted] = useState(false);
 
-
   const myDeptName = currentUser?.department?.name || currentUser?.departmentName || (typeof currentUser?.department === 'string' ? currentUser.department : null);
 
   const deptFilteredTickets = tickets.filter(t => {
@@ -490,8 +489,6 @@ export default function SLAView() {
   const dataSectionRef = useRef(null);
   const isMounted = useRef(false);
 
-
-
   useEffect(() => {
     if (pageInput !== String(currentPage)) {
       Promise.resolve().then(() => {
@@ -545,7 +542,7 @@ export default function SLAView() {
 
   return (
     <div ref={dataSectionRef} style={{ maxWidth: 1200, margin: '0 auto', display: 'flex', flexDirection: 'column', gap: 24 }}>
-      {/* ─── DESKTOP ONLY LAYOUT ─── */}
+      {/* DESKTOP ONLY LAYOUT */}
       <div className="desktop-only-layout" style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
         {/* Desktop Header */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
@@ -656,7 +653,7 @@ export default function SLAView() {
         </div>
       </div>
 
-      {/* ─── MOBILE ONLY LAYOUT (Original Header, Policies & Stats) ─── */}
+      {/* MOBILE ONLY LAYOUT (Original Header, Policies & Stats) */}
       <div className="mobile-only-layout">
         {/* Header */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8, flexWrap: 'wrap', gap: 12 }}>
@@ -822,7 +819,7 @@ export default function SLAView() {
         </div>
       </div>
 
-      {/* ─── DESKTOP ONLY: SLA Table ─── */}
+      {/* DESKTOP ONLY: SLA Table */}
       <div className="desktop-only-layout">
         <div className="table-card" style={{ overflow: 'hidden' }}>
           {/* Desktop Toolbar */}
@@ -1157,7 +1154,7 @@ export default function SLAView() {
         </div>{/* /table-card */}
       </div>{/* /desktop-only-layout */}
 
-      {/* ─── MOBILE ONLY LAYOUT ─── */}
+      {/* MOBILE ONLY LAYOUT */}
       <div className="mobile-only-layout">
         {/* Mobile sticky header — same structure as TicketTable */}
         <div className="mobile-header-search-card" style={{
@@ -1624,7 +1621,7 @@ export default function SLAView() {
         )}
       </div>
 
-      {/* ─── Mobile Filter Bottom Sheet ─── */}
+      {/* Mobile Filter Bottom Sheet */}
       {createPortal(
         <>
           {/* Backdrop */}
@@ -1832,7 +1829,6 @@ export default function SLAView() {
       </>,
       document.body
     )}
-
 
     </div>
   );

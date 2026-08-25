@@ -322,7 +322,6 @@ export default function HelpModal({ onClose }) {
           )}
         </div>
 
-
       </div>
     </div>
   );
