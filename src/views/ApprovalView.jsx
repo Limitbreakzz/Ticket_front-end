@@ -567,9 +567,7 @@ export default function ApprovalView({ isEmbedded = false }) {
           margin: '12px 0 16px 0',
           padding: '16px',
           boxShadow: 'var(--shadow-sm)',
-          position: 'sticky',
-          top: 12,
-          zIndex: 100,
+          zIndex: 10,
           display: 'flex',
           flexDirection: 'column',
           gap: 12,
@@ -739,9 +737,10 @@ export default function ApprovalView({ isEmbedded = false }) {
           flexDirection: 'column', 
           gap: 10, 
           marginBottom: 24, 
-          maxHeight: '450px', 
-          overflowY: 'auto', 
-          paddingRight: 6 
+          maxHeight: isMobile ? '380px' : '480px',
+          overflowY: 'auto',
+          paddingRight: 6,
+          paddingBottom: 4
         }}>
           {filteredPending.map(t => {
             const catInfo = CATEGORIES[t.category];
@@ -832,7 +831,7 @@ export default function ApprovalView({ isEmbedded = false }) {
             </div>
           </div>
         ) : isMobile ? (
-          <div className="mobile-only-cards" style={{ display: 'flex', flexDirection: 'column', gap: 12, padding: '0 0 12px 0', maxHeight: '500px', overflowY: 'auto', paddingRight: 4 }}>
+          <div className="mobile-only-cards" style={{ display: 'flex', flexDirection: 'column', gap: 12, padding: '0 0 12px 0', paddingRight: 4 }}>
             {paginatedHistory.map(t => {
               const catInfo = CATEGORIES[t.category];
               const statusInfo = STATUS_LABEL[t.status] || { label: t.status, cls: 'status-pending' };
