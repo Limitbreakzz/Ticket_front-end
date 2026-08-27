@@ -320,15 +320,25 @@ export function SLASkeleton() {
           </div>
         </div>
 
-        {/* Right Side: 4 KPI Cards Grid */}
-        <div className="dashboard-summary-grid" style={{ flex: 1 }}>
-          {[1, 2, 3, 4].map(i => (
-            <div key={i} className="kpi-card" style={{ padding: '16px 20px', background: 'var(--bg-card)', border: '1px solid var(--border-light)', borderRadius: '16px', minHeight: '110px', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+        {/* Right Side: 6 KPI Cards in 3x2 Grid */}
+        <div style={{ flex: '2 1 650px', display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 16 }}>
+          {[1, 2, 3, 4, 5, 6].map(i => (
+            <div key={i} className="table-card" style={{
+              padding: '16px 20px',
+              background: 'var(--bg-card)',
+              border: '1.5px solid var(--border-light)',
+              borderRadius: '12px',
+              minHeight: '90px',
+              display: 'flex',
+              flexDirection: 'column',
+              justifyContent: 'space-between',
+              boxShadow: 'var(--shadow-sm)'
+            }}>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%' }}>
-                <div className="skeleton-shimmer" style={{ width: '60px', height: '12px', borderRadius: '3px' }} />
-                <div className="skeleton-shimmer" style={{ width: '30px', height: '30px', borderRadius: '8px' }} />
+                <div className="skeleton-shimmer" style={{ width: '80px', height: '13px', borderRadius: '3px' }} />
+                <div className="skeleton-shimmer" style={{ width: '32px', height: '32px', borderRadius: '8px' }} />
               </div>
-              <div className="skeleton-shimmer" style={{ width: '40px', height: '24px', borderRadius: '4px' }} />
+              <div className="skeleton-shimmer" style={{ width: '45px', height: '24px', borderRadius: '4px', marginTop: 8 }} />
             </div>
           ))}
         </div>

@@ -29,10 +29,21 @@ const STATUS_TH = { new: 'ใหม่', open: 'เปิด', 'in-progress': '�
 
 // Circular gauge for SLA compliance rate
 function SLAGauge({ value }) {
+  const [animatedVal, setAnimatedVal] = useState(0);
+
+  useEffect(() => {
+    setAnimatedVal(0);
+    const timeout = setTimeout(() => {
+      setAnimatedVal(value);
+    }, 50);
+    return () => clearTimeout(timeout);
+  }, [value]);
+
   const r = 44, cx = 54, cy = 54, sw = 10;
   const circ = 2 * Math.PI * r;
-  const offset = circ - (value / 100) * circ;
-  const color = value >= 90 ? '#10b981' : value >= 70 ? '#f59e0b' : '#ef4444';
+  const offset = circ - (animatedVal / 100) * circ;
+  const color = animatedVal >= 90 ? '#10b981' : animatedVal >= 70 ? '#f59e0b' : '#ef4444';
+
   return (
     <svg width="108" height="108" viewBox="0 0 108 108">
       <circle cx={cx} cy={cy} r={r} fill="none" stroke="var(--bg-main)" strokeWidth={sw} />
@@ -40,9 +51,13 @@ function SLAGauge({ value }) {
         cx={cx} cy={cy} r={r} fill="none" stroke={color} strokeWidth={sw}
         strokeDasharray={circ} strokeDashoffset={offset}
         strokeLinecap="round"
-        style={{ transform: 'rotate(-90deg)', transformOrigin: `${cx}px ${cy}px`, transition: 'stroke-dashoffset 1s ease' }}
+        style={{
+          transform: 'rotate(-90deg)',
+          transformOrigin: `${cx}px ${cy}px`,
+          transition: 'stroke-dashoffset 1.4s cubic-bezier(0.16, 1, 0.3, 1), stroke 0.5s ease'
+        }}
       />
-      <text x={cx} y={cy - 6} textAnchor="middle" fontSize="22" fontWeight="800" fill="var(--text-primary)">{value}%</text>
+      <text x={cx} y={cy - 6} textAnchor="middle" fontSize="22" fontWeight="800" fill="var(--text-primary)">{Math.round(animatedVal)}%</text>
       <text x={cx} y={cy + 12} textAnchor="middle" fontSize="10" fill="var(--text-muted)">อัตราผ่าน</text>
     </svg>
   );
